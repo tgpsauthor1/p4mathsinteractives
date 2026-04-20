@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>p4maths_t2_pp2_18</title>
+<style>
+  :root{
+    --bg:#f7f8fb;
+    --card:#ffffff;
+    --text:#162033;
+    --muted:#5b657a;
+    --primary:#1f5fbf;
+    --primary-weak:#eaf2ff;
+    --accent:#f59e0b;
+    --accent-weak:#fff5df;
+    --good:#11633d;
+    --bad:#a63b2e;
+    --border:#d7deea;
+    --shadow:0 6px 20px rgba(0,0,0,0.08);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 18px;
+  }
+  .topbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .title{
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight:700;
+  }
+  .controls{display:flex; gap:10px; flex-wrap:wrap;}
+  button{
+    font: inherit;
+    border:none;
+    border-radius: 14px;
+    padding: 14px 16px;
+    cursor:pointer;
+    touch-action: manipulation;
+  }
+  .btn{
+    background:var(--primary);
+    color:white;
+    box-shadow: var(--shadow);
+  }
+  .btn.secondary{
+    background:#eef3fb;
+    color:var(--text);
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow: var(--shadow);
+    padding:18px;
+  }
+  .question-panel{
+    margin-bottom:14px;
+    display:none;
+  }
+  .question-panel.show{display:block;}
+  .question-text{
+    font-size: clamp(20px, 3.3vw, 26px);
+    line-height:1.45;
+    white-space: pre-line;
+  }
+  .meta{
+    color:var(--muted);
+    font-size: 15px;
+  }
+  .screen-counter{
+    margin-bottom:10px;
+    color:var(--muted);
+    font-weight:700;
+  }
+  .action-box{
+    background: var(--primary-weak);
+    border:2px solid var(--primary);
+    border-radius:16px;
+    padding:16px;
+    font-size: clamp(22px, 3.8vw, 30px);
+    font-weight:700;
+    line-height:1.35;
+    margin-bottom:14px;
+  }
+  .explain-box{
+    background: var(--accent-weak);
+    border:2px solid var(--accent);
+    border-radius:16px;
+    padding:12px 14px;
+    font-size: clamp(17px, 2.6vw, 21px);
+    margin-bottom:14px;
+    line-height:1.45;
+  }
+  .response-area{margin-top:6px;}
+  .options{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:12px;
+    margin:10px 0 0;
+  }
+  .option{
+    border:2px solid var(--border);
+    background:white;
+    color:var(--text);
+    text-align:left;
+    font-size: clamp(18px, 3vw, 24px);
+    padding:16px 18px;
+    border-radius:16px;
+    min-height:58px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  }
+  .option.selected{
+    border-color:var(--primary);
+    background:var(--primary-weak);
+    box-shadow: 0 0 0 3px rgba(31,95,191,.08);
+  }
+  .option.correct-choice{
+    border-color: var(--good);
+    background: #eef9f2;
+  }
+  .option.wrong-choice{
+    border-color: var(--bad);
+    background: #fff0ed;
+  }
+  input[type="number"], input[type="text"], input{
+    width: 100%;
+    max-width: 420px;
+    font: inherit;
+    font-size: clamp(26px, 4.5vw, 32px);
+    padding: 18px 18px;
+    border:2px solid var(--border);
+    border-radius:16px;
+    margin:8px 0 12px;
+  }
+  .main-input{
+    width: 100%;
+    max-width: 440px;
+    min-height: 66px;
+  }
+  .row-input{
+    width: 100%;
+    min-width: 86px;
+    max-width: none;
+    min-height: 60px;
+    font-size: clamp(22px, 3.5vw, 28px);
+    padding: 12px 10px;
+    margin: 0;
+  }
+  .input-wrap{
+    max-width: 460px;
+  }
+  .visual-panel{
+    background:#f8fafc;
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    margin:10px 0 14px;
+  }
+  .visual-title{
+    font-size: clamp(18px, 2.8vw, 22px);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .group-grid{
+    display:grid;
+    gap:10px;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  }
+  .pair-box, .count-box{
+    background:white;
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:12px 10px;
+    text-align:center;
+  }
+  .pair-legs{
+    font-size: clamp(22px, 4vw, 28px);
+    margin-bottom:6px;
+  }
+  .pair-text{
+    font-size: clamp(16px, 2.4vw, 18px);
+    color:var(--muted);
+    font-weight:700;
+  }
+  .bird-groups{
+    display:grid;
+    gap:12px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    align-items:start;
+  }
+  .group-card{
+    background:white;
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+  }
+  .group-card strong{
+    display:block;
+    font-size: clamp(18px, 2.8vw, 22px);
+    margin-bottom:8px;
+  }
+  .emoji-line{
+    font-size: clamp(26px, 4vw, 34px);
+    line-height:1.35;
+    letter-spacing:2px;
+    word-break: break-word;
+  }
+  .highlight-birds{
+    background:#fff5df;
+    border-color:var(--accent);
+  }
+  .check-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-top:10px;
+  }
+  .feedback{
+    min-height: 64px;
+    margin-top:14px;
+    font-size: clamp(18px, 3vw, 22px);
+    line-height:1.45;
+    padding: 14px 16px;
+    border-radius:16px;
+    background:#f3f6fb;
+    border:1px solid var(--border);
+  }
+  .feedback.good{
+    background:#eef9f2;
+    border-color:#ccebd7;
+  }
+  .feedback.hint{
+    background:#fff9eb;
+    border-color:#f4d48b;
+  }
+  .nav{
+    margin-top:14px;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .table-row{
+    width:100%;
+    border-collapse: collapse;
+    margin-top:10px;
+    font-size: clamp(16px, 2.5vw, 21px);
+  }
+  .table-row th, .table-row td{
+    border:2px solid var(--border);
+    padding:10px 8px;
+    text-align:center;
+  }
+  .table-row th{
+    background:#eef3fb;
+  }
+  .unknown{color:var(--muted);}
+  .small{
+    font-size: clamp(15px, 2.4vw, 18px);
+    color:var(--muted);
+  }
+  .anim-box{
+    display:flex;
+    gap:18px;
+    align-items:center;
+    flex-wrap:wrap;
+    justify-content:center;
+    padding:16px;
+    background:#f8fafc;
+    border:2px dashed var(--border);
+    border-radius:16px;
+    margin-top:6px;
+  }
+  .animal-card{
+    min-width:140px;
+    padding:16px;
+    border-radius:18px;
+    border:2px solid var(--border);
+    text-align:center;
+    background:white;
+  }
+  .animal-name{
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .legs{
+    font-size: clamp(18px, 3vw, 24px);
+  }
+  .arrow{
+    font-size: clamp(32px, 6vw, 54px);
+    font-weight:700;
+  }
+
+  .swap-scene{
+    display:grid;
+    gap:14px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    align-items:stretch;
+  }
+  .swap-card{
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    text-align:center;
+  }
+  .swap-emoji{
+    font-size: clamp(36px, 6vw, 54px);
+    line-height:1.2;
+    margin-bottom:6px;
+  }
+  .swap-legs{
+    font-size: clamp(18px, 3vw, 24px);
+    font-weight:700;
+  }
+  .legs-change{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:10px;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight:700;
+  }
+  .minus-two{
+    color:var(--bad);
+    background:#fff0ed;
+    border:2px solid #f1b8ae;
+    border-radius:16px;
+    padding:10px 14px;
+    animation:pulseSoft 1.6s ease-in-out infinite;
+  }
+  .swap-grid{
+    display:grid;
+    gap:12px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    margin-top:12px;
+  }
+  .swap-step{
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+    text-align:center;
+    animation: floatSoft 2.4s ease-in-out infinite;
+  }
+  .swap-step:nth-child(odd){ animation-delay: .2s; }
+  .swap-step:nth-child(even){ animation-delay: .8s; }
+  .swap-step .mini{
+    font-size: clamp(24px, 4vw, 30px);
+    margin-bottom:4px;
+  }
+  .swap-step .caption{
+    font-size: clamp(14px, 2.4vw, 17px);
+    color:var(--muted);
+    font-weight:700;
+  }
+  .bird-total-panel{
+    display:grid;
+    gap:12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top:10px;
+  }
+  .count-badge{
+    display:inline-block;
+    margin-top:8px;
+    font-size: clamp(18px, 3vw, 24px);
+    font-weight:700;
+    background:#eef3fb;
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:8px 12px;
+  }
+  @keyframes pulseSoft{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.06); }
+  }
+  @keyframes floatSoft{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-4px); }
+  }
+  .row-strip{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap:8px;
+    margin-top:10px;
+  }
+  .cell{
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    background:#fafcff;
+    min-height:72px;
+  }
+  .cell-label{
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .cell-value{
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight:700;
+  }
+  .sort-list{
+    display:grid;
+    gap:10px;
+    margin-top:10px;
+  }
+  .sort-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px;
+    border:2px solid var(--border);
+    border-radius:14px;
+    background:#fff;
+    font-size: clamp(18px, 3vw, 22px);
+  }
+  .sort-item select{
+    font: inherit;
+    font-size: clamp(16px, 2.8vw, 20px);
+    padding:8px 10px;
+    border-radius:10px;
+    border:2px solid var(--border);
+  }
+  @media (max-width: 760px){
+    .row-strip{grid-template-columns: 1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="title">Cats and Birds Interactive</div>
+    <div class="controls">
+      <button class="btn secondary" id="toggleQuestionBtn" type="button">Show question</button>
+      <button class="btn secondary" id="speakBtn" type="button">Read aloud</button>
+      <button class="btn secondary" id="resetBtn" type="button">Restart</button>
+    </div>
+  </div>
+
+  <div class="card question-panel" id="questionPanel">
+    <div class="question-text" id="questionText"></div>
+    <div class="meta">Use the question whenever you need to check what the problem is asking.</div>
+  </div>
+
+  <div class="screen-counter" id="screenCounter"></div>
+
+  <div class="card" id="app"></div>
+</div>
+
+<script>
+(() => {
+  const questionText = `Peter drew 48 cats and birds on the whiteboard.
+He counted 128 legs altogether.
+How many birds did he draw?
+A cat has 4 legs. A bird has 2 legs.`;
+
+  const state = {
+    screenIndex: 0,
+    showQuestion: false,
+    selected: null,
+    inputValue: "",
+    multiSelected: [],
+    orderMap: {},
+    answers: {
+      row1Cats: null,
+      row1BirdLegs: null,
+      row1CatLegs: null,
+      row1TotalLegs: null,
+      row2Cats: null,
+      row2BirdLegs: null,
+      row2CatLegs: null,
+      row2TotalLegs: null,
+      extraLegs: null,
+      numChanges: null,
+      finalBirds: null,
+      finalCats: null,
+      finalBirdLegs: null,
+      finalCatLegs: null,
+      finalTotalLegs: null,
+      finalReportType: null,
+      finalReportValue: null
+    },
+    feedback: "",
+    feedbackType: "",
+    sortAnswers: {}
+  };
+
+  document.getElementById("questionText").textContent = questionText;
+
+  const shuffle = (arr, key) => {
+    if (!state.orderMap[key]) {
+      const clone = [...arr];
+      for (let i = clone.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [clone[i], clone[j]] = [clone[j], clone[i]];
+      }
+      state.orderMap[key] = clone;
+    }
+    return state.orderMap[key];
+  };
+
+  const screens = [
+    {
+      id: "findTarget",
+      render: () => optionScreen({
+        action: "What do we need to find?",
+        options: shuffle([
+          {id:"birds", label:"number of birds"},
+          {id:"cats", label:"number of cats"},
+          {id:"legs", label:"number of legs"}
+        ], "s1"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "birds") next("Yes. Keep that in mind.", "good");
+          else setFeedback("Look again at the question sentence. What does it ask Peter to find?", "hint");
+        }
+      })
+    },
+    {
+      id: "matchFacts",
+      render: () => matchScreen()
+    },
+    {
+      id: "rowCheckNeed",
+      render: () => optionScreen({
+        action: "The question says there are 128 legs altogether. If we try one row, what must we be able to check?",
+        options: shuffle([
+          {id:"totallegs", label:"the total number of legs"},
+          {id:"colour", label:"the colour of the animals"},
+          {id:"drawing", label:"Peter’s drawing"},
+          {id:"board", label:"the size of the whiteboard"}
+        ], "s3"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "totallegs") next("Yes. Each row must help us check the total number of legs.", "good");
+          else setFeedback("Look at the words “128 legs altogether”. What must each row help us check?", "hint");
+        }
+      })
+    },
+    {
+      id: "row1NeedCats",
+      render: () => optionScreen({
+        action: "Let’s try Row 1. Start with 24 birds.\nIf there are 48 animals altogether, what do we need to find next?",
+        extra: rowStrip({birds:24, cats:"?", birdLegs:"?", catLegs:"?", totalLegs:"?"}),
+        options: shuffle([
+          {id:"cats", label:"number of cats"},
+          {id:"birdlegs", label:"bird legs"},
+          {id:"totallegs", label:"total legs"}
+        ], "s4"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "cats") next("Yes. First we need the number of cats.", "good");
+          else setFeedback("The animals must make 48 altogether. What goes with birds?", "hint");
+        }
+      })
+    },
+    {
+      id: "row1Cats",
+      render: () => inputScreen({
+        action: "If there are 24 birds, how many cats are there?",
+        extra: rowStrip({birds:24, cats:"__", birdLegs:"?", catLegs:"?", totalLegs:"?"}),
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 24) {
+            state.answers.row1Cats = 24;
+            next("Good. Now we know the two animal numbers in this row.", "good");
+          } else setFeedback("Birds and cats must add up to 48.", "hint");
+        }
+      })
+    },
+    {
+      id: "row1BirdLegLink",
+      render: () => optionScreen({
+        action: "Now that we know the number of birds, what can we work out from that?",
+        extra: rowStrip({birds:24, cats:24, birdLegs:"?", catLegs:"?", totalLegs:"?"}),
+        options: shuffle([
+          {id:"birdlegs", label:"bird legs"},
+          {id:"totallegs", label:"total legs"},
+          {id:"answer", label:"answer"}
+        ], "s6"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "birdlegs") next("Yes. We can work out the bird legs.", "good");
+          else setFeedback("Each bird has 2 legs. What does that help us find?", "hint");
+        }
+      })
+    },
+    {
+      id: "row1BirdLegs",
+      render: () => inputScreen({
+        action: "How many bird legs are there?",
+        explain: "Use the number of birds and 2 legs for each bird.",
+        extra: rowStrip({birds:24, cats:24, birdLegs:"__", catLegs:"?", totalLegs:"?"}),
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 48) {
+            state.answers.row1BirdLegs = 48;
+            next("Good. Now do the same for the cats.", "good");
+          } else setFeedback("Use the number of birds and 2 legs for each bird.", "hint");
+        }
+      })
+    },
+    {
+      id: "row1CatLegLink",
+      render: () => optionScreen({
+        action: "Now that we know the number of cats, what can we work out from that?",
+        extra: rowStrip({birds:24, cats:24, birdLegs:48, catLegs:"?", totalLegs:"?"}),
+        options: shuffle([
+          {id:"catlegs", label:"cat legs"},
+          {id:"totallegs", label:"total legs"},
+          {id:"answer", label:"answer"}
+        ], "s8"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "catlegs") next("Yes. We can work out the cat legs.", "good");
+          else setFeedback("Each cat has 4 legs. What does that help us find?", "hint");
+        }
+      })
+    },
+    {
+      id: "row1CatLegs",
+      render: () => inputScreen({
+        action: "How many cat legs are there?",
+        explain: "Use the number of cats and 4 legs for each cat.",
+        extra: rowStrip({birds:24, cats:24, birdLegs:48, catLegs:"__", totalLegs:"?"}),
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 96) {
+            state.answers.row1CatLegs = 96;
+            next("Good. Now we have both parts.", "good");
+          } else setFeedback("Use the number of cats and 4 legs for each cat.", "hint");
+        }
+      })
+    },
+    {
+      id: "row1TotalLink",
+      render: () => optionScreen({
+        action: "We now know the bird legs and the cat legs. What can we find next?",
+        extra: rowStrip({birds:24, cats:24, birdLegs:48, catLegs:96, totalLegs:"?"}),
+        options: shuffle([
+          {id:"totallegs", label:"total legs"},
+          {id:"answer", label:"answer"},
+          {id:"morebirds", label:"more birds"}
+        ], "s10"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "totallegs") next("Yes. Now we can find the total legs.", "good");
+          else setFeedback("What do we get when we put both leg totals together?", "hint");
+        }
+      })
+    },
+    {
+      id: "row1TotalLegs",
+      render: () => inputScreen({
+        action: "How many legs altogether?",
+        extra: rowStrip({birds:24, cats:24, birdLegs:48, catLegs:96, totalLegs:"__"}),
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 144) {
+            state.answers.row1TotalLegs = 144;
+            next("Now check this row against the question.", "good");
+          } else setFeedback("Add the bird legs and cat legs.", "hint");
+        }
+      })
+    },
+    {
+      id: "row1Check128",
+      render: () => optionScreen({
+        action: "The question says 128 legs altogether. Does Row 1 have too many legs, too few legs, or the right number?",
+        extra: rowStrip({birds:24, cats:24, birdLegs:48, catLegs:96, totalLegs:144}),
+        options: shuffle([
+          {id:"toomany", label:"too many"},
+          {id:"toofew", label:"too few"},
+          {id:"right", label:"right number"}
+        ], "s12"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "toomany") next("Good. That tells us what to do next.", "good");
+          else setFeedback("Compare this row’s total legs with 128.", "hint");
+        }
+      })
+    },
+    {
+      id: "patternVisual",
+      render: () => infoScreen({
+        action: "Watch this change carefully.",
+        explain: "We are not answering yet. We are just watching what happens when 1 cat is exchanged for 1 bird.",
+        extra: swapAnimationVisual(),
+        buttonText: "I can see the change"
+      })
+    },
+    {
+      id: "row2NeedCats",
+      render: () => optionScreen({
+        action: "Now try 25 birds. If there are 48 animals altogether, what do we need to find next?",
+        extra: rowStrip({birds:25, cats:"?", birdLegs:"?", catLegs:"?", totalLegs:"?"}),
+        options: shuffle([
+          {id:"cats", label:"number of cats"},
+          {id:"birdlegs", label:"bird legs"},
+          {id:"totallegs", label:"total legs"}
+        ], "s14"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "cats") next("Yes. First find the cats.", "good");
+          else setFeedback("The animals must still make 48 altogether.", "hint");
+        }
+      })
+    },
+    {
+      id: "row2FullRow",
+      render: () => fullRowInputScreen({
+        action: "Complete Row 2.",
+        explain: "Work across the row in order: cats, bird legs, cat legs, total legs.",
+        birds: 25,
+        catsKey: "row2Cats",
+        birdLegsKey: "row2BirdLegs",
+        catLegsKey: "row2CatLegs",
+        totalLegsKey: "row2TotalLegs",
+        expected: {cats:23, birdLegs:50, catLegs:92, totalLegs:142},
+        hints: {
+          cats: "Birds and cats must add up to 48.",
+          birdLegs: "Each bird has 2 legs.",
+          catLegs: "Each cat has 4 legs.",
+          totalLegs: "Add the two leg totals."
+        },
+        success: "Good. You completed the row."
+      })
+    },
+    {
+      id: "rowCompare",
+      render: () => optionScreen({
+        action: "Compare the total legs in Row 2 with Row 1. What happened?",
+        extra: `
+          ${rowTableCompare()}
+        `,
+        options: shuffle([
+          {id:"down2", label:"the total legs went down by 2"},
+          {id:"up2", label:"the total legs went up by 2"},
+          {id:"same", label:"the total legs stayed the same"}
+        ], "s16"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "down2") next("Good. Keep that pattern.", "good");
+          else setFeedback("Look at the total-legs box in each row.", "hint");
+        }
+      })
+    },
+    {
+      id: "extraLegs",
+      render: () => inputScreen({
+        action: "Row 2 still has too many legs. How many extra legs does Row 2 have?",
+        extra: rowStrip({birds:25, cats:23, birdLegs:50, catLegs:92, totalLegs:142}),
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 14) {
+            state.answers.extraLegs = 14;
+            next("Good. Keep that extra number.", "good");
+          } else setFeedback("Compare Row 2 total legs with 128. How many more legs does Row 2 have?", "hint");
+        }
+      })
+    },
+    {
+      id: "chooseSentence",
+      render: () => infoScreen({
+        action: "Row 2 has 14 extra legs.",
+        explain: "Each exchange of 1 cat for 1 bird removes 2 legs. Watch how 14 extra legs can be cleared 2 legs at a time.",
+        extra: whySevenVisual(),
+        buttonText: "Show the swaps"
+      })
+    },
+    {
+      id: "numChanges",
+      render: () => inputScreen({
+        action: "How many cat-to-bird exchanges are needed?",
+        explain: "Count the swap cards. Each swap removes 2 legs.",
+        extra: swapsCountVisual(),
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 7) {
+            state.answers.numChanges = 7;
+            next("Good. Now use the 7 exchanges to update the birds.", "good");
+          } else setFeedback("Count the swap cards. Each card is 1 exchange.", "hint");
+        }
+      })
+    },
+    {
+      id: "finalBirds",
+      render: () => inputScreen({
+        action: "Row 2 has 25 birds. The 7 exchanges make 7 more birds. How many birds are there now?",
+        extra: finalBirdsVisual() + rowStrip({birds:"__", cats:"?", birdLegs:"?", catLegs:"?", totalLegs:"?"}),
+        explain: "Count the 25 birds first. Then count the 7 new birds.",
+        value: state.inputValue,
+        onInput: v => { state.inputValue = v; },
+        onCheck: () => {
+          const v = numVal(state.inputValue);
+          if (v === null) return setFeedback("Type your answer first.", "hint");
+          if (v === 32) {
+            state.answers.finalBirds = 32;
+            next("Good. Now complete the row.", "good");
+          } else setFeedback("Use the picture. Count 25 birds and then 7 more birds.", "hint");
+        }
+      })
+    },
+    {
+      id: "finalRow",
+      render: () => fullRowInputScreen({
+        action: "Complete the final row.",
+        explain: "Work across the row in order: cats, bird legs, cat legs, total legs.",
+        birds: state.answers.finalBirds || 32,
+        catsKey: "finalCats",
+        birdLegsKey: "finalBirdLegs",
+        catLegsKey: "finalCatLegs",
+        totalLegsKey: "finalTotalLegs",
+        expected: {cats:16, birdLegs:64, catLegs:64, totalLegs:128},
+        hints: {
+          cats: "Birds and cats must add up to 48.",
+          birdLegs: "Multiply birds by 2.",
+          catLegs: "Multiply cats by 4.",
+          totalLegs: "Add the two leg totals."
+        },
+        success: "Good. Now check this row."
+      })
+    },
+    {
+      id: "finalCheck",
+      render: () => optionScreen({
+        action: "Does the final row make 128 legs?",
+        extra: rowStrip({birds:32, cats:16, birdLegs:64, catLegs:64, totalLegs:128}),
+        options: shuffle([
+          {id:"yes", label:"yes"},
+          {id:"no", label:"no"}
+        ], "s22"),
+        selected: state.selected,
+        onSelect: id => { state.selected = id; render(); },
+        onCheck: () => {
+          if (!state.selected) return setFeedback("Choose one answer.", "hint");
+          if (state.selected === "yes") next("Good. The row works.", "good");
+          else setFeedback("Check the total legs in the final row and compare it with 128.", "hint");
+        }
+      })
+    },
+    {
+      id: "finalAnswer",
+      render: () => finalAnswerScreen()
+    },
+    {
+      id: "strategySort",
+      render: () => sortScreen()
+    },
+    {
+      id: "done",
+      render: () => `
+        <div class="action-box">Well done.</div>
+        <div class="explain-box">You built each row step by step, checked the legs against 128, noticed the down-by-2 pattern, and found the number of birds.</div>
+        <div class="feedback good">You can restart to try it again.</div>
+        <div class="nav">
+          <button class="btn secondary" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to top</button>
+          <button class="btn" type="button" id="restartFromEnd">Restart</button>
+        </div>
+      `
+    }
+  ];
+
+  function rowTableCompare() {
+    return `
+      <table class="table-row" aria-label="Compare Row 1 and Row 2">
+        <tr>
+          <th>Row</th><th>Birds</th><th>Cats</th><th>Bird legs</th><th>Cat legs</th><th>Total legs</th>
+        </tr>
+        <tr>
+          <td>1</td><td>24</td><td>24</td><td>48</td><td>96</td><td>144</td>
+        </tr>
+        <tr>
+          <td>2</td><td>25</td><td>23</td><td>50</td><td>92</td><td>142</td>
+        </tr>
+      </table>
+    `;
+  }
+
+  function rowStrip(vals) {
+    return `
+      <div class="row-strip">
+        ${cell("birds", vals.birds)}
+        ${cell("cats", vals.cats)}
+        ${cell("bird legs", vals.birdLegs)}
+        ${cell("cat legs", vals.catLegs)}
+        ${cell("total legs", vals.totalLegs)}
+      </div>
+    `;
+  }
+  function cell(label, value) {
+    const display = String(value);
+    return `<div class="cell"><div class="cell-label">${label}</div><div class="cell-value ${display.includes("?") || display.includes("_") ? 'unknown' : ''}">${display}</div></div>`;
+  }
+
+  function swapAnimationVisual() {
+    return `
+      <div class="visual-panel">
+        <div class="visual-title">One exchange</div>
+        <div class="swap-scene">
+          <div class="swap-card">
+            <div class="swap-emoji">🐱</div>
+            <div class="swap-legs">1 cat = 4 legs</div>
+          </div>
+          <div class="swap-card">
+            <div class="swap-emoji">🐦</div>
+            <div class="swap-legs">1 bird = 2 legs</div>
+          </div>
+        </div>
+        <div class="legs-change">
+          <span>4 legs</span>
+          <span class="arrow">→</span>
+          <span>2 legs</span>
+          <span class="minus-two">2 fewer legs</span>
+        </div>
+        <div class="small" style="margin-top:10px;">The number of animals stays the same. Only the legs change.</div>
+      </div>
+    `;
+  }
+
+  function whySevenVisual() {
+    return `
+      <div class="visual-panel">
+        <div class="visual-title">Use the 14 extra legs</div>
+        <div class="explain-box" style="margin-bottom:10px;">Each exchange removes 2 legs. So we clear the 14 extra legs in groups of 2.</div>
+        <div class="swap-grid">
+          ${Array.from({length:7}, (_,i) => `
+            <div class="swap-step">
+              <div class="mini">🐱 → 🐦</div>
+              <div class="caption">swap ${i+1}</div>
+              <div class="count-badge">2 fewer legs</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="small" style="margin-top:10px;">Keep counting the swaps until all 14 extra legs are gone.</div>
+      </div>
+    `;
+  }
+
+  function swapsCountVisual() {
+    return `
+      <div class="visual-panel">
+        <div class="visual-title">Count the swaps</div>
+        <div class="swap-grid">
+          ${Array.from({length:7}, (_,i) => `
+            <div class="swap-step">
+              <div class="mini">🐱 → 🐦</div>
+              <div class="caption">1 exchange</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="small" style="margin-top:10px;">Each card shows 1 cat changing to 1 bird.</div>
+      </div>
+    `;
+  }
+
+  function finalBirdsVisual() {
+    return `
+      <div class="visual-panel">
+        <div class="visual-title">Use the birds to update the final row</div>
+        <div class="bird-total-panel">
+          <div class="group-card">
+            <strong>Row 2 already has 25 birds</strong>
+            <div class="emoji-line">🐦🐦🐦🐦🐦</div>
+            <div class="emoji-line">🐦🐦🐦🐦🐦</div>
+            <div class="emoji-line">🐦🐦🐦🐦🐦</div>
+            <div class="emoji-line">🐦🐦🐦🐦🐦</div>
+            <div class="emoji-line">🐦🐦🐦🐦🐦</div>
+            <div class="count-badge">25 birds</div>
+          </div>
+          <div class="group-card highlight-birds">
+            <strong>7 exchanges mean 7 more birds</strong>
+            <div class="emoji-line">🐦🐦🐦🐦🐦</div>
+            <div class="emoji-line">🐦🐦</div>
+            <div class="count-badge">7 more birds</div>
+          </div>
+        </div>
+        <div class="small" style="margin-top:10px;">Count 25 birds, then count 7 more birds.</div>
+      </div>
+    `;
+  }
+
+
+  function infoScreen({action, explain="", extra="", buttonText="Next"}) {
+    return `
+      <div class="action-box">${escapeBr(action)}</div>
+      ${explain ? `<div class="explain-box">${escapeBr(explain)}</div>` : ""}
+      ${extra || ""}
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn" ${state.screenIndex===0 ? 'disabled' : ''}>Back</button>
+        <button class="btn" type="button" id="continueBtn">${buttonText}</button>
+      </div>
+    `;
+  }
+
+  function optionScreen({action, explain="", extra="", options, selected, onSelect, onCheck}) {
+    return `
+      <div class="action-box">${escapeBr(action)}</div>
+      ${explain ? `<div class="explain-box">${escapeBr(explain)}</div>` : ""}
+      ${extra || ""}
+      <div class="response-area">
+        <div class="options">
+          ${options.map(opt => `
+            <button type="button" class="option ${selected === opt.id ? 'selected' : ''}" data-opt="${opt.id}">
+              ${opt.label}
+            </button>
+          `).join("")}
+        </div>
+      </div>
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn" ${state.screenIndex===0 ? 'disabled' : ''}>Back</button>
+        <button class="btn" type="button" id="checkBtn">Check</button>
+      </div>
+    `;
+  }
+
+  function inputScreen({action, explain="", extra="", value="", onInput, onCheck}) {
+    return `
+      <div class="action-box">${escapeBr(action)}</div>
+      ${explain ? `<div class="explain-box">${escapeBr(explain)}</div>` : ""}
+      ${extra || ""}
+      <div class="response-area input-wrap">
+        <label class="small" for="mainInput">Type your answer:</label><br>
+        <input class="main-input" id="mainInput" inputmode="numeric" autocomplete="off" value="${safeAttr(value)}" />
+      </div>
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn" ${state.screenIndex===0 ? 'disabled' : ''}>Back</button>
+        <button class="btn" type="button" id="checkBtn">Check</button>
+      </div>
+    `;
+  }
+
+  function fullRowInputScreen({action, explain="", birds, catsKey, birdLegsKey, catLegsKey, totalLegsKey, expected, hints, success}) {
+    const current = {
+      cats: state.answers[catsKey] ?? "",
+      birdLegs: state.answers[birdLegsKey] ?? "",
+      catLegs: state.answers[catLegsKey] ?? "",
+      totalLegs: state.answers[totalLegsKey] ?? ""
+    };
+    return `
+      <div class="action-box">${escapeBr(action)}</div>
+      ${explain ? `<div class="explain-box">${escapeBr(explain)}</div>` : ""}
+      <table class="table-row" aria-label="Complete the row">
+        <tr>
+          <th>Birds</th><th>Cats</th><th>Bird legs</th><th>Cat legs</th><th>Total legs</th>
+        </tr>
+        <tr>
+          <td>${birds}</td>
+          <td><input class="row-input" id="catsInput" inputmode="numeric" value="${safeAttr(current.cats)}"></td>
+          <td><input class="row-input" id="birdLegsInput" inputmode="numeric" value="${safeAttr(current.birdLegs)}"></td>
+          <td><input class="row-input" id="catLegsInput" inputmode="numeric" value="${safeAttr(current.catLegs)}"></td>
+          <td><input class="row-input" id="totalLegsInput" inputmode="numeric" value="${safeAttr(current.totalLegs)}"></td>
+        </tr>
+      </table>
+      <div class="small">Check each box carefully before you press Check.</div>
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn">Back</button>
+        <button class="btn" type="button" id="checkBtn">Check</button>
+      </div>
+    `;
+  }
+
+  function finalAnswerScreen() {
+    return `
+      <div class="action-box">What is the answer to the question?</div>
+      <div class="explain-box">Step 1: choose what to report. Step 2: type the answer.</div>
+      <div class="options">
+        ${shuffle([
+          {id:"birds", label:"number of birds"},
+          {id:"cats", label:"number of cats"},
+          {id:"legs", label:"number of legs"}
+        ], "finalType").map(opt => `
+          <button type="button" class="option ${state.selected === opt.id ? 'selected' : ''}" data-opt="${opt.id}">
+            ${opt.label}
+          </button>`).join("")}
+      </div>
+      <div class="response-area input-wrap">
+        <label class="small" for="mainInput">Type the answer:</label><br>
+        <input class="main-input" id="mainInput" inputmode="numeric" autocomplete="off" value="${safeAttr(state.inputValue)}" />
+      </div>
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn">Back</button>
+        <button class="btn" type="button" id="checkBtn">Check</button>
+      </div>
+    `;
+  }
+
+  function sortScreen() {
+    const items = [
+      "start with a trial number of birds",
+      "find the cats",
+      "find the bird legs and cat legs",
+      "find the total legs",
+      "compare with 128",
+      "notice how the total legs change"
+    ];
+    return `
+      <div class="action-box">Put the strategy steps in order.</div>
+      <div class="explain-box">Choose 1 for the first step, 2 for the second step, and so on.</div>
+      <div class="sort-list">
+        ${items.map((text, idx) => `
+          <div class="sort-item">
+            <select data-sort="${idx}">
+              <option value="">?</option>
+              ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${state.sortAnswers[idx] == n ? 'selected' : ''}>${n}</option>`).join("")}
+            </select>
+            <div>${text}</div>
+          </div>
+        `).join("")}
+      </div>
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn">Back</button>
+        <button class="btn" type="button" id="checkBtn">Check</button>
+      </div>
+    `;
+  }
+
+  function matchScreen() {
+    const facts = [
+      {k:"48", label:"48"},
+      {k:"128", label:"128"},
+      {k:"4", label:"4"},
+      {k:"2", label:"2"}
+    ];
+    const choices = {
+      "48": ["total number of animals", "total number of legs", "legs on each cat", "legs on each bird"],
+      "128": ["total number of animals", "total number of legs", "legs on each cat", "legs on each bird"],
+      "4": ["total number of animals", "total number of legs", "legs on each cat", "legs on each bird"],
+      "2": ["total number of animals", "total number of legs", "legs on each cat", "legs on each bird"]
+    };
+    return `
+      <div class="action-box">Match each fact to what it tells us.</div>
+      <div class="sort-list">
+        ${facts.map((f, idx) => `
+          <div class="sort-item">
+            <div style="min-width:70px;font-weight:700">${f.label}</div>
+            <select data-match="${f.k}">
+              <option value="">Choose one</option>
+              ${choices[f.k].map(opt => `<option value="${opt}" ${state.sortAnswers[f.k] === opt ? 'selected' : ''}>${opt}</option>`).join("")}
+            </select>
+          </div>
+        `).join("")}
+      </div>
+      ${feedbackHtml()}
+      <div class="nav">
+        <button class="btn secondary" type="button" id="backBtn">Back</button>
+        <button class="btn" type="button" id="checkBtn">Check</button>
+      </div>
+    `;
+  }
+
+  function feedbackHtml() {
+    if (!state.feedback) return `<div class="feedback">Choose or type your answer, then press Check.</div>`;
+    return `<div class="feedback ${state.feedbackType || ''}">${escapeBr(state.feedback)}</div>`;
+  }
+
+  function setFeedback(text, type="") {
+    state.feedback = text;
+    state.feedbackType = type;
+    render();
+  }
+
+  function next(text="", type="good") {
+    state.feedback = text;
+    state.feedbackType = type;
+    render();
+    setTimeout(() => {
+      state.screenIndex++;
+      clearTransient();
+      render();
+    }, 550);
+  }
+
+  function clearTransient() {
+    state.selected = null;
+    state.inputValue = "";
+    state.multiSelected = [];
+    state.feedback = "";
+    state.feedbackType = "";
+  }
+
+  function numVal(v) {
+    if (v === undefined || v === null) return null;
+    const s = String(v).trim();
+    if (s === "") return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function safeAttr(v) {
+    return String(v ?? "").replace(/"/g, '&quot;');
+  }
+
+  function escapeBr(text) {
+    return String(text).replace(/\n/g, "<br>");
+  }
+
+  function render() {
+    const app = document.getElementById("app");
+    document.getElementById("screenCounter").textContent = `Screen ${Math.min(state.screenIndex + 1, screens.length)} of ${screens.length}`;
+    document.getElementById("questionPanel").classList.toggle("show", state.showQuestion);
+    document.getElementById("toggleQuestionBtn").textContent = state.showQuestion ? "Hide question" : "Show question";
+    app.innerHTML = screens[state.screenIndex].render();
+
+    const backBtn = document.getElementById("backBtn");
+    if (backBtn) {
+      backBtn.addEventListener("click", () => {
+        if (state.screenIndex > 0) {
+          state.screenIndex--;
+          clearTransient();
+          render();
+        }
+      });
+    }
+    const checkBtn = document.getElementById("checkBtn");
+    if (checkBtn) {
+      checkBtn.addEventListener("click", handleCheckForScreen);
+    }
+    const restartFromEnd = document.getElementById("restartFromEnd");
+    if (restartFromEnd) restartFromEnd.addEventListener("click", restart);
+    const continueBtn = document.getElementById("continueBtn");
+    if (continueBtn) {
+      continueBtn.addEventListener("click", () => {
+        next("", "");
+      });
+    }
+
+    document.querySelectorAll("[data-opt]").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        state.selected = e.currentTarget.dataset.opt;
+        render();
+      });
+    });
+    const mainInput = document.getElementById("mainInput");
+    if (mainInput) {
+      mainInput.addEventListener("input", e => { state.inputValue = e.target.value; });
+      mainInput.addEventListener("keydown", e => { if (e.key === "Enter") handleCheckForScreen(); });
+    }
+    document.querySelectorAll("[data-match]").forEach(sel => {
+      sel.addEventListener("change", e => {
+        state.sortAnswers[e.target.dataset.match] = e.target.value;
+      });
+    });
+    document.querySelectorAll("[data-sort]").forEach(sel => {
+      sel.addEventListener("change", e => {
+        state.sortAnswers[e.target.dataset.sort] = e.target.value;
+      });
+    });
+  }
+
+  function handleCheckForScreen() {
+    const id = screens[state.screenIndex].id;
+
+    if (id === "matchFacts") {
+      const ok =
+        state.sortAnswers["48"] === "total number of animals" &&
+        state.sortAnswers["128"] === "total number of legs" &&
+        state.sortAnswers["4"] === "legs on each cat" &&
+        state.sortAnswers["2"] === "legs on each bird";
+      if (ok) next("Good. Each number tells us something different.", "good");
+      else setFeedback("Try one number at a time. What does 128 count?", "hint");
+      return;
+    }
+
+    if (id === "row2FullRow") {
+      checkFullRow({
+        catsInputId:"catsInput", birdInputId:"birdLegsInput", catInputId:"catLegsInput", totalInputId:"totalLegsInput",
+        expected:{cats:23, birdLegs:50, catLegs:92, totalLegs:142},
+        keys:{cats:"row2Cats", birdLegs:"row2BirdLegs", catLegs:"row2CatLegs", totalLegs:"row2TotalLegs"},
+        hints:{
+          cats:"Birds and cats must add up to 48.",
+          birdLegs:"Each bird has 2 legs.",
+          catLegs:"Each cat has 4 legs.",
+          totalLegs:"Add the two leg totals."
+        },
+        success:"Good. You completed the row."
+      });
+      return;
+    }
+
+    if (id === "finalRow") {
+      checkFullRow({
+        catsInputId:"catsInput", birdInputId:"birdLegsInput", catInputId:"catLegsInput", totalInputId:"totalLegsInput",
+        expected:{cats:16, birdLegs:64, catLegs:64, totalLegs:128},
+        keys:{cats:"finalCats", birdLegs:"finalBirdLegs", catLegs:"finalCatLegs", totalLegs:"finalTotalLegs"},
+        hints:{
+          cats:"Birds and cats must add up to 48.",
+          birdLegs:"Multiply birds by 2.",
+          catLegs:"Multiply cats by 4.",
+          totalLegs:"Add the two leg totals."
+        },
+        success:"Good. Now check this row."
+      });
+      return;
+    }
+
+    if (id === "finalAnswer") {
+      const value = numVal(state.inputValue);
+      if (!state.selected) return setFeedback("Choose what to report first.", "hint");
+      if (value === null) return setFeedback("Type the answer too.", "hint");
+      if (state.selected === "birds" && value === 32) next("Yes.", "good");
+      else setFeedback("Check what the question asks for.", "hint");
+      return;
+    }
+
+    if (id === "strategySort") {
+      const want = {
+        0:"1", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6"
+      };
+      const values = Object.values(state.sortAnswers);
+      if (values.length < 6 || values.includes("")) return setFeedback("Choose a number for each step.", "hint");
+      const unique = new Set(values);
+      if (unique.size !== 6) return setFeedback("Use each number once.", "hint");
+      const ok = Object.keys(want).every(k => state.sortAnswers[k] === want[k]);
+      if (ok) next("Good. That is the strategy.", "good");
+      else setFeedback("Think about what you had to do first in each row.", "hint");
+      return;
+    }
+
+    // Generic screen check
+    const screen = screens[state.screenIndex];
+    // use render config callbacks indirectly by re-running render? simpler: switch not needed because generic screens are option/inputScreen only with closures impossible after render.
+    // Create explicit map by id:
+    genericCheckMap[id]();
+  }
+
+  function checkFullRow({catsInputId,birdInputId,catInputId,totalInputId,expected,keys,hints,success}) {
+    const cats = numVal(document.getElementById(catsInputId).value);
+    const birdLegs = numVal(document.getElementById(birdInputId).value);
+    const catLegs = numVal(document.getElementById(catInputId).value);
+    const totalLegs = numVal(document.getElementById(totalInputId).value);
+    if (cats === null || birdLegs === null || catLegs === null || totalLegs === null) {
+      return setFeedback("Fill in every box before you press Check.", "hint");
+    }
+    if (cats !== expected.cats) return setFeedback(hints.cats, "hint");
+    if (birdLegs !== expected.birdLegs) return setFeedback(hints.birdLegs, "hint");
+    if (catLegs !== expected.catLegs) return setFeedback(hints.catLegs, "hint");
+    if (totalLegs !== expected.totalLegs) return setFeedback(hints.totalLegs, "hint");
+
+    state.answers[keys.cats] = cats;
+    state.answers[keys.birdLegs] = birdLegs;
+    state.answers[keys.catLegs] = catLegs;
+    state.answers[keys.totalLegs] = totalLegs;
+    next(success, "good");
+  }
+
+  const genericCheckMap = {
+    findTarget: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "birds") next("Yes. Keep that in mind.", "good");
+      else setFeedback("Look again at the question sentence. What does it ask Peter to find?", "hint");
+    },
+    rowCheckNeed: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "totallegs") next("Yes. Each row must help us check the total number of legs.", "good");
+      else setFeedback("Look at the words “128 legs altogether”. What must each row help us check?", "hint");
+    },
+    row1NeedCats: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "cats") next("Yes. First we need the number of cats.", "good");
+      else setFeedback("The animals must make 48 altogether. What goes with birds?", "hint");
+    },
+    row1Cats: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 24) next("Good. Now we know the two animal numbers in this row.", "good");
+      else setFeedback("Birds and cats must add up to 48.", "hint");
+    },
+    row1BirdLegLink: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "birdlegs") next("Yes. We can work out the bird legs.", "good");
+      else setFeedback("Each bird has 2 legs. What does that help us find?", "hint");
+    },
+    row1BirdLegs: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 48) next("Good. Now do the same for the cats.", "good");
+      else setFeedback("Use the number of birds and 2 legs for each bird.", "hint");
+    },
+    row1CatLegLink: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "catlegs") next("Yes. We can work out the cat legs.", "good");
+      else setFeedback("Each cat has 4 legs. What does that help us find?", "hint");
+    },
+    row1CatLegs: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 96) next("Good. Now we have both parts.", "good");
+      else setFeedback("Use the number of cats and 4 legs for each cat.", "hint");
+    },
+    row1TotalLink: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "totallegs") next("Yes. Now we can find the total legs.", "good");
+      else setFeedback("What do we get when we put both leg totals together?", "hint");
+    },
+    row1TotalLegs: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 144) next("Now check this row against the question.", "good");
+      else setFeedback("Add the bird legs and cat legs.", "hint");
+    },
+    row1Check128: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "toomany") next("Good. That tells us what to do next.", "good");
+      else setFeedback("Compare this row’s total legs with 128.", "hint");
+    },
+    patternVisual: () => {
+      next("", "");
+    },
+    row2NeedCats: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "cats") next("Yes. First find the cats.", "good");
+      else setFeedback("The animals must still make 48 altogether.", "hint");
+    },
+    rowCompare: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "down2") next("Good. Keep that pattern.", "good");
+      else setFeedback("Look at the total-legs box in each row.", "hint");
+    },
+    extraLegs: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 14) next("Good. Keep that extra number.", "good");
+      else setFeedback("Compare Row 2 total legs with 128. How many more legs does Row 2 have?", "hint");
+    },
+    chooseSentence: () => {
+      next("", "");
+    },
+    numChanges: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 7) next("Good. Now use the 7 exchanges to update the birds.", "good");
+      else setFeedback("Count the swap cards. Each card is 1 exchange.", "hint");
+    },
+    finalBirds: () => {
+      const v = numVal(state.inputValue);
+      if (v === null) return setFeedback("Type your answer first.", "hint");
+      if (v === 32) next("Good. Now complete the row.", "good");
+      else setFeedback("Use the picture. Count 25 birds and then 7 more birds.", "hint");
+    },
+    finalCheck: () => {
+      if (!state.selected) return setFeedback("Choose one answer.", "hint");
+      if (state.selected === "yes") next("Good. The row works.", "good");
+      else setFeedback("Check the total legs in the final row and compare it with 128.", "hint");
+    }
+  };
+
+  function restart() {
+    state.screenIndex = 0;
+    state.showQuestion = false;
+    state.selected = null;
+    state.inputValue = "";
+    state.multiSelected = [];
+    state.orderMap = {};
+    state.answers = {
+      row1Cats:null,row1BirdLegs:null,row1CatLegs:null,row1TotalLegs:null,
+      row2Cats:null,row2BirdLegs:null,row2CatLegs:null,row2TotalLegs:null,
+      extraLegs:null,numChanges:null,finalBirds:null,finalCats:null,
+      finalBirdLegs:null,finalCatLegs:null,finalTotalLegs:null,
+      finalReportType:null,finalReportValue:null
+    };
+    state.feedback = "";
+    state.feedbackType = "";
+    state.sortAnswers = {};
+    render();
+  }
+
+  document.getElementById("toggleQuestionBtn").addEventListener("click", () => {
+    state.showQuestion = !state.showQuestion;
+    render();
+  });
+
+  document.getElementById("speakBtn").addEventListener("click", () => {
+    const content = document.querySelector(".action-box");
+    const extra = document.querySelector(".explain-box");
+    let text = questionText + ". ";
+    if (content) text += content.textContent + ". ";
+    if (extra) text += extra.textContent;
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    } else {
+      alert("Read aloud is not available in this browser.");
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", restart);
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Raju's Number</title>
+  <style>
+    :root{
+      --bg:#f6f8ff;
+      --card:#ffffff;
+      --ink:#1e2a3a;
+      --muted:#5b6676;
+      --accent:#1b73e8;
+      --accent-2:#0f9d58;
+      --warn:#d93025;
+      --amber:#f9ab00;
+      --soft-blue:#e8f1ff;
+      --soft-green:#e9f8ef;
+      --soft-amber:#fff6db;
+      --soft-red:#ffe9e8;
+      --line:#d7e0ef;
+      --shadow:0 10px 30px rgba(25,40,70,.10);
+      --radius:22px;
+      --radius-sm:16px;
+      --btn-radius:16px;
+      --maxw:1180px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;background:linear-gradient(180deg,#eef3ff 0%, #f8fbff 100%);color:var(--ink)}
+    body{min-height:100vh}
+    button{font:inherit}
+    .app-shell{max-width:var(--maxw);margin:0 auto;padding:18px 18px 28px}
+    .topbar{
+      display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;
+      margin-bottom:14px;
+    }
+    .brand-card,.tool-card,.screen-card,.question-card,.feedback,.progress-card{
+      background:var(--card);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    }
+    .brand-card{padding:16px 18px}
+    .brand-title{font-size:32px;font-weight:800;line-height:1.1;margin:0 0 8px}
+    .brand-sub{font-size:22px;color:var(--muted);line-height:1.35}
+    .tool-card{padding:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .tool-btn,.nav-btn,.action-btn,.mini-btn{
+      border:none;border-radius:var(--btn-radius);padding:14px 18px;cursor:pointer;
+      font-size:24px;font-weight:700;line-height:1.2;
+      background:var(--accent);color:#fff;box-shadow:0 6px 14px rgba(27,115,232,.18);
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      touch-action:manipulation;
+    }
+    .tool-btn:hover,.nav-btn:hover,.action-btn:hover,.mini-btn:hover{transform:translateY(-1px)}
+    .tool-btn.secondary,.nav-btn.secondary,.action-btn.secondary,.mini-btn.secondary{
+      background:#eaf1ff;color:var(--accent);box-shadow:none;border:2px solid #c9dbff;
+    }
+    .tool-btn.success,.nav-btn.success,.action-btn.success{background:var(--accent-2)}
+    .tool-btn.warn,.nav-btn.warn,.action-btn.warn{background:var(--warn)}
+    .tool-btn.amber,.action-btn.amber{background:var(--amber);color:#1d1d1d}
+    .progress-card{padding:14px 18px;margin-bottom:14px}
+    .progress-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .progress-label{font-size:24px;font-weight:800}
+    .progress-count{font-size:22px;color:var(--muted);font-weight:700}
+    .progress-track{height:18px;background:#edf2fb;border-radius:999px;overflow:hidden;border:2px solid #d7e2f3}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#6ba6ff);border-radius:999px}
+    .question-card{padding:14px 16px;margin-bottom:14px}
+    .question-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .question-toggle h2{margin:0;font-size:26px}
+    .question-body{
+      margin-top:12px;padding:16px;border:2px dashed #c8d6ef;border-radius:20px;background:#fbfdff;
+      font-size:24px;line-height:1.5;display:none;
+    }
+    .question-body.open{display:block}
+    .question-line{display:block}
+    .screen-card{padding:20px}
+    .screen-title{margin:0 0 8px;font-size:34px;line-height:1.15}
+    .screen-sub{font-size:24px;color:var(--muted);line-height:1.45;margin-bottom:16px}
+    .badge-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 16px}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;
+      font-size:22px;font-weight:800;border:2px solid #d8e5ff;background:var(--soft-blue);color:#194f9c;
+    }
+    .clue-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+    .clue-box{
+      min-height:112px;padding:16px;border-radius:20px;border:2px dashed #c8d6ef;background:#fbfdff;
+      display:flex;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:700;color:var(--muted);
+    }
+    .clue-box.filled{border-style:solid;background:var(--soft-green);border-color:#bee7cc;color:#0b6a37}
+    .big-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+    .choice-card,.pair-card,.reason-card,.row-card,.yn-card,.chip,.slot,.rem-choice,.counter-dot,.phrase-chunk{
+      border:2px solid var(--line);background:#fff;border-radius:20px;padding:16px;cursor:pointer;
+      font-size:24px;line-height:1.35;font-weight:700;color:var(--ink);
+      transition:transform .12s ease,border-color .12s ease, background .12s ease, box-shadow .12s ease;
+      touch-action:manipulation;
+      user-select:none;
+    }
+    .choice-card:hover,.pair-card:hover,.reason-card:hover,.row-card:hover,.yn-card:hover,.chip:hover,.slot:hover,.rem-choice:hover,.counter-dot:hover,.phrase-chunk:hover{
+      transform:translateY(-1px);
+      box-shadow:0 6px 16px rgba(25,40,70,.08);
+    }
+    .choice-card.selected,.pair-card.selected,.reason-card.selected,.row-card.selected,.yn-card.selected,.chip.selected,.slot.selected,.rem-choice.selected,.counter-dot.selected,.phrase-chunk.selected{
+      border-color:var(--accent);background:#eef5ff;box-shadow:0 0 0 4px rgba(27,115,232,.12);
+    }
+    .choice-card.correct,.pair-card.correct,.reason-card.correct,.row-card.correct,.yn-card.correct,.slot.correct,.rem-choice.correct,.counter-dot.correct,.phrase-chunk.correct{
+      border-color:var(--accent-2);background:var(--soft-green);box-shadow:0 0 0 4px rgba(15,157,88,.12);
+    }
+    .choice-card.wrong,.pair-card.wrong,.reason-card.wrong,.row-card.wrong,.yn-card.wrong,.slot.wrong,.rem-choice.wrong,.counter-dot.wrong,.phrase-chunk.wrong{
+      border-color:var(--warn);background:var(--soft-red);box-shadow:0 0 0 4px rgba(217,48,37,.10);
+    }
+    .choice-card .small-note,.reason-card .small-note,.pair-card .small-note,.row-card .small-note{display:block;font-size:20px;color:var(--muted);font-weight:700;margin-top:8px}
+    .question-chip{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:16px;border:2px solid #c8d6ef;background:#fff;font-size:24px;font-weight:700;margin:4px 6px 4px 0;
+    }
+    .feedback{
+      margin-top:16px;padding:16px 18px;font-size:24px;line-height:1.45
+    }
+    .feedback.good{border-color:#bee7cc;background:var(--soft-green)}
+    .feedback.warn{border-color:#ffd56a;background:var(--soft-amber)}
+    .feedback.bad{border-color:#ffc6c2;background:var(--soft-red)}
+    .nav-row{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:20px;flex-wrap:wrap}
+    .nav-left,.nav-right{display:flex;gap:12px;flex-wrap:wrap}
+    .question-text-card{
+      padding:18px;border:2px solid #d8e5ff;border-radius:24px;background:#fbfdff;
+      font-size:28px;line-height:1.5;
+    }
+    .phrase-wrap{display:flex;flex-wrap:wrap;gap:8px;line-height:1.7}
+    .phrase-chunk{display:inline-flex;align-items:center;min-height:56px;padding:10px 14px}
+    .helper-strip{
+      margin-top:12px;padding:12px 14px;border-radius:18px;background:#eef5ff;border:2px solid #d8e5ff;
+      font-size:22px;font-weight:700;color:#27548f;
+    }
+    .mini-visual,.pair-visual,.groups-visual,.proof-visual,.factor-arch{
+      background:#fbfdff;border:2px solid #e0e8f5;border-radius:20px;padding:14px;
+    }
+    .pair-card{display:grid;gap:12px}
+    .pair-eq{font-size:32px;font-weight:800;text-align:center}
+    .pair-bars{display:grid;gap:8px}
+    .bar-stack{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+    .mini-bar{
+      min-width:42px;padding:8px 12px;border-radius:14px;background:#eef5ff;border:2px solid #cddfff;
+      font-size:22px;font-weight:800;color:#194f9c;text-align:center;
+    }
+    .mini-bar.good{background:var(--soft-green);border-color:#bee7cc;color:#0b6a37}
+    .pair-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+    .divisor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:14px}
+    .divisor-card{border:2px solid var(--line);background:#fff;border-radius:20px;padding:16px;display:grid;gap:12px}
+    .divisor-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .divisor-title{font-size:28px;font-weight:800}
+    .divisor-eq{font-size:24px;font-weight:800;color:var(--muted)}
+    .answer-row{display:flex;gap:10px;flex-wrap:wrap}
+    .answer-pill{
+      border:2px solid #cddfff;background:#eef5ff;color:#194f9c;border-radius:16px;
+      padding:10px 14px;font-size:22px;font-weight:800;cursor:pointer;touch-action:manipulation;
+    }
+    .answer-pill.selected{background:#dce9ff;border-color:#8fb0eb;box-shadow:0 0 0 3px rgba(27,115,232,.12)}
+    .answer-pill.good{background:var(--soft-green);border-color:#bee7cc;color:#0b6a37}
+    .answer-pill.bad{background:#fff0ee;border-color:#f0b9b0;color:#a13f2f}
+    .divisor-reveal{
+      background:#fbfdff;border:2px dashed #d5e2fb;border-radius:16px;padding:12px;
+      font-size:22px;font-weight:700;color:#244a84;
+    }
+    .divisor-reveal.good{background:#f4fff7;border-style:solid;border-color:#bee7cc;color:#0b6a37}
+    .pair-pill{
+      padding:10px 14px;border-radius:999px;border:2px solid #c8d6ef;background:#fff;font-size:22px;font-weight:800;
+    }
+    .chip-bank,.slots-row{display:flex;flex-wrap:wrap;gap:12px}
+    .chip{
+      min-width:76px;min-height:72px;display:flex;align-items:center;justify-content:center;background:#fff;
+    }
+    .chip.used{opacity:.45;cursor:not-allowed}
+    .slot{
+      min-width:76px;min-height:76px;display:flex;align-items:center;justify-content:center;background:#fbfdff;
+      border-style:dashed;font-weight:800;
+    }
+    .slot.filled{border-style:solid;background:#fff}
+    .slot-num{font-size:30px}
+    .slot-label{font-size:20px;color:var(--muted);font-weight:700}
+    .factor-arch{
+      display:grid;gap:12px;margin-top:12px
+    }
+    .arch-row{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .arch-pill{padding:10px 14px;border-radius:16px;background:#eef5ff;border:2px solid #cfe0ff;font-size:24px;font-weight:800}
+    .repeat-pill{padding:10px 14px;border-radius:16px;background:#f4f6fb;border:2px dashed #cbd4e6;font-size:24px;font-weight:800;color:#8b95a5}
+    .counter-area{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+    .counter-box{
+      padding:16px;border-radius:22px;border:2px solid #dce5f3;background:#fbfdff;min-height:190px
+    }
+    .counter-box h3{margin:0 0 10px;font-size:26px}
+    .dot-grid{display:flex;flex-wrap:wrap;gap:12px}
+    .counter-dot{
+      width:58px;height:58px;border-radius:999px;padding:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:#fff
+    }
+    .counter-dot.in-group{background:#eef5ff}
+    .counter-dot.leftover{background:#fffdf5}
+    .leftover-tag{
+      display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;border-radius:999px;border:2px solid #bee7cc;background:var(--soft-green);font-size:22px;font-weight:800;color:#0b6a37
+    }
+    .remainder-grid{display:grid;gap:18px}
+    .remainder-row{
+      padding:16px;border:2px solid #dce5f3;border-radius:22px;background:#fbfdff
+    }
+    .remainder-top{
+      display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:16px;align-items:start
+    }
+    .row-prompt{font-size:28px;font-weight:800;line-height:1.35}
+    .row-prompt .small{display:block;font-size:20px;color:var(--muted);font-weight:700;margin-top:8px}
+    .rem-choices{display:flex;flex-wrap:wrap;gap:10px}
+    .rem-choice{
+      min-width:58px;min-height:58px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:16px
+    }
+    .groups-visual{margin-top:14px}
+    .group-strip{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .group-box,.left-box{
+      display:flex;gap:6px;align-items:center;padding:10px 12px;border-radius:16px;border:2px solid #cfe0ff;background:#eef5ff
+    }
+    .left-box{border-color:#ffd56a;background:#fff6db}
+    .tiny-dot{width:16px;height:16px;border-radius:999px;background:#4b84da}
+    .left-box .tiny-dot{background:#d18a00}
+    .group-label{font-size:20px;font-weight:800;color:#194f9c}
+    .left-box .group-label{color:#8e5f00}
+    .row-status{
+      margin-top:12px;padding:12px 14px;border-radius:16px;font-size:22px;font-weight:700
+    }
+    .row-status.good{background:var(--soft-green);color:#0b6a37}
+    .row-status.bad{background:var(--soft-red);color:#8a211a}
+    .summary-table{width:100%;border-collapse:collapse;margin-top:14px}
+    .summary-table th,.summary-table td{
+      border:2px solid #d7e0ef;padding:12px 10px;text-align:center;font-size:22px
+    }
+    .summary-table th{background:#eef5ff}
+    .summary-table tr.good td{background:var(--soft-green);font-weight:800}
+    .proof-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:14px}
+    .proof-panel{padding:16px;border-radius:22px;border:2px solid #dce5f3;background:#fbfdff}
+    .proof-panel h3{margin:0 0 10px;font-size:26px}
+    .eq-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:16px;border:2px solid #cfe0ff;background:#eef5ff;font-size:24px;font-weight:800;margin:4px 8px 4px 0}
+    .table-wrap{overflow:auto}
+    .correction-card{
+      margin-top:14px;padding:18px;border-radius:24px;border:2px solid #dce5f3;background:#ffffff
+    }
+    .big-note{
+      padding:16px;border-radius:20px;background:var(--soft-amber);border:2px solid #ffd56a;font-size:24px;font-weight:800;color:#6a4e00
+    }
+    .footer-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .pulse{animation:pulse 1.4s infinite}
+    @keyframes pulse{
+      0%{transform:scale(1)}
+      50%{transform:scale(1.03)}
+      100%{transform:scale(1)}
+    }
+    @media (max-width: 860px){
+      .topbar{grid-template-columns:1fr}
+      .tool-card{justify-content:flex-start}
+      .remainder-top{grid-template-columns:1fr}
+      .counter-area{grid-template-columns:1fr}
+    }
+    @media (max-width: 620px){
+      .app-shell{padding:12px 12px 24px}
+      .brand-title{font-size:28px}
+      .brand-sub,.screen-sub,.feedback,.question-body,.row-status,.big-note{font-size:21px}
+      .screen-title{font-size:30px}
+      .choice-card,.pair-card,.reason-card,.row-card,.yn-card,.chip,.slot,.rem-choice,.counter-dot,.phrase-chunk,.tool-btn,.nav-btn,.action-btn,.mini-btn{font-size:21px}
+      .row-prompt,.pair-eq,.question-text-card{font-size:24px}
+      .summary-table th,.summary-table td{font-size:19px}
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function(){
+  const QUESTION_LINES = [
+    "Raju thinks of a number.",
+    "It is a factor of 54 and leaves a remainder of 4 when divided by 7.",
+    "What is the number Raju is thinking of?"
+  ];
+
+  const factorPairs = [
+    {id:"1x54", a:1, b:54, correct:true},
+    {id:"2x27", a:2, b:27, correct:true},
+    {id:"3x18", a:3, b:18, correct:true},
+    {id:"6x9", a:6, b:9, correct:true},
+    {id:"4x13", a:4, b:13, correct:false},
+    {id:"5x10", a:5, b:10, correct:false},
+    {id:"7x8", a:7, b:8, correct:false}
+  ];
+
+  const screen4Divisors = [
+    {d:1, exact:true, q:54},
+    {d:2, exact:true, q:27},
+    {d:3, exact:true, q:18},
+    {d:4, exact:false, q:null},
+    {d:5, exact:false, q:null},
+    {d:6, exact:true, q:9}
+  ];
+
+  const screen3Options = [
+    {id:"all54", text:"List all numbers up to 54", correct:false},
+    {id:"factors54", text:"List the factors of 54", correct:true},
+    {id:"mult7", text:"List the multiples of 7", correct:false},
+    {id:"has4", text:"List numbers with 4 in them", correct:false}
+  ];
+
+  const screen6Options = [
+    {id:"biggestFactor", text:"Because 6 is the biggest factor", correct:false},
+    {id:"repeatPairs", text:"Because after 6 × 9, the pairs would repeat", correct:true},
+    {id:"onlyFour", text:"Because 54 has only four factors", correct:false},
+    {id:"half54", text:"Because 9 is half of 54", correct:false}
+  ];
+
+  const screen8Rows = [
+    {n:1, rem:1, note:"1 is smaller than 7, so 1 is left over."},
+    {n:2, rem:2, note:"2 is smaller than 7, so 2 is left over."},
+    {n:3, rem:3, note:"3 is smaller than 7, so 3 is left over."},
+    {n:6, rem:6, note:"6 is smaller than 7, so 6 is left over."}
+  ];
+
+  const screen9Rows = [
+    {n:9, rem:2, note:"9 = 7 + 2, so the remainder is 2."},
+    {n:18, rem:4, note:"18 = 14 + 4, so the remainder is 4."},
+    {n:27, rem:6, note:"27 = 21 + 6, so the remainder is 6."},
+    {n:54, rem:5, note:"54 = 49 + 5, so the remainder is 5."}
+  ];
+
+  const factorOrder = [1,2,3,6,9,18,27,54];
+  const correctionRows = [
+    {factor:1, div:"1 ÷ 7 = 0 r 1", rem:1, keep:"No"},
+    {factor:2, div:"2 ÷ 7 = 0 r 2", rem:2, keep:"No"},
+    {factor:3, div:"3 ÷ 7 = 0 r 3", rem:3, keep:"No"},
+    {factor:6, div:"6 ÷ 7 = 0 r 6", rem:6, keep:"No"},
+    {factor:9, div:"9 ÷ 7 = 1 r 2", rem:2, keep:"No"},
+    {factor:18, div:"18 ÷ 7 = 2 r 4", rem:4, keep:"Yes"},
+    {factor:27, div:"27 ÷ 7 = 3 r 6", rem:6, keep:"No"},
+    {factor:54, div:"54 ÷ 7 = 7 r 5", rem:5, keep:"No"}
+  ];
+
+  function shuffle(arr){
+    const copy = arr.slice();
+    for(let i = copy.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  const state = {
+    current: 0,
+    questionOpen: false,
+    orders: {
+      screen3: shuffle(screen3Options.map(o => o.id)),
+      screen4: shuffle(factorPairs.map(p => p.id)),
+      screen6: shuffle(screen6Options.map(o => o.id))
+    },
+    s2: { selected: [], feedback:"" },
+    s3: { selected:null, attempts:0, correct:false, feedback:"" },
+    s4: { answers:{}, attempts:0, correct:false, feedback:"" },
+    s5: { bankOrder: shuffle([1,54,2,27,3,18,6,9]), selectedChip:null, slots:Array(8).fill(null), attempts:0, correct:false, feedback:"" },
+    s6: { selected:null, attempts:0, correct:false, feedback:"" },
+    s7: { selected:[], attempts:0, correct:false, feedback:"" },
+    s8: { answers:{}, checked:false, attempts:0, correct:false, feedback:"" },
+    s9: { answers:{}, checked:false, attempts:0, correct:false, feedback:"" },
+    s10:{ selected:null, attempts:0, correct:false, feedback:"" },
+    s11:{ q1:null, q2:null, attempts:0, correct:false, showWhy:false, feedback:"" }
+  };
+
+  function isSelected(list, value){
+    return list.indexOf(value) !== -1;
+  }
+
+  function toggleInArray(list, value){
+    const idx = list.indexOf(value);
+    if(idx === -1){ list.push(value); } else { list.splice(idx,1); }
+  }
+
+  function progressPct(){
+    return Math.round(((state.current + 1) / 12) * 100);
+  }
+
+  function stripHtml(html){
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.innerText.replace(/\s+/g, ' ').trim();
+  }
+
+  function speakText(text){
+    if(!("speechSynthesis" in window)){ alert("Read aloud is not supported on this device."); return; }
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.95;
+    utter.pitch = 1;
+    window.speechSynthesis.speak(utter);
+  }
+
+  function currentSpeechText(){
+    const screen = document.getElementById('screen-body');
+    if(!screen) return QUESTION_LINES.join(' ');
+    return screen.innerText.replace(/\s+/g, ' ').trim();
+  }
+
+  function canGoNext(){
+    switch(state.current){
+      case 0: return true;
+      case 1: return state.s2.selected.length === 2 && isSelected(state.s2.selected, "factor54") && isSelected(state.s2.selected, "rem4");
+      case 2: return state.s3.correct;
+      case 3: return state.s4.correct;
+      case 4: return state.s5.correct;
+      case 5: return state.s6.correct;
+      case 6: return state.s7.correct;
+      case 7: return state.s8.correct;
+      case 8: return state.s9.correct;
+      case 9: return state.s10.correct;
+      case 10:return state.s11.correct && state.s11.showWhy;
+      case 11:return false;
+      default:return false;
+    }
+  }
+
+  function renderQuestionCard(){
+    return `
+      <section class="question-card">
+        <div class="question-toggle">
+          <h2>Question</h2>
+          <div class="nav-right">
+            <button class="tool-btn secondary" data-action="toggle-question">${state.questionOpen ? "Hide question" : "Show question"}</button>
+          </div>
+        </div>
+        <div class="question-body ${state.questionOpen ? "open" : ""}">
+          ${QUESTION_LINES.map(line => `<span class="question-line">${line}</span>`).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderFeedback(text, type){
+    if(!text) return "";
+    return `<div class="feedback ${type}">${text}</div>`;
+  }
+
+  function renderNav(){
+    const prevDisabled = state.current === 0 ? 'disabled style="opacity:.45;cursor:not-allowed"' : "";
+    const nextDisabled = !canGoNext() ? 'disabled style="opacity:.45;cursor:not-allowed"' : "";
+    return `
+      <div class="nav-row">
+        <div class="nav-left">
+          <button class="nav-btn secondary" data-action="prev" ${prevDisabled}>Back</button>
+        </div>
+        <div class="nav-right">
+          ${state.current < 11 ? `<button class="nav-btn success" data-action="next" ${nextDisabled}>Continue</button>` : `
+            <button class="nav-btn secondary" data-action="restart">Restart</button>
+          `}
+        </div>
+      </div>
+    `;
+  }
+
+  function factorPairPills(){
+    return `
+      <div class="pair-list">
+        ${["1 × 54","2 × 27","3 × 18","6 × 9"].map(t => `<span class="pair-pill">${t}</span>`).join("")}
+      </div>
+    `;
+  }
+
+  function renderGroupsVisual(n){
+    const full = Math.floor(n / 7);
+    const rem = n % 7;
+    const fullBoxes = new Array(full).fill(0).map(() => `
+      <div class="group-box">
+        ${new Array(7).fill(0).map(() => `<span class="tiny-dot"></span>`).join("")}
+        <span class="group-label">7</span>
+      </div>
+    `).join("");
+    const left = rem > 0 ? `
+      <div class="left-box ${rem===4 ? "pulse" : ""}">
+        ${new Array(rem).fill(0).map(() => `<span class="tiny-dot"></span>`).join("")}
+        <span class="group-label">${rem} left</span>
+      </div>
+    ` : `<div class="group-box"><span class="group-label">0 left</span></div>`;
+    return `
+      <div class="groups-visual">
+        <div class="group-strip">
+          ${fullBoxes || ""}
+          ${left}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderScreen(){
+    switch(state.current){
+      case 0:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Find Raju’s number</h1>
+            <div class="screen-sub">We will use one clear method: <strong>list the factors of 54</strong>, then <strong>test each factor by dividing by 7</strong>.</div>
+            <div class="badge-row">
+              <span class="badge">🔍 2 clues</span>
+              <span class="badge">✏️ 1 method</span>
+              <span class="badge">🧠 Check both clues</span>
+            </div>
+            <div class="question-text-card">
+              ${QUESTION_LINES.map(line => `<div>${line}</div>`).join("")}
+            </div>
+            <div class="helper-strip">First, read the question carefully. Then press <strong>Continue</strong>.</div>
+            ${renderNav()}
+          </section>
+        `;
+      case 1:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Find the 2 clues</h1>
+            <div class="screen-sub">Tap the parts of the question that tell you what kind of number to look for.</div>
+            <div class="question-text-card">
+              <div class="phrase-wrap">
+                <button class="phrase-chunk ${isSelected(state.s2.selected,'raju') ? 'selected' : ''}" data-action="s2-toggle" data-value="raju">Raju thinks of a number.</button>
+                <button class="phrase-chunk ${isSelected(state.s2.selected,'factor54') ? 'correct' : ''}" data-action="s2-toggle" data-value="factor54">It is a factor of 54</button>
+                <button class="phrase-chunk ${isSelected(state.s2.selected,'and') ? 'selected' : ''}" data-action="s2-toggle" data-value="and">and</button>
+                <button class="phrase-chunk ${isSelected(state.s2.selected,'rem4') ? 'correct' : ''}" data-action="s2-toggle" data-value="rem4">leaves a remainder of 4 when divided by 7.</button>
+                <button class="phrase-chunk ${isSelected(state.s2.selected,'ask') ? 'selected' : ''}" data-action="s2-toggle" data-value="ask">What is the number Raju is thinking of?</button>
+              </div>
+            </div>
+            <div class="clue-boxes">
+              <div class="clue-box ${isSelected(state.s2.selected,'factor54') ? 'filled' : ''}">${isSelected(state.s2.selected,'factor54') ? 'Clue A: factor of 54' : 'Tap clue A'}</div>
+              <div class="clue-box ${isSelected(state.s2.selected,'rem4') ? 'filled' : ''}">${isSelected(state.s2.selected,'rem4') ? 'Clue B: remainder 4 when divided by 7' : 'Tap clue B'}</div>
+            </div>
+            ${renderFeedback(state.s2.feedback, canGoNext() ? "good" : "warn")}
+            ${renderNav()}
+          </section>
+        `;
+      case 2:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Which clue tells you where to start?</h1>
+            <div class="screen-sub">We do not want to test random numbers. Pick the best first step.</div>
+            <div class="badge-row"><span class="badge">Clue A: factor of 54</span></div>
+            <div class="big-card-grid">
+              ${state.orders.screen3.map(id => {
+                const opt = screen3Options.find(o => o.id === id);
+                let cls = "choice-card";
+                if(state.s3.selected === id) cls += " selected";
+                if(state.s3.correct && opt.correct) cls += " correct";
+                if(state.s3.feedback && state.s3.selected === id && !opt.correct && !state.s3.correct) cls += " wrong";
+                return `<button class="${cls}" data-action="s3-select" data-value="${id}">
+                  ${opt.text}
+                </button>`;
+              }).join("")}
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s3-check">Check</button>
+            </div>
+            ${renderFeedback(state.s3.feedback, state.s3.correct ? "good" : (state.s3.feedback ? "warn" : ""))}
+            ${state.s3.attempts >= 2 && !state.s3.correct ? `
+              <div class="mini-visual" style="margin-top:14px">
+                <div class="screen-sub" style="margin-bottom:10px"><strong>Quick help:</strong> If a mystery number is a factor of 12, a good start is to list the <strong>factors of 12</strong>, not all numbers.</div>
+                <span class="question-chip">1</span><span class="question-chip">2</span><span class="question-chip">3</span><span class="question-chip">4</span><span class="question-chip">6</span><span class="question-chip">12</span>
+              </div>
+            ` : ""}
+            ${renderNav()}
+          </section>
+        `;
+      case 3:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Build the factor pairs of 54</h1>
+            <div class="screen-sub">Try the small divisors in order. Decide which ones divide 54 exactly.</div>
+            <div class="helper-strip">Start with 1, then 2, then 3... up to 6. When a divisor works exactly, it gives you a factor pair.</div>
+            <div class="divisor-grid">
+              ${screen4Divisors.map(item => {
+                const selected = state.s4.answers[item.d] || "";
+                return `<div class="divisor-card">
+                  <div class="divisor-head">
+                    <div class="divisor-title">Try ${item.d}</div>
+                    <div class="divisor-eq">54 ÷ ${item.d}</div>
+                  </div>
+                  <div class="answer-row">
+                    <button class="answer-pill ${selected === 'exact' ? 'selected' : ''}" data-action="s4-answer" data-value="${item.d}|exact">Divides exactly</button>
+                    <button class="answer-pill ${selected === 'not' ? 'selected' : ''}" data-action="s4-answer" data-value="${item.d}|not">Does not divide exactly</button>
+                  </div>
+                  ${state.s4.correct ? (
+                    item.exact
+                      ? `<div class="divisor-reveal good">Yes. 54 ÷ ${item.d} = ${item.q}, so the factor pair is <strong>${item.d} × ${item.q}</strong>.</div>`
+                      : `<div class="divisor-reveal">No. ${item.d} is not a factor of 54.</div>`
+                  ) : ``}
+                </div>`;
+              }).join("")}
+            </div>
+            <div class="footer-actions">
+              <button class="mini-btn secondary" data-action="s4-reset">Reset this screen</button>
+              <button class="action-btn" data-action="s4-check">Check</button>
+            </div>
+            ${renderFeedback(state.s4.feedback, state.s4.correct ? "good" : (state.s4.feedback ? "warn" : ""))}
+            ${state.s4.attempts >= 2 && !state.s4.correct ? `
+              <div class="mini-visual" style="margin-top:14px">
+                <div class="screen-sub" style="margin-bottom:8px"><strong>Quick help:</strong> A number is a factor of 54 if <strong>54 ÷ that number</strong> has <strong>no remainder</strong>.</div>
+                <div class="helper-strip" style="margin-top:8px">Check 54 ÷ 4 and 54 ÷ 5 carefully. They do not split 54 exactly.</div>
+              </div>
+            ` : ""}
+            ${renderNav()}
+          </section>
+        `;
+      case 4:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Put the factors in order</h1>
+            <div class="screen-sub">Tap a number chip. Then tap a slot. Put the factors in ascending order.</div>
+            ${factorPairPills()}
+            <div class="helper-strip">Start with the smallest factor.</div>
+            <div class="chip-bank" style="margin:16px 0">
+              ${state.s5.bankOrder.map(num => {
+                const used = state.s5.slots.indexOf(num) !== -1;
+                let cls = "chip";
+                if(state.s5.selectedChip === num) cls += " selected";
+                if(used) cls += " used";
+                return `<button class="${cls}" data-action="s5-chip" data-value="${num}" ${used ? 'disabled' : ''}>${num}</button>`;
+              }).join("")}
+            </div>
+            <div class="slots-row">
+              ${state.s5.slots.map((num, idx) => {
+                let cls = "slot";
+                if(num !== null) cls += " filled";
+                if(state.s5.correct) cls += " correct";
+                if(state.s5.feedback && !state.s5.correct && num !== null && num !== factorOrder[idx]) cls += " wrong";
+                return `<button class="${cls}" data-action="s5-slot" data-index="${idx}">
+                  ${num === null ? `<span class="slot-label">Slot ${idx + 1}</span>` : `<span class="slot-num">${num}</span>`}
+                </button>`;
+              }).join("")}
+            </div>
+            <div class="footer-actions">
+              <button class="mini-btn secondary" data-action="s5-reset">Reset order</button>
+              <button class="action-btn" data-action="s5-check">Check</button>
+            </div>
+            ${renderFeedback(state.s5.feedback, state.s5.correct ? "good" : (state.s5.feedback ? "warn" : ""))}
+            ${renderNav()}
+          </section>
+        `;
+      case 5:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Why can we stop here?</h1>
+            <div class="screen-sub">A systematic list stops when the factor pairs start to repeat.</div>
+            <div class="factor-arch">
+              <div class="arch-row">
+                <span class="arch-pill">1 × 54</span>
+                <span class="arch-pill">2 × 27</span>
+                <span class="arch-pill">3 × 18</span>
+                <span class="arch-pill">6 × 9</span>
+              </div>
+              <div class="arch-row">
+                <span class="repeat-pill">9 × 6</span>
+                <span class="repeat-pill">18 × 3</span>
+                <span class="repeat-pill">27 × 2</span>
+                <span class="repeat-pill">54 × 1</span>
+              </div>
+            </div>
+            <div class="big-card-grid" style="margin-top:16px">
+              ${state.orders.screen6.map(id => {
+                const opt = screen6Options.find(o => o.id === id);
+                let cls = "reason-card";
+                if(state.s6.selected === id) cls += " selected";
+                if(state.s6.correct && opt.correct) cls += " correct";
+                if(state.s6.feedback && state.s6.selected === id && !opt.correct && !state.s6.correct) cls += " wrong";
+                return `<button class="${cls}" data-action="s6-select" data-value="${id}">${opt.text}</button>`;
+              }).join("")}
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s6-check">Check</button>
+            </div>
+            ${renderFeedback(state.s6.feedback, state.s6.correct ? "good" : (state.s6.feedback ? "warn" : ""))}
+            ${renderNav()}
+          </section>
+        `;
+      case 6:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">What does “remainder” mean?</h1>
+            <div class="screen-sub">Here are 11 counters. Share them into groups of 7. Tap the counters that are left over.</div>
+            <div class="counter-area">
+              <div class="counter-box">
+                <h3>One full group of 7</h3>
+                <div class="dot-grid">
+                  ${new Array(7).fill(0).map((_,i) => {
+                    const id = i + 1;
+                    const selected = isSelected(state.s7.selected, String(id));
+                    let cls = "counter-dot in-group";
+                    if(selected) cls += " selected";
+                    return `<button class="${cls}" data-action="s7-toggle" data-value="${id}">${id}</button>`;
+                  }).join("")}
+                </div>
+              </div>
+              <div class="counter-box">
+                <h3>Left over after making a full group of 7</h3>
+                <div class="dot-grid">
+                  ${[8,9,10,11].map(id => {
+                    const selected = isSelected(state.s7.selected, String(id));
+                    let cls = "counter-dot leftover";
+                    if(selected) cls += " selected";
+                    if(state.s7.correct) cls += " correct";
+                    return `<button class="${cls}" data-action="s7-toggle" data-value="${id}">${id}</button>`;
+                  }).join("")}
+                </div>
+                ${state.s7.correct ? `<div class="leftover-tag">✅ remainder = what is left over</div>` : ``}
+              </div>
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s7-check">Check</button>
+            </div>
+            ${renderFeedback(state.s7.feedback, state.s7.correct ? "good" : (state.s7.feedback ? "warn" : ""))}
+            ${renderNav()}
+          </section>
+        `;
+      case 7:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Check the first half of the factor list</h1>
+            <div class="screen-sub">For each factor, choose the remainder when it is divided by 7.</div>
+            ${factorPairPills()}
+            <div class="remainder-grid">
+              ${screen8Rows.map(row => {
+                const selected = state.s8.answers[row.n];
+                const statusClass = state.s8.checked ? ((selected === row.rem) ? "good" : "bad") : "";
+                return `
+                  <div class="remainder-row">
+                    <div class="remainder-top">
+                      <div class="row-prompt">${row.n} ÷ 7 leaves remainder
+                        <span class="small">This number is smaller than 7, so all of it is left over.</span>
+                      </div>
+                      <div class="rem-choices">
+                        ${[0,1,2,3,4,5,6].map(num => {
+                          let cls = "rem-choice";
+                          if(selected === num) cls += " selected";
+                          if(state.s8.checked && selected === num && num === row.rem) cls += " correct";
+                          if(state.s8.checked && selected === num && num !== row.rem) cls += " wrong";
+                          return `<button class="${cls}" data-action="s8-choice" data-row="${row.n}" data-value="${num}">${num}</button>`;
+                        }).join("")}
+                      </div>
+                    </div>
+                    ${renderGroupsVisual(row.n)}
+                    ${state.s8.checked ? `<div class="row-status ${statusClass}">${selected === row.rem ? row.note : "Try again. This number is smaller than 7, so the whole number is left over."}</div>` : ``}
+                  </div>
+                `;
+              }).join("")}
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s8-check">Check</button>
+            </div>
+            ${renderFeedback(state.s8.feedback, state.s8.correct ? "good" : (state.s8.feedback ? "warn" : ""))}
+            ${renderNav()}
+          </section>
+        `;
+      case 8:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Check the second half of the factor list</h1>
+            <div class="screen-sub">Keep using the same method. Make full 7s first. Then look at what is left.</div>
+            <div class="remainder-grid">
+              ${screen9Rows.map(row => {
+                const selected = state.s9.answers[row.n];
+                const statusClass = state.s9.checked ? ((selected === row.rem) ? "good" : "bad") : "";
+                return `
+                  <div class="remainder-row">
+                    <div class="remainder-top">
+                      <div class="row-prompt">${row.n} ÷ 7 leaves remainder
+                        <span class="small">Look for full 7s first, then the leftover part.</span>
+                      </div>
+                      <div class="rem-choices">
+                        ${[0,1,2,3,4,5,6].map(num => {
+                          let cls = "rem-choice";
+                          if(selected === num) cls += " selected";
+                          if(state.s9.checked && selected === num && num === row.rem) cls += " correct";
+                          if(state.s9.checked && selected === num && num !== row.rem) cls += " wrong";
+                          return `<button class="${cls}" data-action="s9-choice" data-row="${row.n}" data-value="${num}">${num}</button>`;
+                        }).join("")}
+                      </div>
+                    </div>
+                    ${renderGroupsVisual(row.n)}
+                    ${state.s9.checked ? `<div class="row-status ${statusClass}">${selected === row.rem ? row.note : "Try again. Make as many full 7s as you can. Then check what is left."}</div>` : ``}
+                  </div>
+                `;
+              }).join("")}
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s9-check">Check</button>
+            </div>
+            ${renderFeedback(state.s9.feedback, state.s9.correct ? "good" : (state.s9.feedback ? "warn" : ""))}
+            ${renderNav()}
+          </section>
+        `;
+      case 9:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Which number fits both clues?</h1>
+            <div class="screen-sub">Tap the one number that is in the factor list of 54 and also leaves remainder 4 when divided by 7.</div>
+            <div class="badge-row">
+              <span class="badge">Clue A: factor of 54 ✔</span>
+              <span class="badge">Clue B: remainder 4 when divided by 7 ✔</span>
+            </div>
+            <div class="table-wrap">
+              <table class="summary-table">
+                <thead>
+                  <tr><th>Factor of 54</th><th>Remainder when divided by 7</th><th>Pick?</th></tr>
+                </thead>
+                <tbody>
+                  ${correctionRows.map(r => {
+                    let cls = "row-card";
+                    if(state.s10.selected === String(r.factor)) cls += " selected";
+                    if(state.s10.correct && r.factor === 18) cls += " correct";
+                    if(state.s10.feedback && state.s10.selected === String(r.factor) && r.factor !== 18 && !state.s10.correct) cls += " wrong";
+                    return `
+                      <tr class="${r.factor === 18 && state.s10.correct ? 'good' : ''}">
+                        <td>${r.factor}</td>
+                        <td>${r.rem}</td>
+                        <td><button class="${cls}" data-action="s10-select" data-value="${r.factor}">${state.s10.selected === String(r.factor) ? "Selected" : "Tap this row"}</button></td>
+                      </tr>
+                    `;
+                  }).join("")}
+                </tbody>
+              </table>
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s10-check">Check</button>
+            </div>
+            ${renderFeedback(state.s10.feedback, state.s10.correct ? "good" : (state.s10.feedback ? "warn" : ""))}
+            ${renderNav()}
+          </section>
+        `;
+      case 10:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Show why 18 works</h1>
+            <div class="screen-sub">Check both clues. Then press <strong>Show why</strong>.</div>
+            <div class="proof-panels">
+              <div class="proof-panel">
+                <h3>Clue A</h3>
+                <div style="font-size:24px;font-weight:700;margin-bottom:12px">18 is a factor of 54.</div>
+                <div class="big-card-grid" style="grid-template-columns:repeat(2,minmax(140px,1fr))">
+                  ${["Yes","No"].map(ans => {
+                    const chosen = state.s11.q1 === ans;
+                    let cls = "yn-card";
+                    if(chosen) cls += " selected";
+                    if(state.s11.correct && ans === "Yes") cls += " correct";
+                    if(state.s11.feedback && chosen && ans !== "Yes" && !state.s11.correct) cls += " wrong";
+                    return `<button class="${cls}" data-action="s11-q1" data-value="${ans}">${ans}</button>`;
+                  }).join("")}
+                </div>
+              </div>
+              <div class="proof-panel">
+                <h3>Clue B</h3>
+                <div style="font-size:24px;font-weight:700;margin-bottom:12px">18 ÷ 7 leaves remainder 4.</div>
+                <div class="big-card-grid" style="grid-template-columns:repeat(2,minmax(140px,1fr))">
+                  ${["Yes","No"].map(ans => {
+                    const chosen = state.s11.q2 === ans;
+                    let cls = "yn-card";
+                    if(chosen) cls += " selected";
+                    if(state.s11.correct && ans === "Yes") cls += " correct";
+                    if(state.s11.feedback && chosen && ans !== "Yes" && !state.s11.correct) cls += " wrong";
+                    return `<button class="${cls}" data-action="s11-q2" data-value="${ans}">${ans}</button>`;
+                  }).join("")}
+                </div>
+              </div>
+            </div>
+            <div class="footer-actions">
+              <button class="action-btn" data-action="s11-check">Check</button>
+              <button class="action-btn amber" data-action="s11-show" ${!(state.s11.correct) ? 'disabled style="opacity:.45;cursor:not-allowed"' : ''}>Show why</button>
+            </div>
+            ${renderFeedback(state.s11.feedback, state.s11.correct ? "good" : (state.s11.feedback ? "warn" : ""))}
+            ${state.s11.showWhy ? `
+              <div class="proof-visual" style="margin-top:16px">
+                <div class="proof-panels">
+                  <div class="proof-panel">
+                    <h3>18 is a factor of 54</h3>
+                    <div class="eq-badge">54 = 3 × 18</div>
+                    <div class="helper-strip">So 18 divides 54 exactly.</div>
+                  </div>
+                  <div class="proof-panel">
+                    <h3>18 leaves remainder 4 when divided by 7</h3>
+                    <div class="eq-badge">18 = 7 + 7 + 4</div>
+                    ${renderGroupsVisual(18)}
+                    <div class="helper-strip">Two full 7s and 4 left over.</div>
+                  </div>
+                </div>
+              </div>
+            ` : ""}
+            ${renderNav()}
+          </section>
+        `;
+      case 11:
+        return `
+          <section class="screen-card" id="screen-body">
+            <h1 class="screen-title">Draw this table for your corrections</h1>
+            <div class="screen-sub">Use the same method on paper: <strong>list the factors first</strong>, then <strong>test each factor by 7</strong>.</div>
+            <div class="big-note">Answer: <strong>18</strong></div>
+            <div class="correction-card">
+              <h2 style="margin:0 0 12px;font-size:30px">Factor pairs of 54</h2>
+              ${factorPairPills()}
+              <h2 style="margin:18px 0 12px;font-size:30px">Systematic listing table</h2>
+              <div class="table-wrap">
+                <table class="summary-table">
+                  <thead>
+                    <tr>
+                      <th>Factor of 54</th>
+                      <th>Divide by 7</th>
+                      <th>Remainder</th>
+                      <th>Keep?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${correctionRows.map(r => `
+                      <tr class="${r.factor === 18 ? 'good' : ''}">
+                        <td>${r.factor}</td>
+                        <td>${r.div}</td>
+                        <td>${r.rem}</td>
+                        <td>${r.keep === "Yes" ? "<strong>Yes</strong>" : "No"}</td>
+                      </tr>
+                    `).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="helper-strip">Only one factor leaves remainder 4 when divided by 7. That factor is <strong>18</strong>.</div>
+            <div class="footer-actions">
+              <button class="nav-btn secondary" data-action="restart">Restart</button>
+            </div>
+          </section>
+        `;
+      default:
+        return `<section class="screen-card" id="screen-body"><h1 class="screen-title">Loading…</h1></section>`;
+    }
+  }
+
+  function renderApp(){
+    document.getElementById('app').innerHTML = `
+      <main class="app-shell">
+        <div class="topbar">
+          <section class="brand-card">
+            <h1 class="brand-title">P4 Maths Interactive</h1>
+            <div class="brand-sub">Find the number by using a systematic factor list and a remainder check.</div>
+          </section>
+          <section class="tool-card">
+            <button class="tool-btn secondary" data-action="toggle-question">${state.questionOpen ? "Hide question" : "Show question"}</button>
+            <button class="tool-btn" data-action="read-aloud">Read aloud</button>
+          </section>
+        </div>
+
+        <section class="progress-card">
+          <div class="progress-top">
+            <div class="progress-label">Progress</div>
+            <div class="progress-count">Screen ${state.current + 1} of 12</div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${progressPct()}%"></div>
+          </div>
+        </section>
+
+        ${renderQuestionCard()}
+        ${renderScreen()}
+      </main>
+    `;
+  }
+
+  function resetAll(){
+    state.current = 0;
+    state.questionOpen = false;
+    state.orders.screen3 = shuffle(screen3Options.map(o => o.id));
+    state.orders.screen4 = shuffle(factorPairs.map(p => p.id));
+    state.orders.screen6 = shuffle(screen6Options.map(o => o.id));
+    state.s2 = { selected: [], feedback:"" };
+    state.s3 = { selected:null, attempts:0, correct:false, feedback:"" };
+    state.s4 = { selected:[], attempts:0, correct:false, feedback:"" };
+    state.s5 = { bankOrder: shuffle([1,54,2,27,3,18,6,9]), selectedChip:null, slots:Array(8).fill(null), attempts:0, correct:false, feedback:"" };
+    state.s6 = { selected:null, attempts:0, correct:false, feedback:"" };
+    state.s7 = { selected:[], attempts:0, correct:false, feedback:"" };
+    state.s8 = { answers:{}, checked:false, attempts:0, correct:false, feedback:"" };
+    state.s9 = { answers:{}, checked:false, attempts:0, correct:false, feedback:"" };
+    state.s10= { selected:null, attempts:0, correct:false, feedback:"" };
+    state.s11= { q1:null, q2:null, attempts:0, correct:false, showWhy:false, feedback:"" };
+  }
+
+  function arraysEqualAsSets(a,b){
+    return a.length === b.length && a.every(v => b.indexOf(v) !== -1);
+  }
+
+  document.addEventListener('click', function(e){
+    const el = e.target.closest('[data-action]');
+    if(!el) return;
+    const action = el.dataset.action;
+    const value = el.dataset.value;
+    const index = el.dataset.index;
+
+    if(action === 'toggle-question'){
+      state.questionOpen = !state.questionOpen;
+      renderApp();
+      return;
+    }
+    if(action === 'read-aloud'){
+      speakText(currentSpeechText());
+      return;
+    }
+    if(action === 'prev'){
+      if(state.current > 0){
+        state.current -= 1;
+        renderApp();
+      }
+      return;
+    }
+    if(action === 'next'){
+      if(canGoNext() && state.current < 11){
+        state.current += 1;
+        renderApp();
+      }
+      return;
+    }
+    if(action === 'restart'){
+      resetAll();
+      renderApp();
+      return;
+    }
+
+    // Screen 2
+    if(action === 's2-toggle'){
+      const correctIds = ['factor54','rem4'];
+      if(correctIds.indexOf(value) !== -1){
+        if(!isSelected(state.s2.selected, value) && state.s2.selected.length < 2){
+          state.s2.selected.push(value);
+        }else if(isSelected(state.s2.selected, value)){
+          toggleInArray(state.s2.selected, value);
+        }
+        state.s2.feedback = canGoNext() ? "Great. These are the 2 clues we must use." : "Good. Keep tapping the 2 clues.";
+      } else {
+        state.s2.feedback = "Tap the parts that tell you what kind of number to look for.";
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 3
+    if(action === 's3-select'){
+      state.s3.selected = value;
+      state.s3.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's3-check'){
+      if(!state.s3.selected){
+        state.s3.feedback = "Choose one answer first.";
+      } else {
+        state.s3.attempts += 1;
+        const opt = screen3Options.find(o => o.id === state.s3.selected);
+        if(opt.correct){
+          state.s3.correct = true;
+          state.s3.feedback = "Yes. First list the factors of 54. Those are the only possible numbers to test.";
+        } else {
+          state.s3.correct = false;
+          state.s3.feedback = "Use the clue “factor of 54”. Which option matches that clue?";
+        }
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 4
+    if(action === 's4-answer'){
+      const parts = String(value).split('|');
+      const divisor = parts[0];
+      const answer = parts[1];
+      state.s4.answers[divisor] = answer;
+      state.s4.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's4-reset'){
+      state.s4.answers = {};
+      state.s4.correct = false;
+      state.s4.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's4-check'){
+      const missing = screen4Divisors.some(item => !state.s4.answers[item.d]);
+      if(missing){
+        state.s4.feedback = "Answer every divisor card first.";
+      } else {
+        state.s4.attempts += 1;
+        const ok = screen4Divisors.every(item => state.s4.answers[item.d] === (item.exact ? 'exact' : 'not'));
+        if(ok){
+          state.s4.correct = true;
+          state.s4.feedback = "Yes. The exact divisors are 1, 2, 3 and 6. Those give the factor pairs of 54.";
+        } else {
+          state.s4.correct = false;
+          state.s4.feedback = "Check which divisors split 54 exactly with no remainder.";
+        }
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 5
+    if(action === 's5-chip'){
+      const num = Number(value);
+      if(state.s5.slots.indexOf(num) === -1){
+        state.s5.selectedChip = num;
+        state.s5.feedback = "";
+      }
+      renderApp();
+      return;
+    }
+    if(action === 's5-slot'){
+      const idx = Number(index);
+      if(state.s5.slots[idx] !== null){
+        state.s5.slots[idx] = null;
+      } else if(state.s5.selectedChip !== null){
+        state.s5.slots[idx] = state.s5.selectedChip;
+        state.s5.selectedChip = null;
+      }
+      state.s5.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's5-reset'){
+      state.s5.selectedChip = null;
+      state.s5.slots = Array(8).fill(null);
+      state.s5.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's5-check'){
+      if(state.s5.slots.some(v => v === null)){
+        state.s5.feedback = "Fill every slot first.";
+      } else {
+        state.s5.attempts += 1;
+        const ok = state.s5.slots.every((v,i) => v === factorOrder[i]);
+        if(ok){
+          state.s5.correct = true;
+          state.s5.feedback = "Yes. This is the full factor list in ascending order.";
+        } else {
+          state.s5.correct = false;
+          state.s5.feedback = "Put the smallest factor first, then keep going in order.";
+        }
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 6
+    if(action === 's6-select'){
+      state.s6.selected = value;
+      state.s6.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's6-check'){
+      if(!state.s6.selected){
+        state.s6.feedback = "Choose one answer first.";
+      } else {
+        state.s6.attempts += 1;
+        const opt = screen6Options.find(o => o.id === state.s6.selected);
+        if(opt.correct){
+          state.s6.correct = true;
+          state.s6.feedback = "Yes. After 6 × 9, the factor pairs would repeat.";
+        } else {
+          state.s6.correct = false;
+          state.s6.feedback = "Look at 6 × 9 and 9 × 6. What is happening?";
+        }
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 7
+    if(action === 's7-toggle'){
+      toggleInArray(state.s7.selected, value);
+      state.s7.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's7-check'){
+      state.s7.attempts += 1;
+      const answer = ['8','9','10','11'];
+      if(arraysEqualAsSets(state.s7.selected.slice().sort(), answer.slice().sort())){
+        state.s7.correct = true;
+        state.s7.feedback = "Yes. The remainder is what is left over.";
+      } else {
+        state.s7.correct = false;
+        state.s7.feedback = "Tap the counters that do not fit into a full group of 7.";
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 8
+    if(action === 's8-choice'){
+      state.s8.answers[Number(el.dataset.row)] = Number(value);
+      state.s8.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's8-check'){
+      if(screen8Rows.some(r => state.s8.answers[r.n] === undefined)){
+        state.s8.feedback = "Choose a remainder for every row first.";
+      } else {
+        state.s8.attempts += 1;
+        state.s8.checked = true;
+        const ok = screen8Rows.every(r => state.s8.answers[r.n] === r.rem);
+        state.s8.correct = ok;
+        state.s8.feedback = ok ? "Good. You checked the first four factors correctly." : "Some rows need another look. These numbers are all smaller than 7.";
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 9
+    if(action === 's9-choice'){
+      state.s9.answers[Number(el.dataset.row)] = Number(value);
+      state.s9.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's9-check'){
+      if(screen9Rows.some(r => state.s9.answers[r.n] === undefined)){
+        state.s9.feedback = "Choose a remainder for every row first.";
+      } else {
+        state.s9.attempts += 1;
+        state.s9.checked = true;
+        const ok = screen9Rows.every(r => state.s9.answers[r.n] === r.rem);
+        state.s9.correct = ok;
+        state.s9.feedback = ok ? "Great. One row now shows remainder 4." : "Some rows need another look. Make full 7s first, then check the leftover part.";
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 10
+    if(action === 's10-select'){
+      state.s10.selected = value;
+      state.s10.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's10-check'){
+      if(!state.s10.selected){
+        state.s10.feedback = "Tap one row first.";
+      } else {
+        state.s10.attempts += 1;
+        if(Number(state.s10.selected) === 18){
+          state.s10.correct = true;
+          state.s10.feedback = "Yes. 18 fits both clues.";
+        } else {
+          state.s10.correct = false;
+          state.s10.feedback = "Check both clues. We need one number that is a factor of 54 and leaves remainder 4.";
+        }
+      }
+      renderApp();
+      return;
+    }
+
+    // Screen 11
+    if(action === 's11-q1'){
+      state.s11.q1 = value;
+      state.s11.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's11-q2'){
+      state.s11.q2 = value;
+      state.s11.feedback = "";
+      renderApp();
+      return;
+    }
+    if(action === 's11-check'){
+      if(!state.s11.q1 || !state.s11.q2){
+        state.s11.feedback = "Answer both checks first.";
+      } else {
+        state.s11.attempts += 1;
+        const ok = state.s11.q1 === "Yes" && state.s11.q2 === "Yes";
+        state.s11.correct = ok;
+        state.s11.feedback = ok ? "Correct. Both checks are true." : "Check the two clues again. 18 works for both.";
+      }
+      renderApp();
+      return;
+    }
+    if(action === 's11-show'){
+      if(state.s11.correct){
+        state.s11.showWhy = true;
+        renderApp();
+      }
+      return;
+    }
+  });
+
+  renderApp();
+})();
+</script>
+</body>
+</html>

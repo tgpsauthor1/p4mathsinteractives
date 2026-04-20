@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>p4maths_t2_pp2_16_v3</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --panel:#ffffff;
+    --ink:#17324d;
+    --muted:#5f7084;
+    --line:#d8e2ee;
+    --blue:#1f6feb;
+    --blue-soft:#eaf2ff;
+    --amber:#ffb020;
+    --amber-soft:#fff4dd;
+    --green:#0f9d58;
+    --green-soft:#eaf8f0;
+    --red:#d93025;
+    --red-soft:#fdecea;
+    --shadow:0 10px 24px rgba(17,38,63,0.08);
+  }
+
+  *{ box-sizing:border-box; }
+  html, body{
+    margin:0;
+    padding:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  body{ min-height:100vh; }
+  button, input{ font:inherit; }
+  button{ cursor:pointer; touch-action:manipulation; }
+
+  .shell{
+    max-width:1080px;
+    margin:0 auto;
+    padding:18px 14px 40px;
+  }
+
+  .topbar, .question-panel, .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+  }
+
+  .topbar{
+    position:sticky;
+    top:8px;
+    z-index:10;
+    padding:16px;
+  }
+
+  .eyebrow{
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+
+  h1{
+    margin:0 0 12px;
+    font-size:clamp(28px, 4vw, 38px);
+    line-height:1.15;
+  }
+
+  .progress-wrap{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin:12px 0 14px;
+  }
+
+  .progress{
+    flex:1;
+    height:14px;
+    background:#e7eef8;
+    border:1px solid #d4dff0;
+    border-radius:999px;
+    overflow:hidden;
+  }
+
+  .progress-fill{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg, #5ea1ff, #1f6feb);
+    transition:width 0.3s ease;
+  }
+
+  .progress-label{
+    min-width:94px;
+    text-align:right;
+    font-weight:700;
+    color:var(--muted);
+  }
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .btn, .primary, .secondary{
+    border:none;
+    border-radius:14px;
+    min-height:48px;
+    padding:12px 16px;
+    font-weight:700;
+  }
+
+  .btn, .secondary{
+    background:#edf3fb;
+    border:1px solid #d7e3f3;
+    color:var(--ink);
+  }
+
+  .primary{
+    background:var(--blue);
+    color:#fff;
+    box-shadow:0 8px 16px rgba(31,111,235,0.18);
+  }
+
+  button[disabled]{
+    opacity:0.45;
+    cursor:not-allowed;
+    box-shadow:none;
+  }
+
+  .question-panel{
+    margin-top:12px;
+    padding:16px;
+  }
+
+  .question-panel.hidden{ display:none; }
+
+  .question-title{
+    font-weight:700;
+    margin-bottom:8px;
+  }
+
+  .question-text{
+    line-height:1.6;
+    font-size:18px;
+  }
+
+  .app{ margin-top:16px; }
+
+  .card{ padding:20px; }
+
+  .screen-number{
+    display:inline-block;
+    background:var(--blue-soft);
+    color:var(--blue);
+    padding:7px 12px;
+    border-radius:999px;
+    font-weight:700;
+    margin-bottom:14px;
+  }
+
+  .action-box{
+    background:var(--blue-soft);
+    border:2px solid #cfe1ff;
+    border-radius:18px;
+    padding:16px;
+    font-size:24px;
+    font-weight:700;
+    line-height:1.3;
+    margin-bottom:14px;
+  }
+
+  .support-box{
+    background:var(--amber-soft);
+    border:2px solid #ffd885;
+    border-radius:18px;
+    padding:14px 16px;
+    font-size:18px;
+    line-height:1.45;
+    margin-bottom:16px;
+  }
+
+  .feedback{
+    margin-top:14px;
+    border-radius:18px;
+    padding:14px 16px;
+    font-size:18px;
+    line-height:1.45;
+    border:2px solid transparent;
+  }
+
+  .feedback.success{
+    background:var(--green-soft);
+    border-color:#b8e3ca;
+    color:#11663f;
+  }
+
+  .feedback.error{
+    background:var(--red-soft);
+    border-color:#f2b6b2;
+    color:#9c2a22;
+  }
+
+  .parts-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:12px;
+    margin-top:6px;
+  }
+
+  .part-btn, .option-btn, .date-btn{
+    width:100%;
+    border-radius:18px;
+    border:2px solid #d6e2f1;
+    background:#fff;
+    color:var(--ink);
+    min-height:68px;
+    padding:14px;
+    text-align:left;
+    font-size:20px;
+    line-height:1.3;
+    font-weight:700;
+  }
+
+  .part-btn.selected, .option-btn.selected, .date-btn.selected{
+    background:var(--blue-soft);
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(31,111,235,0.12);
+  }
+
+  .part-btn.done{
+    background:var(--green-soft);
+    border-color:var(--green);
+  }
+
+  .option-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:12px;
+    margin-top:10px;
+  }
+
+  .builder-row, .row-card, .summary{
+    background:#f8fbff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px;
+  }
+
+  .builder-row + .builder-row, .row-card + .row-card{ margin-top:14px; }
+
+  .mini-title{
+    font-weight:700;
+    margin-bottom:10px;
+    color:var(--muted);
+  }
+
+  .date-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(90px, 1fr));
+    gap:10px;
+  }
+
+  .date-btn{
+    min-height:58px;
+    text-align:center;
+    padding:10px 8px;
+    border-radius:16px;
+  }
+
+  .date-btn.locked{
+    background:#eef4fb;
+    border-color:#c9d8eb;
+  }
+
+  .date-btn.correct{
+    background:var(--green-soft);
+    border-color:var(--green);
+  }
+
+  .date-btn.wrong{
+    background:var(--red-soft);
+    border-color:#f2b6b2;
+  }
+
+  .legend{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:12px;
+  }
+
+  .legend-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border-radius:999px;
+    padding:8px 12px;
+    font-weight:700;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+
+  .dot{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    display:inline-block;
+  }
+
+  .dot.start{ background:#dbe6f5; }
+  .dot.pick{ background:#cfe1ff; }
+  .dot.match{ background:#d7f3e4; }
+
+  .visit-strip{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(95px, 1fr));
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .visit-chip{
+    min-height:54px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8px;
+    border-radius:16px;
+    border:2px solid #d6e2f1;
+    background:#fff;
+    font-size:19px;
+    font-weight:700;
+  }
+
+  .visit-chip.start{
+    background:#eef4fb;
+  }
+
+  .visit-chip.library{
+    background:#eaf2ff;
+    border-color:#9fc4ff;
+  }
+
+  .visit-chip.home{
+    background:#fff4dd;
+    border-color:#ffd885;
+  }
+
+  .visit-chip.match{
+    background:var(--green-soft);
+    border-color:var(--green);
+  }
+
+  .row-label{
+    font-weight:700;
+    margin-bottom:10px;
+    color:var(--muted);
+  }
+
+  .input-wrap{ margin-top:10px; }
+
+  .text-input{
+    width:100%;
+    min-height:56px;
+    border-radius:16px;
+    border:2px solid #d6e2f1;
+    padding:12px 16px;
+    font-size:22px;
+  }
+
+  .button-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+
+  .summary ul{
+    margin:8px 0 0 22px;
+    line-height:1.55;
+    font-size:18px;
+  }
+
+  .final-badge{
+    display:inline-block;
+    margin-top:8px;
+    background:var(--green-soft);
+    border:2px solid #b8e3ca;
+    border-radius:999px;
+    padding:10px 14px;
+    font-weight:700;
+    font-size:19px;
+  }
+
+  .toast{
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    background:#17324d;
+    color:#fff;
+    padding:12px 16px;
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    opacity:0;
+    transform:translateY(10px);
+    pointer-events:none;
+    transition:all 0.25s ease;
+    z-index:30;
+  }
+
+  .toast.show{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  @media (max-width:700px){
+    .action-box{ font-size:22px; }
+    .support-box, .feedback{ font-size:17px; }
+    .part-btn, .option-btn, .date-btn{ font-size:18px; }
+    .text-input{ font-size:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="eyebrow">Primary 4 Maths Interactive</div>
+    <h1>Same-day visits</h1>
+    <div class="progress-wrap">
+      <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Step 1 of 7</div>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn" id="toggleQuestionBtn">Hide question</button>
+      <button type="button" class="btn" id="speakBtn">Read this screen</button>
+      <button type="button" class="btn" id="prevBtn">Back</button>
+      <button type="button" class="btn" id="restartBtn">Restart</button>
+    </div>
+  </div>
+
+  <div class="question-panel" id="questionPanel">
+    <div class="question-title">Question</div>
+    <div class="question-text">
+      Fatimah visits the library once every 3 days and she visits the old folks’ home once every 5 days.
+      If she last visited both places on 7 February, what would be the next date she would visit both places on the same day again?
+    </div>
+  </div>
+
+  <div class="app" id="app"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const app = document.getElementById('app');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const questionPanel = document.getElementById('questionPanel');
+  const toggleQuestionBtn = document.getElementById('toggleQuestionBtn');
+  const speakBtn = document.getElementById('speakBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const toast = document.getElementById('toast');
+
+  const dates = Array.from({length:22}, (_, i) => 7 + i); // 7 to 28
+  const libraryVisits = new Set([7,10,13,16,19,22,25,28]);
+  const homeVisits = new Set([7,12,17,22,27]);
+
+  function freshState(){
+    return {
+      screen:1,
+      questionOpen:true,
+      orders:{},
+      s1:{selected:[], feedback:"", success:false},
+      s2:{selected:[7], feedback:"", success:false, checked:false},
+      s3:{selected:[7], feedback:"", success:false, checked:false},
+      s4:{selected:[7], feedback:"", success:false},
+      s5:{value:"", feedback:"", success:false},
+      s6:{selected:null, feedback:"", success:false},
+      s7:{selected:null, feedback:"", success:false, showSummary:false}
+    };
+  }
+
+  let state = freshState();
+
+  function showToast(message){
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function shuffleStable(arr){
+    const copy = arr.slice();
+    for(let i = copy.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function getOrder(key, ids){
+    if(!state.orders[key]){
+      state.orders[key] = shuffleStable(ids);
+    }
+    return state.orders[key];
+  }
+
+  function escapeHtml(text){
+    return String(text)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function updateProgress(){
+    const pct = ((state.screen - 1) / 6) * 100;
+    progressFill.style.width = pct + "%";
+    progressLabel.textContent = `Step ${state.screen} of 7`;
+    prevBtn.disabled = state.screen === 1;
+  }
+
+  function renderOptionCards(key, options, selected){
+    const byId = Object.fromEntries(options.map(o => [o.id, o]));
+    const order = getOrder(key, options.map(o => o.id));
+    return `<div class="option-grid">${order.map(id => {
+      const opt = byId[id];
+      const selectedClass = selected === id ? " selected" : "";
+      return `<button type="button" class="option-btn${selectedClass}" data-action="select-option" data-key="${escapeHtml(key)}" data-id="${escapeHtml(id)}">${escapeHtml(opt.label)}</button>`;
+    }).join("")}</div>`;
+  }
+
+  function toggleQuestion(){
+    state.questionOpen = !state.questionOpen;
+    questionPanel.classList.toggle('hidden', !state.questionOpen);
+    toggleQuestionBtn.textContent = state.questionOpen ? 'Hide question' : 'Show question';
+  }
+
+  function speakCurrentScreen(){
+    if(!('speechSynthesis' in window)){
+      showToast('Read aloud is not available on this device.');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const area = document.querySelector('.card');
+    const text = area ? area.innerText : document.body.innerText;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }
+
+  function setScreen(n){
+    state.screen = n;
+    render();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function nextScreen(){
+    if(state.screen < 7) setScreen(state.screen + 1);
+  }
+
+  function prevScreen(){
+    if(state.screen > 1) setScreen(state.screen - 1);
+  }
+
+  function normaliseDateInput(value){
+    return String(value)
+      .toLowerCase()
+      .replaceAll(".", "")
+      .replaceAll(",", "")
+      .replaceAll("-", " ")
+      .replaceAll("/", " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isCorrectFinalAnswer(value){
+    const v = normaliseDateInput(value);
+    const accepted = new Set([
+      "22 feb", "22 february", "22 feb 2026", "22 february 2026",
+      "22 2", "22 02", "22 february 26", "22 feb 26", "46075"
+    ]);
+    return accepted.has(v);
+  }
+
+  function sorted(arr){
+    return arr.slice().sort((a,b) => a-b);
+  }
+
+  function visitLabel(day){
+    return `${day} Feb`;
+  }
+
+  function selectedListHtml(values, cls){
+    const sortedVals = sorted(values);
+    return `<div class="visit-strip">${
+      sortedVals.map(v => `<div class="visit-chip ${cls}">${visitLabel(v)}</div>`).join("")
+    }</div>`;
+  }
+
+  function fullDateGrid(selectedValues, lockedSeven, actionName, screenKey){
+    const chosen = new Set(selectedValues);
+    return `<div class="date-grid">${
+      dates.map(day => {
+        let classes = ['date-btn'];
+        if(lockedSeven && day === 7) classes.push('locked');
+        if(chosen.has(day) && day !== 7) classes.push('selected');
+        if(chosen.has(day) && day === 7) classes.push('correct');
+        const label = `${day}<br>Feb`;
+        const disabledAttr = lockedSeven && day === 7 ? 'disabled' : '';
+        return `<button type="button" class="${classes.join(' ')}" data-action="${actionName}" data-screen="${screenKey}" data-day="${day}" ${disabledAttr}>${label}</button>`;
+      }).join("")
+    }</div>`;
+  }
+
+  function screen1(){
+    const parts = [
+      {id:'start', label:'7 February'},
+      {id:'library', label:'Library: once every 3 days'},
+      {id:'home', label:'Old folks’ home: once every 5 days'},
+      {id:'goal', label:'Find the next same-day visit'}
+    ];
+    const selected = new Set(state.s1.selected);
+    return `
+      <div class="card">
+        <div class="screen-number">Step 1</div>
+        <div class="action-box">Tap all the important parts of the question.</div>
+        <div class="support-box">We need to notice the start date, the 3-day rule, the 5-day rule, and what we must find.</div>
+        <div class="parts-grid">
+          ${parts.map(part => {
+            const on = selected.has(part.id) ? " selected" : "";
+            const done = state.s1.success && selected.has(part.id) ? " done" : "";
+            return `<button type="button" class="part-btn${on}${done}" data-action="toggle-part" data-id="${part.id}">${escapeHtml(part.label)}</button>`;
+          }).join("")}
+        </div>
+        ${state.s1.feedback ? `<div class="feedback ${state.s1.success ? "success" : "error"}">${escapeHtml(state.s1.feedback)}</div>` : ""}
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s1">Check</button>
+          <button type="button" class="secondary" data-action="next" ${!state.s1.success ? "disabled" : ""}>Next</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function screen2(){
+    return `
+      <div class="card">
+        <div class="screen-number">Step 2</div>
+        <div class="action-box">Starting from 7 Feb, tap every date Fatimah visits the library.</div>
+        <div class="support-box">The library rule is <strong>once every 3 days</strong>. 7 Feb is already given as the start date. Now find the rest up to 28 Feb.</div>
+
+        <div class="builder-row">
+          <div class="mini-title">Tap the library visit dates</div>
+          ${fullDateGrid(state.s2.selected, true, 'toggle-date', 's2')}
+          <div class="legend">
+            <div class="legend-chip"><span class="dot start"></span> 7 Feb is the starting visit</div>
+            <div class="legend-chip"><span class="dot pick"></span> Tap the other library visits</div>
+          </div>
+        </div>
+
+        <div class="builder-row">
+          <div class="mini-title">Your library pattern so far</div>
+          ${selectedListHtml(state.s2.selected, 'library')}
+        </div>
+
+        ${state.s2.feedback ? `<div class="feedback ${state.s2.success ? "success" : "error"}">${escapeHtml(state.s2.feedback)}</div>` : ""}
+
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s2">Check</button>
+          <button type="button" class="secondary" data-action="next" ${!state.s2.success ? "disabled" : ""}>Next</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function screen3(){
+    return `
+      <div class="card">
+        <div class="screen-number">Step 3</div>
+        <div class="action-box">Starting from 7 Feb, tap every date Fatimah visits the old folks’ home.</div>
+        <div class="support-box">The old folks’ home rule is <strong>once every 5 days</strong>. 7 Feb is already given as the start date. Now find the rest up to 28 Feb.</div>
+
+        <div class="builder-row">
+          <div class="mini-title">Tap the old folks’ home visit dates</div>
+          ${fullDateGrid(state.s3.selected, true, 'toggle-date', 's3')}
+          <div class="legend">
+            <div class="legend-chip"><span class="dot start"></span> 7 Feb is the starting visit</div>
+            <div class="legend-chip"><span class="dot pick"></span> Tap the other old folks’ home visits</div>
+          </div>
+        </div>
+
+        <div class="builder-row">
+          <div class="mini-title">Your old folks’ home pattern so far</div>
+          ${selectedListHtml(state.s3.selected, 'home')}
+        </div>
+
+        ${state.s3.feedback ? `<div class="feedback ${state.s3.success ? "success" : "error"}">${escapeHtml(state.s3.feedback)}</div>` : ""}
+
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s3">Check</button>
+          <button type="button" class="secondary" data-action="next" ${!state.s3.success ? "disabled" : ""}>Next</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function screen4(){
+    const chosenMatches = sorted(state.s4.selected);
+    return `
+      <div class="card">
+        <div class="screen-number">Step 4</div>
+        <div class="action-box">Now compare both patterns. Tap all the dates that appear in both patterns.</div>
+        <div class="support-box">Look at both patterns and spot the dates that are in both. Mark the common dates first. Then think about which one is the next date after 7 Feb.</div>
+
+        <div class="row-card">
+          <div class="row-label">Library visits</div>
+          ${selectedListHtml(sorted([...libraryVisits]), 'library')}
+        </div>
+
+        <div class="row-card">
+          <div class="row-label">Old folks’ home visits</div>
+          ${selectedListHtml(sorted([...homeVisits]), 'home')}
+        </div>
+
+        <div class="row-card">
+          <div class="mini-title">Tap the dates that appear in both patterns</div>
+          ${fullDateGrid(state.s4.selected, false, 'toggle-date', 's4')}
+          <div class="legend">
+            <div class="legend-chip"><span class="dot pick"></span> Tap all common dates</div>
+          </div>
+        </div>
+
+        <div class="row-card">
+          <div class="row-label">Dates you selected</div>
+          ${chosenMatches.length ? selectedListHtml(chosenMatches, 'match') : '<div class="support-box" style="margin:0;">No dates selected yet.</div>'}
+        </div>
+
+        ${state.s4.feedback ? `<div class="feedback ${state.s4.success ? "success" : "error"}">${escapeHtml(state.s4.feedback)}</div>` : ""}
+
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s4">Check</button>
+          <button type="button" class="secondary" data-action="next" ${!state.s4.success ? "disabled" : ""}>Next</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function screen5(){
+    return `
+      <div class="card">
+        <div class="screen-number">Step 5</div>
+        <div class="action-box">Write the next date she will visit both places on the same day again.</div>
+        <div class="support-box">Be careful. The final answer must be a <strong>date</strong>, not just the number of days.</div>
+        <div class="input-wrap">
+          <input id="finalInput" class="text-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type the date here" value="${escapeHtml(state.s5.value)}" />
+        </div>
+        ${state.s5.feedback ? `<div class="feedback ${state.s5.success ? "success" : "error"}">${escapeHtml(state.s5.feedback)}</div>` : ""}
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s5">Check</button>
+          <button type="button" class="secondary" data-action="next" ${!state.s5.success ? "disabled" : ""}>Next</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function screen6(){
+    const options = [
+      {id:"14", label:"14"},
+      {id:"15", label:"15"},
+      {id:"16", label:"16"}
+    ];
+    return `
+      <div class="card">
+        <div class="screen-number">Step 6</div>
+        <div class="action-box">How many days after 7 Feb is 22 Feb?</div>
+        <div class="support-box">This helps us explain why the two patterns meet again on 22 Feb.</div>
+        ${renderOptionCards("screen6-choice", options, state.s6.selected)}
+        ${state.s6.feedback ? `<div class="feedback ${state.s6.success ? "success" : "error"}">${escapeHtml(state.s6.feedback)}</div>` : ""}
+        ${state.s6.success ? `
+          <div class="summary">
+            <strong>Why 15 matters</strong>
+            <ul>
+              <li>15 is a multiple of 3.</li>
+              <li>15 is also a multiple of 5.</li>
+              <li>So 15 days after 7 Feb, both visit patterns land on the same date.</li>
+            </ul>
+          </div>
+        ` : ""}
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s6">Check</button>
+          <button type="button" class="secondary" data-action="next" ${!state.s6.success ? "disabled" : ""}>Next</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function screen7(){
+    const options = [
+      {id:"best", label:"Start at 7 Feb, build the 3-day pattern and the 5-day pattern, then find the first date that matches."},
+      {id:"add", label:"Add 3 and 5 once and use that date."},
+      {id:"bigger", label:"Use the bigger number only."}
+    ];
+    return `
+      <div class="card">
+        <div class="screen-number">Step 7</div>
+        <div class="action-box">Which strategy works best for this question?</div>
+        <div class="support-box">Choose the strategy that matches the way we solved the problem.</div>
+        ${renderOptionCards("screen7-choice", options, state.s7.selected)}
+        ${state.s7.feedback ? `<div class="feedback ${state.s7.success ? "success" : "error"}">${escapeHtml(state.s7.feedback)}</div>` : ""}
+        ${state.s7.showSummary ? `
+          <div class="summary">
+            <strong>Consolidate the strategy</strong>
+            <div class="final-badge">Next same-day visit: 22 Feb</div>
+            <ul>
+              <li>Start from the shared date: 7 Feb.</li>
+              <li>Build one pattern for every 3 days.</li>
+              <li>Build one pattern for every 5 days.</li>
+              <li>Find the first date that appears in both patterns.</li>
+              <li>That matching date is 22 Feb.</li>
+              <li>Another way to describe the match: 22 Feb is 15 days after 7 Feb.</li>
+            </ul>
+          </div>
+        ` : ""}
+        <div class="button-row">
+          <button type="button" class="primary" data-action="check-s7">Check</button>
+          <button type="button" class="secondary" data-action="restart">Restart</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function render(){
+    updateProgress();
+    let html = "";
+    if(state.screen === 1) html = screen1();
+    if(state.screen === 2) html = screen2();
+    if(state.screen === 3) html = screen3();
+    if(state.screen === 4) html = screen4();
+    if(state.screen === 5) html = screen5();
+    if(state.screen === 6) html = screen6();
+    if(state.screen === 7) html = screen7();
+    app.innerHTML = html;
+
+    const input = document.getElementById('finalInput');
+    if(input){
+      input.addEventListener('input', e => {
+        state.s5.value = e.target.value;
+      });
+      setTimeout(() => input.focus(), 30);
+    }
+  }
+
+  function reset(){
+    state = freshState();
+    render();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  app.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    const action = btn.dataset.action;
+
+    if(action === 'toggle-part'){
+      const id = btn.dataset.id;
+      const set = new Set(state.s1.selected);
+      if(set.has(id)) set.delete(id); else set.add(id);
+      state.s1.selected = [...set];
+      state.s1.feedback = "";
+      render();
+      return;
+    }
+
+    if(action === 'check-s1'){
+      const need = ['start','library','home','goal'];
+      state.s1.success = need.every(id => state.s1.selected.includes(id));
+      state.s1.feedback = state.s1.success
+        ? "Yes. You found the start date, both rules, and what we need to find."
+        : "Check again. You need all four parts: the start date, the 3-day rule, the 5-day rule, and the goal.";
+      render();
+      return;
+    }
+
+    if(action === 'toggle-date'){
+      const day = Number(btn.dataset.day);
+      const screenKey = btn.dataset.screen;
+      const target = state[screenKey];
+      if((screenKey === 's2' || screenKey === 's3') && day === 7) return;
+      const set = new Set(target.selected);
+      if(set.has(day)) set.delete(day); else set.add(day);
+      target.selected = [...set];
+      target.feedback = "";
+      render();
+      return;
+    }
+
+    if(action === 'check-s2'){
+      const chosen = new Set(state.s2.selected);
+      let ok = chosen.size === libraryVisits.size;
+      for(const day of libraryVisits){ if(!chosen.has(day)) ok = false; }
+      state.s2.success = ok;
+      state.s2.feedback = ok
+        ? "Good. You built the library pattern from 7 Feb to 28 Feb."
+        : "Not yet. Starting at 7 Feb, keep jumping 3 days each time.";
+      render();
+      return;
+    }
+
+    if(action === 'check-s3'){
+      const chosen = new Set(state.s3.selected);
+      let ok = chosen.size === homeVisits.size;
+      for(const day of homeVisits){ if(!chosen.has(day)) ok = false; }
+      state.s3.success = ok;
+      state.s3.feedback = ok
+        ? "Good. You built the old folks’ home pattern from 7 Feb to 28 Feb."
+        : "Not yet. Starting at 7 Feb, keep jumping 5 days each time.";
+      render();
+      return;
+    }
+
+    if(action === 'select-option'){
+      const key = btn.dataset.key;
+      const id = btn.dataset.id;
+      if(key === 'screen6-choice'){
+        state.s6.selected = id;
+        state.s6.feedback = "";
+      } else if(key === 'screen7-choice'){
+        state.s7.selected = id;
+        state.s7.feedback = "";
+      }
+      render();
+      return;
+    }
+
+    if(action === 'check-s4'){
+      const chosen = new Set(state.s4.selected);
+      state.s4.success = chosen.size === 2 && chosen.has(7) && chosen.has(22);
+      state.s4.feedback = state.s4.success
+        ? "Good. You spotted the dates that appear in both patterns."
+        : "Check again. Tap all the dates that appear in both patterns.";
+      render();
+      return;
+    }
+
+    if(action === 'check-s5'){
+      state.s5.success = isCorrectFinalAnswer(state.s5.value);
+      state.s5.feedback = state.s5.success
+        ? "Correct. The next same-day visit is 22 Feb."
+        : "Try again. Write the date, not just the number of days.";
+      render();
+      return;
+    }
+
+    if(action === 'check-s6'){
+      state.s6.success = state.s6.selected === '15';
+      state.s6.feedback = state.s6.success
+        ? "Yes. 22 Feb is 15 days after 7 Feb."
+        : "Try again. Count the days from 7 Feb to 22 Feb.";
+      render();
+      return;
+    }
+
+    if(action === 'check-s7'){
+      state.s7.success = state.s7.selected === 'best';
+      state.s7.showSummary = state.s7.success;
+      state.s7.feedback = state.s7.success
+        ? "Yes. That is the strategy we used."
+        : "Choose the strategy that builds both patterns and then looks for the first match.";
+      render();
+      return;
+    }
+
+    if(action === 'next'){
+      nextScreen();
+      return;
+    }
+
+    if(action === 'restart'){
+      reset();
+      return;
+    }
+  });
+
+  toggleQuestionBtn.addEventListener('click', toggleQuestion);
+  speakBtn.addEventListener('click', speakCurrentScreen);
+  prevBtn.addEventListener('click', prevScreen);
+  restartBtn.addEventListener('click', reset);
+
+  render();
+})();
+</script>
+</body>
+</html>

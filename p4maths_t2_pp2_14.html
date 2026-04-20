@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>p4maths_t2_pp2_14</title>
+<style>
+  :root{
+    --bg:#f4f8ff;
+    --panel:#ffffff;
+    --ink:#17324d;
+    --muted:#5b7083;
+    --line:#d6e2f0;
+    --accent:#2563eb;
+    --accent-2:#f59e0b;
+    --good:#15803d;
+    --bad:#b91c1c;
+    --soft-good:#ecfdf3;
+    --soft-bad:#fef2f2;
+    --soft-blue:#eff6ff;
+    --soft-orange:#fff7ed;
+    --shadow:0 12px 30px rgba(23,50,77,0.08);
+    --unit-w:68px;
+    --unit-h:46px;
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;background:linear-gradient(180deg,#eef5ff 0%, #f9fbff 100%);color:var(--ink);}
+  body{min-height:100vh;}
+  .page{max-width:980px;margin:0 auto;padding:16px 14px 34px;}
+  .header{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+  }
+  .header-top{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  h1{
+    font-size:clamp(24px,3.2vw,34px);
+    margin:0 0 4px 0;
+    line-height:1.15;
+  }
+  .subtle{color:var(--muted);font-size:15px;line-height:1.4;}
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  button{
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    touch-action:manipulation;
+    box-shadow:0 6px 16px rgba(37,99,235,0.15);
+  }
+  button.secondary{
+    background:#fff;
+    color:var(--ink);
+    border:1px solid var(--line);
+    box-shadow:none;
+  }
+  button.orange{background:var(--accent-2); color:#3b2800;}
+  button.good{background:var(--good);}
+  button.ghost{background:#eef4ff;color:var(--accent);box-shadow:none;}
+  button:disabled{opacity:0.5;cursor:not-allowed;}
+  details{
+    margin-top:12px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:#fbfdff;
+    overflow:hidden;
+  }
+  summary{
+    list-style:none;
+    cursor:pointer;
+    padding:12px 14px;
+    font-weight:700;
+    color:var(--ink);
+    touch-action:manipulation;
+  }
+  summary::-webkit-details-marker{display:none;}
+  .question-box{
+    padding:0 14px 14px 14px;
+    color:var(--ink);
+    line-height:1.55;
+    font-size:17px;
+  }
+
+  .progress-wrap{
+    margin-top:12px;
+  }
+  .progress-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .progress-bar{
+    height:14px;
+    border-radius:999px;
+    background:#e8eef7;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#2563eb,#60a5fa);
+    transition:width 0.35s ease;
+  }
+
+  .app{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    padding:18px;
+    min-height:560px;
+  }
+
+  .screen-tag{
+    display:inline-block;
+    padding:8px 12px;
+    background:#eef4ff;
+    border-radius:999px;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .action-box{
+    background:var(--soft-blue);
+    border:2px solid #bfdbfe;
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .action-title{
+    margin:0;
+    font-size:clamp(24px,3vw,34px);
+    line-height:1.2;
+  }
+  .support-box{
+    background:var(--soft-orange);
+    border:2px solid #fed7aa;
+    border-radius:18px;
+    padding:14px 16px;
+    margin-bottom:16px;
+    font-size:17px;
+    line-height:1.45;
+  }
+  .support-box strong{color:#8a4b00;}
+  .question-sentences{
+    display:grid;
+    gap:12px;
+    margin:14px 0 10px 0;
+  }
+
+  .sentence-card,.choice-card,.mini-card,.model-card{
+    background:#fff;
+    color:var(--ink);
+    border:2px solid var(--line);
+    border-radius:18px;
+    padding:16px;
+    font-size:18px;
+    line-height:1.4;
+    text-align:left;
+    cursor:pointer;
+    touch-action:manipulation;
+    transition:transform .08s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .sentence-card:hover,.choice-card:hover,.mini-card:hover,.model-card:hover{transform:translateY(-1px);}
+  .model-card{display:block;width:100%;}
+  .sentence-card.selected,.choice-card.selected,.mini-card.selected,.model-card.selected{
+    border-color:var(--accent);
+    background:#e9f1ff;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+  }
+  .sentence-card.correct,.choice-card.correct,.mini-card.correct,.model-card.correct{
+    border-color:var(--good);
+    background:var(--soft-good);
+  }
+  .sentence-card.incorrect,.choice-card.incorrect,.mini-card.incorrect,.model-card.incorrect{
+    border-color:var(--bad);
+    background:var(--soft-bad);
+  }
+  .choices-grid{
+    display:grid;
+    gap:12px;
+    margin:16px 0;
+  }
+  .choices-grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+  .choices-grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+
+  .feedback{
+    min-height:60px;
+    margin:12px 0 16px 0;
+    padding:14px 16px;
+    border-radius:16px;
+    border:2px solid var(--line);
+    font-size:18px;
+    line-height:1.45;
+    background:#fbfdff;
+  }
+  .feedback.good{border-color:#86efac;background:var(--soft-good);}
+  .feedback.bad{border-color:#fecaca;background:var(--soft-bad);}
+  .feedback.info{border-color:#bfdbfe;background:var(--soft-blue);}
+
+  .nav{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+    align-items:center;
+  }
+
+  .center{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;}
+  .small{font-size:15px;color:var(--muted);}
+  .input-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:16px 0;
+  }
+  input[type="number"], input[type="text"]{
+    font-size:24px;
+    padding:12px 14px;
+    border-radius:16px;
+    border:2px solid var(--line);
+    width:160px;
+    max-width:100%;
+  }
+
+  .transfer-visual, .check-visual{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin:16px 0;
+    align-items:center;
+  }
+  .person-box{
+    background:#fbfdff;
+    border:2px solid var(--line);
+    border-radius:18px;
+    padding:16px;
+  }
+  .person-box h3{
+    margin:0 0 8px 0;
+    font-size:22px;
+  }
+  .dots{display:flex;gap:8px;flex-wrap:wrap;min-height:28px;}
+  .dot{
+    width:18px;height:18px;border-radius:50%;background:#2563eb;
+    box-shadow:0 2px 6px rgba(37,99,235,0.25);
+  }
+  .dot.orange{background:#f59e0b;box-shadow:0 2px 6px rgba(245,158,11,0.25);}
+  .total-badge{
+    display:inline-block;
+    padding:10px 14px;
+    background:#eefdf4;
+    border:2px solid #86efac;
+    border-radius:999px;
+    font-weight:700;
+    margin-top:10px;
+  }
+  .arrow-big{
+    font-size:34px;
+    text-align:center;
+    color:var(--accent);
+    font-weight:700;
+  }
+
+  .model-area{
+    background:#fcfdff;
+    border:2px solid var(--line);
+    border-radius:18px;
+    padding:16px;
+    margin:16px 0;
+    overflow-x:auto;
+  }
+  .brace-label{
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:8px;
+    text-align:center;
+  }
+  .brace-line{
+    height:14px;
+    border-top:4px solid #60a5fa;
+    border-left:4px solid #60a5fa;
+    border-right:4px solid #60a5fa;
+    border-radius:10px 10px 0 0;
+    width:calc(var(--unit-w) * 3 + 16px);
+    margin:0 auto 8px auto;
+  }
+  .row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin:10px 0;
+    justify-content:center;
+  }
+  .row-label{
+    width:78px;
+    font-weight:700;
+    font-size:18px;
+  }
+  .segments{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .segment{
+    width:var(--unit-w);
+    height:var(--unit-h);
+    border-radius:12px;
+    border:2px solid #60a5fa;
+    background:#dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:16px;
+    color:#1d4ed8;
+  }
+  .segment.betty{border-color:#f59e0b;background:#ffedd5;color:#9a4d00;}
+  .segment.derived{outline:4px solid rgba(21,128,61,0.15);}
+  .pulse{
+    animation:pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.05);}
+  }
+  .move-right{
+    animation:moveRight 1.4s ease-in-out infinite;
+  }
+  @keyframes moveRight{
+    0%{transform:translateX(0);}
+    50%{transform:translateX(28px);}
+    100%{transform:translateX(0);}
+  }
+  .flow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin:18px 0;
+  }
+  .pill{
+    padding:10px 14px;
+    border-radius:999px;
+    font-weight:700;
+    border:2px solid var(--line);
+    background:#fff;
+  }
+  .pill.good{border-color:#86efac;background:var(--soft-good);}
+  .pill.orange{border-color:#fed7aa;background:var(--soft-orange);}
+  .math-big{
+    font-size:clamp(30px,4vw,42px);
+    font-weight:800;
+    line-height:1.15;
+    margin:6px 0 4px 0;
+    text-align:center;
+  }
+  .mini-practice{
+    background:#fbfdff;
+    border:2px dashed #bfdbfe;
+    border-radius:18px;
+    padding:16px;
+    margin-top:14px;
+  }
+  .streak{
+    display:inline-block;
+    padding:8px 12px;
+    background:#eff6ff;
+    border-radius:999px;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .footer-note{
+    color:var(--muted);
+    font-size:14px;
+    margin-top:16px;
+  }
+  .hidden{display:none !important;}
+
+  @media (max-width:720px){
+    :root{--unit-w:56px; --unit-h:44px;}
+    .page{padding:10px;}
+    .app{padding:14px;}
+    .row{justify-content:flex-start;}
+    .row-label{width:64px;}
+    .brace-line{width:calc(var(--unit-w) * 3 + 16px);}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>Pen Problem Interactive</h1>
+        <div class="subtle">Built for Primary 4 students who need help seeing the structure, choosing the right operation, and working back carefully.</div>
+      </div>
+      <div class="controls">
+        <button id="readScreenBtn" type="button">Read this screen aloud</button>
+        <button id="stopReadBtn" type="button" class="secondary">Stop reading</button>
+      </div>
+    </div>
+
+    <details id="questionPanel" open>
+      <summary>Question</summary>
+      <div class="question-box" id="questionTextBox">
+        Andy and Betty had 60 pens altogether. After Betty gave 4 pens to Andy, Andy had twice as many pens as Betty. How many pens did Betty have at the beginning?
+      </div>
+    </details>
+
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <div id="progressLabel">Step 1 of 12</div>
+        <div id="progressTitle">Read the question</div>
+      </div>
+      <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="app" id="app" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+  const QUESTION = "Andy and Betty had 60 pens altogether. After Betty gave 4 pens to Andy, Andy had twice as many pens as Betty. How many pens did Betty have at the beginning?";
+
+  const state = {
+    screenIndex: 0,
+    feedback: {},
+    selections: {},
+    typed: {},
+    answers: {},
+    orders: {},
+    checkStates: {},
+    remediation: null
+  };
+
+  const screens = [
+    { id:"s1", title:"Read the question", type:"sentenceTap" },
+    { id:"s2", title:"Does the total change?", type:"choice" },
+    { id:"s3", title:"Who has more after the transfer?", type:"choice" },
+    { id:"s4", title:"Choose the after-transfer model", type:"modelChoice" },
+    { id:"s5", title:"How many same parts make 60?", type:"choice" },
+    { id:"s6", title:"Choose the operation", type:"choice" },
+    { id:"s7", title:"Find Betty's pens after the transfer", type:"input" },
+    { id:"s8", title:"Do we stop at 20?", type:"choice" },
+    { id:"s9", title:"Go back to the beginning", type:"choice" },
+    { id:"s10", title:"Find Betty's beginning number", type:"input" },
+    { id:"s11", title:"Check the story", type:"choice" },
+    { id:"s12", title:"Consolidate the strategy", type:"choice" }
+  ];
+
+  const APP = document.getElementById("app");
+  const progressLabel = document.getElementById("progressLabel");
+  const progressTitle = document.getElementById("progressTitle");
+  const progressFill = document.getElementById("progressFill");
+  const readScreenBtn = document.getElementById("readScreenBtn");
+  const stopReadBtn = document.getElementById("stopReadBtn");
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function shuffleIds(ids, key){
+    if (!state.orders[key]) {
+      const arr = ids.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      state.orders[key] = arr;
+    }
+    return state.orders[key];
+  }
+
+  function setFeedback(key, kind, text){
+    state.feedback[key] = { kind, text };
+  }
+
+  function getFeedbackHtml(key){
+    const fb = state.feedback[key];
+    if (!fb) return `<div class="feedback info">Choose an answer, then press <strong>Check</strong>.</div>`;
+    return `<div class="feedback ${fb.kind}">${fb.text}</div>`;
+  }
+
+  function updateProgress(){
+    const step = state.screenIndex + 1;
+    progressLabel.textContent = `Step ${step} of ${screens.length}`;
+    progressTitle.textContent = screens[state.screenIndex].title;
+    progressFill.style.width = `${(step / screens.length) * 100}%`;
+  }
+
+  function readAloud(text){
+    try{
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.95;
+      utter.pitch = 1;
+      window.speechSynthesis.speak(utter);
+    }catch(err){}
+  }
+
+  function stopReading(){
+    try{ window.speechSynthesis.cancel(); }catch(err){}
+  }
+
+  function screenReadText(){
+    if (state.remediation) {
+      return remediationReadText();
+    }
+    const screen = screens[state.screenIndex];
+    const texts = {
+      s1: "Read the question. Tap the sentence that tells what changed between Andy and Betty.",
+      s2: "Does the total change? Choose the sentence that is true after Betty gives 4 pens to Andy.",
+      s3: "Who has more pens after the transfer? Choose the correct person.",
+      s4: "Which bar model matches the after-transfer situation? Choose the correct model.",
+      s5: "How many same parts make 60? Count the equal parts in the model.",
+      s6: "What should we do to find 1 same part? Choose the operation that fits the model.",
+      s7: "How many pens does Betty have after the transfer? Type your answer.",
+      s8: "Do we stop at 20? Decide whether 20 is the final answer.",
+      s9: "How do we go back to the beginning? Choose what to do with 4.",
+      s10: "How many pens did Betty have at the beginning? Type your answer.",
+      s11: "Check the story. Decide if the check matches the question.",
+      s12: "Consolidate the strategy. Choose the best strategy summary."
+    };
+    return `${QUESTION} ${texts[screen.id] || ""}`;
+  }
+
+  function remediationReadText(){
+    const r = state.remediation;
+    if (!r) return "";
+    if (r.kind === "divide3") {
+      const byStage = {
+        hint: "Hint. The total 60 covers 3 same parts, not 2.",
+        example: "Parallel example. If 3 same parts make 15, what should we do to find 1 same part?",
+        explain: "Animated explanation. Three same parts make the whole, so divide the whole by 3 to find 1 part.",
+        practice: `Practice. Get 3 correct in a row. ${r.item.prompt}`
+      };
+      return byStage[r.stage] || "";
+    }
+    if (r.kind === "addBack") {
+      const byStage = {
+        hint: "Hint. Betty gave away 4, so to go back to the beginning she must have had 4 more before giving.",
+        example: "Parallel example. Mia gave 2 stickers away and has 7 left. To go back to the beginning, should we add 2 or subtract 2?",
+        explain: "Animated explanation. When someone gives some away, their number gets smaller. To go back, add the amount back.",
+        practice: `Practice. Get 3 correct in a row. ${r.item.prompt}`
+      };
+      return byStage[r.stage] || "";
+    }
+    return "";
+  }
+
+  function renderSentenceCards(){
+    const selected = state.selections.s1 || null;
+    const checked = !!state.checkStates.s1;
+    const sentences = [
+      { id:"q1", text:"Andy and Betty had 60 pens altogether.", correct:false },
+      { id:"q2", text:"After Betty gave 4 pens to Andy,", correct:true },
+      { id:"q3", text:"Andy had twice as many pens as Betty.", correct:false },
+      { id:"q4", text:"How many pens did Betty have at the beginning?", correct:false }
+    ];
+    return `
+      <div class="screen-tag">Step 1</div>
+      <div class="action-box">
+        <h2 class="action-title">Tap the sentence that tells what changed between Andy and Betty.</h2>
+      </div>
+      <div class="support-box"><strong>Look for the change.</strong> Which sentence shows pens moving from one person to the other?</div>
+      <div class="question-sentences">
+        ${sentences.map(s => {
+          let cls = "sentence-card";
+          if (selected === s.id) cls += " selected";
+          if (checked && selected === s.id && s.correct) cls += " correct";
+          if (checked && selected === s.id && !s.correct) cls += " incorrect";
+          return `<button type="button" class="${cls}" data-role="s1-sentence" data-id="${s.id}">${escapeHtml(s.text)}</button>`;
+        }).join("")}
+      </div>
+      ${getFeedbackHtml("s1")}
+      <div class="nav">
+        <div class="small">Start by noticing the change sentence first.</div>
+        <div class="center">
+          <button type="button" class="secondary" disabled>Back</button>
+          <button type="button" data-role="check-s1">Check</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTransferVisual(animated){
+    const moving = animated ? "move-right" : "";
+    return `
+      <div class="transfer-visual">
+        <div class="person-box">
+          <h3>Betty</h3>
+          <div class="small">4 pens move away from Betty</div>
+          <div class="dots">
+            <span class="dot orange ${moving}"></span>
+            <span class="dot orange ${moving}"></span>
+            <span class="dot orange ${moving}"></span>
+            <span class="dot orange ${moving}"></span>
+          </div>
+        </div>
+        <div class="arrow-big">→</div>
+        <div class="person-box">
+          <h3>Andy</h3>
+          <div class="small">The same 4 pens move to Andy</div>
+          <div class="dots">
+            <span class="dot ${moving}"></span>
+            <span class="dot ${moving}"></span>
+            <span class="dot ${moving}"></span>
+            <span class="dot ${moving}"></span>
+          </div>
+        </div>
+      </div>
+      <div class="center"><div class="total-badge">Total stays 60</div></div>
+    `;
+  }
+
+  function renderChoiceScreen(id, stepNum, prompt, support, options, feedbackKey, backEnabled, extraHtml){
+    const selected = state.selections[id] || null;
+    const checked = !!state.checkStates[id];
+    const order = shuffleIds(options.map(o => o.id), id);
+    const map = Object.fromEntries(options.map(o => [o.id, o]));
+    return `
+      <div class="screen-tag">Step ${stepNum}</div>
+      <div class="action-box">
+        <h2 class="action-title">${escapeHtml(prompt)}</h2>
+      </div>
+      <div class="support-box">${support}</div>
+      ${extraHtml || ""}
+      <div class="choices-grid cols-2">
+        ${order.map(optionId => {
+          const o = map[optionId];
+          let cls = "choice-card";
+          if (selected === o.id) cls += " selected";
+          if (checked && selected === o.id && o.correct) cls += " correct";
+          if (checked && selected === o.id && !o.correct) cls += " incorrect";
+          return `<button type="button" class="${cls}" data-role="choice" data-screen="${id}" data-id="${o.id}">${escapeHtml(o.text)}</button>`;
+        }).join("")}
+      </div>
+      ${getFeedbackHtml(feedbackKey)}
+      <div class="nav">
+        <button type="button" class="secondary" ${backEnabled ? 'data-role="back"' : 'disabled'}>Back</button>
+        <div class="center">
+          <button type="button" data-role="check-choice" data-screen="${id}">Check</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function modelRow(label, units, kind, showText, highlight){
+    let segs = "";
+    for (let i = 0; i < units; i++) {
+      const extra = `${kind === "betty" ? " betty" : ""}${highlight ? " pulse" : ""}`;
+      segs += `<div class="segment${extra}">${showText ? escapeHtml(showText) : ""}</div>`;
+    }
+    return `
+      <div class="row">
+        <div class="row-label">${escapeHtml(label)}</div>
+        <div class="segments">${segs}</div>
+      </div>
+    `;
+  }
+
+  function modelRowWithSplit(label, unitLabels, kind, highlightIndices){
+    const segs = unitLabels.map((lab, idx) => {
+      const extra = `${kind === "betty" ? " betty" : ""}${highlightIndices && highlightIndices.includes(idx) ? " pulse" : ""}`;
+      return `<div class="segment${extra}">${lab ? escapeHtml(lab) : ""}</div>`;
+    }).join("");
+    return `
+      <div class="row">
+        <div class="row-label">${escapeHtml(label)}</div>
+        <div class="segments">${segs}</div>
+      </div>
+    `;
+  }
+
+  function renderModelCard(typeId){
+    if (typeId === "correct") {
+      return `
+        <div class="model-area">
+          ${modelRow("Andy", 2, "andy", "", false)}
+          ${modelRow("Betty", 1, "betty", "", false)}
+        </div>
+      `;
+    }
+    if (typeId === "reverse") {
+      return `
+        <div class="model-area">
+          ${modelRow("Andy", 1, "andy", "", false)}
+          ${modelRow("Betty", 2, "betty", "", false)}
+        </div>
+      `;
+    }
+    return `
+      <div class="model-area">
+        ${modelRow("Andy", 1, "andy", "", false)}
+        ${modelRow("Betty", 1, "betty", "", false)}
+      </div>
+    `;
+  }
+
+  function renderModelChoice(){
+    const id = "s4";
+    const selected = state.selections[id] || null;
+    const checked = !!state.checkStates[id];
+    const options = [
+      { id:"correct", correct:true, label:"Andy = 2 same parts, Betty = 1 same part" },
+      { id:"reverse", correct:false, label:"Andy = 1 same part, Betty = 2 same parts" },
+      { id:"equal", correct:false, label:"Andy = 1 part, Betty = 1 part" }
+    ];
+    const order = shuffleIds(options.map(o => o.id), id);
+    const map = Object.fromEntries(options.map(o => [o.id, o]));
+    return `
+      <div class="screen-tag">Step 4</div>
+      <div class="action-box">
+        <h2 class="action-title">Choose the bar model that matches the after-transfer situation.</h2>
+      </div>
+      <div class="support-box"><strong>Use the words carefully.</strong> After the transfer, Andy had <strong>twice as many</strong> pens as Betty.</div>
+      <div class="choices-grid">
+        ${order.map(optionId => {
+          const o = map[optionId];
+          let cls = "model-card";
+          if (selected === o.id) cls += " selected";
+          if (checked && selected === o.id && o.correct) cls += " correct";
+          if (checked && selected === o.id && !o.correct) cls += " incorrect";
+          return `
+            <button type="button" class="${cls}" data-role="choice" data-screen="${id}" data-id="${o.id}">
+              <div style="font-weight:700;margin-bottom:10px;">${escapeHtml(o.label)}</div>
+              ${renderModelCard(o.id)}
+            </button>
+          `;
+        }).join("")}
+      </div>
+      ${getFeedbackHtml("s4")}
+      <div class="nav">
+        <button type="button" class="secondary" data-role="back">Back</button>
+        <button type="button" data-role="check-choice" data-screen="${id}">Check</button>
+      </div>
+    `;
+  }
+
+  function renderModel60(pulseCount, showDerived, braceLabel){
+    return `
+      <div class="model-area">
+        <div class="brace-label">${braceLabel || ""}</div>
+        <div class="brace-line"></div>
+        ${modelRowWithSplit("Andy", [showDerived ? "20" : "", showDerived ? "20" : ""], "andy", pulseCount ? [0,1] : [])}
+        ${modelRowWithSplit("Betty", [showDerived ? "20" : ""], "betty", pulseCount ? [0] : [])}
+      </div>
+    `;
+  }
+
+  function renderInputScreen(id, stepNum, prompt, support, placeholder, feedbackKey, visualHtml){
+    const value = state.typed[id] || "";
+    return `
+      <div class="screen-tag">Step ${stepNum}</div>
+      <div class="action-box">
+        <h2 class="action-title">${escapeHtml(prompt)}</h2>
+      </div>
+      <div class="support-box">${support}</div>
+      ${visualHtml || ""}
+      <div class="input-row">
+        <label for="${id}-input" style="font-size:18px;font-weight:700;">Type your answer:</label>
+        <input id="${id}-input" type="number" inputmode="numeric" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" data-role="input" data-screen="${id}" />
+        <button type="button" data-role="check-input" data-screen="${id}">Check</button>
+      </div>
+      ${getFeedbackHtml(feedbackKey)}
+      <div class="nav">
+        <button type="button" class="secondary" data-role="back">Back</button>
+        <div></div>
+      </div>
+    `;
+  }
+
+  function startRemediation(kind){
+    if (kind === "divide3") {
+      state.remediation = {
+        kind,
+        stage:"hint",
+        streak:0,
+        itemIndex:0,
+        item:{
+          prompt:"If 3 same parts make 18, what should you do to find 1 part?",
+          options:[
+            {id:"d3", text:"Divide 18 by 3", correct:true},
+            {id:"d2", text:"Divide 18 by 2", correct:false},
+            {id:"a3", text:"Add 3 to 18", correct:false}
+          ]
+        }
+      };
+    } else if (kind === "addBack") {
+      state.remediation = {
+        kind,
+        stage:"hint",
+        streak:0,
+        itemIndex:0,
+        item:{
+          prompt:"Sam gave 3 marbles away and has 8 left. To go back to the beginning, what should you do with 3?",
+          options:[
+            {id:"add", text:"Add 3", correct:true},
+            {id:"sub", text:"Subtract 3", correct:false},
+            {id:"dbl", text:"Double 3", correct:false}
+          ]
+        }
+      };
+    }
+    render();
+  }
+
+  function nextRemediationStage(){
+    const r = state.remediation;
+    if (!r) return;
+    if (r.stage === "hint") r.stage = "example";
+    else if (r.stage === "example") r.stage = "explain";
+    else if (r.stage === "explain") r.stage = "practice";
+    render();
+  }
+
+  function practicePools(kind){
+    if (kind === "divide3") {
+      return [
+        {
+          prompt:"If 3 same parts make 12, what should you do to find 1 part?",
+          options:[
+            {id:"p1", text:"Divide 12 by 3", correct:true},
+            {id:"p2", text:"Divide 12 by 2", correct:false},
+            {id:"p3", text:"Add 3 to 12", correct:false}
+          ]
+        },
+        {
+          prompt:"If 3 same parts make 21, what should you do to find 1 part?",
+          options:[
+            {id:"p4", text:"Divide 21 by 3", correct:true},
+            {id:"p5", text:"Divide 21 by 2", correct:false},
+            {id:"p6", text:"Multiply 21 by 3", correct:false}
+          ]
+        },
+        {
+          prompt:"If the whole is 27 and it is split into 3 same parts, what should you do first?",
+          options:[
+            {id:"p7", text:"Divide 27 by 3", correct:true},
+            {id:"p8", text:"Subtract 3 from 27", correct:false},
+            {id:"p9", text:"Divide 27 by 2", correct:false}
+          ]
+        }
+      ];
+    }
+    return [
+      {
+        prompt:"Lina gave 2 cards away and has 9 left. To go back to the beginning, what should you do with 2?",
+        options:[
+          {id:"a1", text:"Add 2", correct:true},
+          {id:"a2", text:"Subtract 2", correct:false},
+          {id:"a3", text:"Double 2", correct:false}
+        ]
+      },
+      {
+        prompt:"Tom gave 5 stickers to his friend. He now has 11. To find his beginning number, what should you do?",
+        options:[
+          {id:"b1", text:"Add back 5", correct:true},
+          {id:"b2", text:"Subtract 5", correct:false},
+          {id:"b3", text:"Halve 11", correct:false}
+        ]
+      },
+      {
+        prompt:"Nina had some sweets. She gave 4 away and now has 13. To go back to the beginning, what should you do with 4?",
+        options:[
+          {id:"c1", text:"Add 4", correct:true},
+          {id:"c2", text:"Subtract 4", correct:false},
+          {id:"c3", text:"Double 4", correct:false}
+        ]
+      }
+    ];
+  }
+
+  function loadNextPracticeItem(){
+    const r = state.remediation;
+    const pool = practicePools(r.kind);
+    const item = pool[r.itemIndex % pool.length];
+    r.item = item;
+    if (!state.orders[`rem-${r.kind}-${r.itemIndex}`]) {
+      shuffleIds(item.options.map(o => o.id), `rem-${r.kind}-${r.itemIndex}`);
+    }
+  }
+
+  function renderRemediation(){
+    const r = state.remediation;
+    if (!r) return "";
+    if (r.stage === "hint") {
+      return `
+        <div class="screen-tag">Help step</div>
+        <div class="action-box"><h2 class="action-title">${escapeHtml(r.kind === "divide3" ? "Look at the model again." : "Think about the direction again.")}</h2></div>
+        <div class="support-box">${
+          r.kind === "divide3"
+            ? "<strong>Hint:</strong> The whole 60 covers <strong>3 same parts</strong>: Andy has 2 parts and Betty has 1 part."
+            : "<strong>Hint:</strong> Betty <strong>gave away</strong> 4, so her number became smaller. To go back to the beginning, she must have had <strong>4 more</strong> before giving."
+        }</div>
+        ${
+          r.kind === "divide3"
+            ? renderModel60(true, false, "60 covers all 3 same parts")
+            : `<div class="flow">
+                <div class="pill orange">Beginning: ?</div>
+                <div class="arrow-big">→</div>
+                <div class="pill">Betty gave 4 away</div>
+                <div class="arrow-big">→</div>
+                <div class="pill good">After: 20</div>
+              </div>`
+        }
+        <div class="nav">
+          <button type="button" class="secondary" data-role="close-remediation">Back to question</button>
+          <button type="button" class="orange" data-role="rem-next">Show me more help</button>
+        </div>
+      `;
+    }
+
+    if (r.stage === "example") {
+      const item = r.kind === "divide3"
+        ? {
+            prompt:"If 3 same parts make 15, what should you do to find 1 same part?",
+            options:[
+              {id:"e1", text:"Divide 15 by 3", correct:true},
+              {id:"e2", text:"Divide 15 by 2", correct:false},
+              {id:"e3", text:"Add 3 to 15", correct:false}
+            ]
+          }
+        : {
+            prompt:"Mia gave 2 stickers away and now has 7 left. To go back to the beginning, should we add 2 or subtract 2?",
+            options:[
+              {id:"e4", text:"Add 2", correct:true},
+              {id:"e5", text:"Subtract 2", correct:false},
+              {id:"e6", text:"Double 2", correct:false}
+            ]
+          };
+      const key = `example-${r.kind}`;
+      const selected = state.selections[key] || null;
+      const checked = !!state.checkStates[key];
+      const order = shuffleIds(item.options.map(o=>o.id), key);
+      const map = Object.fromEntries(item.options.map(o=>[o.id,o]));
+      return `
+        <div class="screen-tag">Help step</div>
+        <div class="action-box"><h2 class="action-title">${escapeHtml(item.prompt)}</h2></div>
+        <div class="support-box"><strong>Try a smaller parallel example.</strong> Use the same thinking.</div>
+        <div class="choices-grid cols-2">
+          ${order.map(optionId => {
+            const o = map[optionId];
+            let cls = "choice-card";
+            if (selected === o.id) cls += " selected";
+            if (checked && selected === o.id && o.correct) cls += " correct";
+            if (checked && selected === o.id && !o.correct) cls += " incorrect";
+            return `<button type="button" class="${cls}" data-role="choice" data-screen="${key}" data-id="${o.id}">${escapeHtml(o.text)}</button>`;
+          }).join("")}
+        </div>
+        ${getFeedbackHtml(key)}
+        <div class="nav">
+          <button type="button" class="secondary" data-role="close-remediation">Back to question</button>
+          <div class="center">
+            <button type="button" data-role="check-rem-example" data-key="${key}">Check</button>
+            <button type="button" class="orange" data-role="rem-next">Show the explanation</button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (r.stage === "explain") {
+      return `
+        <div class="screen-tag">Help step</div>
+        <div class="action-box">
+          <h2 class="action-title">${escapeHtml(r.kind === "divide3" ? "See why we divide by 3." : "See why we add back 4.")}</h2>
+        </div>
+        ${
+          r.kind === "divide3"
+            ? `<div class="support-box"><strong>Animated explanation:</strong> The whole is 60. The model shows 3 same parts. To find 1 same part, split the whole into 3 equal parts.</div>
+               <div class="math-big">60 ÷ 3 = 20</div>
+               ${renderModel60(true, true, "The whole 60 is split into 3 same parts")}`
+            : `<div class="support-box"><strong>Animated explanation:</strong> Betty gave away 4, so her number went down. To go back to the beginning, add the 4 back.</div>
+               <div class="flow">
+                 <div class="pill good">After: 20</div>
+                 <div class="arrow-big">+ 4</div>
+                 <div class="pill orange pulse">Beginning: 24</div>
+               </div>`
+        }
+        <div class="nav">
+          <button type="button" class="secondary" data-role="close-remediation">Back to question</button>
+          <button type="button" class="orange" data-role="rem-next">Try practice</button>
+        </div>
+      `;
+    }
+
+    if (r.stage === "practice") {
+      loadNextPracticeItem();
+      const key = `practice-${r.kind}-${r.itemIndex}`;
+      const selected = state.selections[key] || null;
+      const checked = !!state.checkStates[key];
+      const item = r.item;
+      const order = shuffleIds(item.options.map(o=>o.id), key);
+      const map = Object.fromEntries(item.options.map(o=>[o.id,o]));
+      return `
+        <div class="screen-tag">Practice help</div>
+        <div class="action-box">
+          <h2 class="action-title">${escapeHtml(item.prompt)}</h2>
+        </div>
+        <div class="support-box"><strong>Goal:</strong> get <strong>3 correct in a row</strong>, then go back to the original question.</div>
+        <div class="mini-practice">
+          <div class="streak">Correct in a row: ${r.streak} / 3</div>
+          <div class="choices-grid cols-2" style="margin-top:14px;">
+            ${order.map(optionId => {
+              const o = map[optionId];
+              let cls = "choice-card";
+              if (selected === o.id) cls += " selected";
+              if (checked && selected === o.id && o.correct) cls += " correct";
+              if (checked && selected === o.id && !o.correct) cls += " incorrect";
+              return `<button type="button" class="${cls}" data-role="choice" data-screen="${key}" data-id="${o.id}">${escapeHtml(o.text)}</button>`;
+            }).join("")}
+          </div>
+          ${getFeedbackHtml(key)}
+        </div>
+        <div class="nav">
+          <button type="button" class="secondary" data-role="close-remediation">Back to question</button>
+          <button type="button" data-role="check-rem-practice" data-key="${key}">Check</button>
+        </div>
+      `;
+    }
+    return "";
+  }
+
+  function render(){
+    updateProgress();
+    if (state.remediation) {
+      APP.innerHTML = renderRemediation();
+      return;
+    }
+
+    const screen = screens[state.screenIndex];
+    let html = "";
+    switch(screen.id){
+      case "s1":
+        html = renderSentenceCards();
+        break;
+      case "s2":
+        html = renderChoiceScreen(
+          "s2", 2,
+          "Does the total change after Betty gives 4 pens to Andy?",
+          "<strong>Think:</strong> the pens only move from one person to the other. No pens disappear.",
+          [
+            {id:"stay", text:"The total stays 60.", correct:true},
+            {id:"down", text:"The total becomes 56.", correct:false},
+            {id:"up", text:"The total becomes 64.", correct:false}
+          ],
+          "s2",
+          true,
+          renderTransferVisual(!!state.feedback.s2 && state.feedback.s2.kind === "bad")
+        );
+        break;
+      case "s3":
+        html = renderChoiceScreen(
+          "s3", 3,
+          "Who has more pens after the transfer?",
+          "<strong>Look at the wording:</strong> after the transfer, Andy had <strong>twice as many</strong> pens as Betty.",
+          [
+            {id:"andy", text:"Andy has more pens.", correct:true},
+            {id:"betty", text:"Betty has more pens.", correct:false},
+            {id:"same", text:"They have the same number of pens.", correct:false}
+          ],
+          "s3",
+          true,
+          ""
+        );
+        break;
+      case "s4":
+        html = renderModelChoice();
+        break;
+      case "s5":
+        html = renderChoiceScreen(
+          "s5", 5,
+          "How many same parts make 60?",
+          "<strong>Count the after-transfer model.</strong> Andy has 2 same parts and Betty has 1 same part.",
+          [
+            {id:"two", text:"2 same parts", correct:false},
+            {id:"three", text:"3 same parts", correct:true},
+            {id:"four", text:"4 same parts", correct:false}
+          ],
+          "s5",
+          true,
+          renderModel60(!!state.feedback.s5 && state.feedback.s5.kind === "bad", false, "60 covers all the same parts")
+        );
+        break;
+      case "s6":
+        html = renderChoiceScreen(
+          "s6", 6,
+          "What should we do to find 1 same part?",
+          "<strong>Do not guess from the word twice.</strong> Use the model: the whole 60 covers 3 same parts.",
+          [
+            {id:"divide3", text:"Divide 60 by 3.", correct:true},
+            {id:"divide2", text:"Divide 60 by 2.", correct:false},
+            {id:"add3", text:"Add 3 to 60.", correct:false}
+          ],
+          "s6",
+          true,
+          renderModel60(false, false, "The whole 60 is made of 3 same parts")
+        );
+        break;
+      case "s7":
+        html = renderInputScreen(
+          "s7", 7,
+          "How many pens does Betty have after the transfer?",
+          "<strong>Use what you found:</strong> 3 same parts make 60, so 1 same part is Betty's after-transfer number.",
+          "",
+          "s7",
+          renderModel60(false, false, "Find 1 same part")
+        );
+        break;
+      case "s8":
+        html = renderChoiceScreen(
+          "s8", 8,
+          "Do we stop at 20?",
+          "<strong>Check the question ending.</strong> The question asks for Betty's number <strong>at the beginning</strong>.",
+          [
+            {id:"no", text:"No. 20 is Betty's number after the transfer.", correct:true},
+            {id:"yes", text:"Yes. 20 is the final answer.", correct:false}
+          ],
+          "s8",
+          true,
+          `<div class="flow">
+            <div class="pill good">20 = Betty after the transfer</div>
+            <div class="arrow-big">?</div>
+            <div class="pill orange">Beginning number still needed</div>
+          </div>`
+        );
+        break;
+      case "s9":
+        html = renderChoiceScreen(
+          "s9", 9,
+          "How do we go back to Betty's beginning number?",
+          "<strong>Track the direction carefully.</strong> Betty gave 4 pens away, so her number became smaller after the transfer.",
+          [
+            {id:"add4", text:"Add 4.", correct:true},
+            {id:"sub4", text:"Subtract 4.", correct:false},
+            {id:"double4", text:"Double 4.", correct:false}
+          ],
+          "s9",
+          true,
+          `<div class="flow">
+            <div class="pill orange">Beginning: ?</div>
+            <div class="arrow-big">gave 4</div>
+            <div class="pill good">After: 20</div>
+          </div>`
+        );
+        break;
+      case "s10":
+        html = renderInputScreen(
+          "s10", 10,
+          "How many pens did Betty have at the beginning?",
+          "<strong>Go back:</strong> Betty had 20 after the transfer, so return the 4 pens to get her beginning number.",
+          "",
+          "s10",
+          `<div class="flow">
+            <div class="pill good">20 after</div>
+            <div class="arrow-big">+ 4</div>
+            <div class="pill orange">beginning = ?</div>
+          </div>`
+        );
+        break;
+      case "s11":
+        html = renderChoiceScreen(
+          "s11", 11,
+          "Does this check match the story?",
+          "<strong>Use the story to check.</strong> Betty began with 24. After giving away 4, Betty had 20. Andy then had 40, which is twice 20.",
+          [
+            {id:"yes", text:"Yes, that matches the story.", correct:true},
+            {id:"no", text:"No, that does not match.", correct:false}
+          ],
+          "s11",
+          true,
+          `<div class="check-visual">
+            <div class="person-box"><h3>Beginning</h3><div>Betty: 24</div><div>Andy: 36</div><div class="total-badge">24 + 36 = 60</div></div>
+            <div class="person-box"><h3>After Betty gives 4</h3><div>Betty: 20</div><div>Andy: 40</div><div class="total-badge">40 is twice 20</div></div>
+          </div>`
+        );
+        break;
+      case "s12":
+        html = renderChoiceScreen(
+          "s12", 12,
+          "Choose the best strategy summary.",
+          "<strong>Keep the recap short and clear.</strong> Which summary matches the method you used?",
+          [
+            {id:"best", text:"First use the after-transfer picture. See 3 same parts make 60. Find 1 part. Then go back 4 to Betty's beginning number.", correct:true},
+            {id:"half", text:"First halve 60 because Andy had twice as many.", correct:false},
+            {id:"sub", text:"First subtract 4 from 60, then divide by 2.", correct:false},
+            {id:"stop", text:"First find Andy's number and stop there.", correct:false}
+          ],
+          "s12",
+          true,
+          `<div class="support-box"><strong>Consolidate the strategy:</strong> transfer does not change the total, the after-transfer model shows 3 same parts, and the final step is to work back.</div>`
+        );
+        break;
+    }
+    APP.innerHTML = html;
+  }
+
+  function goNext(){
+    stopReading();
+    if (state.screenIndex < screens.length - 1) {
+      state.screenIndex += 1;
+      render();
+    } else {
+      render();
+    }
+  }
+
+  function goBack(){
+    stopReading();
+    if (state.screenIndex > 0) {
+      state.screenIndex -= 1;
+      render();
+    }
+  }
+
+  function validateSentenceTap(){
+    state.checkStates.s1 = true;
+    const picked = state.selections.s1;
+    if (!picked) {
+      setFeedback("s1", "bad", "Choose one sentence first.");
+      render();
+      return;
+    }
+    if (picked === "q2") {
+      setFeedback("s1", "good", "Yes. That sentence shows the change: Betty gave 4 pens to Andy.");
+      render();
+      setTimeout(goNext, 700);
+    } else {
+      setFeedback("s1", "bad", "Not yet. Look for the sentence that shows pens moving from one person to the other.");
+      render();
+    }
+  }
+
+  function validateChoice(screenId){
+    state.checkStates[screenId] = true;
+    const picked = state.selections[screenId];
+    if (!picked) {
+      setFeedback(screenId, "bad", "Choose an answer first.");
+      render();
+      return;
+    }
+
+    let options = [];
+    if (screenId === "s2") options = [{id:"stay", correct:true}];
+    if (screenId === "s3") options = [{id:"andy", correct:true}];
+    if (screenId === "s4") options = [{id:"correct", correct:true}];
+    if (screenId === "s5") options = [{id:"three", correct:true}];
+    if (screenId === "s6") options = [{id:"divide3", correct:true}];
+    if (screenId === "s8") options = [{id:"no", correct:true}];
+    if (screenId === "s9") options = [{id:"add4", correct:true}];
+    if (screenId === "s11") options = [{id:"yes", correct:true}];
+    if (screenId === "s12") options = [{id:"best", correct:true}];
+
+    const correctId = options[0].id;
+    if (picked === correctId) {
+      const messages = {
+        s2: "Correct. The total stays 60 because the pens were only transferred.",
+        s3: "Correct. After the transfer, Andy has more because he has twice as many as Betty.",
+        s4: "Correct. The after-transfer model is Andy = 2 same parts and Betty = 1 same part.",
+        s5: "Correct. There are 3 same parts altogether.",
+        s6: "Correct. The whole 60 covers 3 same parts, so we divide 60 by 3.",
+        s8: "Correct. 20 is Betty's number after the transfer, not the beginning number.",
+        s9: "Correct. Betty gave 4 away, so to go back to the beginning we add 4 back.",
+        s11: "Correct. The check matches the story.",
+        s12: "Correct. That is the full strategy."
+      };
+      setFeedback(screenId, "good", messages[screenId] || "Correct.");
+      render();
+      if (screenId === "s12") return;
+      setTimeout(goNext, 700);
+      return;
+    }
+
+    const wrongMessages = {
+      s2: "Not yet. The 4 pens move from Betty to Andy, so the total does not change.",
+      s3: "Not yet. Re-read the words: Andy had twice as many pens as Betty after the transfer.",
+      s4: "Not yet. The model must match the after-transfer sentence: Andy has 2 same parts and Betty has 1 same part.",
+      s5: "Not yet. Count all the same parts: 2 for Andy and 1 for Betty.",
+      s6: "Not yet. Do not divide by 2 just because Andy has 2 parts. The whole 60 covers 3 same parts.",
+      s8: "Not yet. The question asks for Betty's number at the beginning, so 20 is not the final answer.",
+      s9: "Not yet. Betty gave 4 away, so to go back to the beginning she must have had 4 more before giving.",
+      s11: "Not yet. Try the check again using the story carefully.",
+      s12: "Not yet. Pick the summary that uses the after-transfer model, 3 same parts, and then works back."
+    };
+    setFeedback(screenId, "bad", wrongMessages[screenId] || "Try again.");
+    render();
+
+    if (screenId === "s6") {
+      setTimeout(() => startRemediation("divide3"), 550);
+    }
+    if (screenId === "s9") {
+      setTimeout(() => startRemediation("addBack"), 550);
+    }
+  }
+
+  function validateInput(screenId){
+    const raw = state.typed[screenId];
+    const num = Number(raw);
+    if (raw === "" || Number.isNaN(num)) {
+      setFeedback(screenId, "bad", "Type a number first.");
+      render();
+      return;
+    }
+
+    if (screenId === "s7") {
+      if (num === 20) {
+        setFeedback("s7", "good", "Correct. 60 ÷ 3 = 20, so Betty has 20 pens after the transfer.");
+        render();
+        setTimeout(goNext, 700);
+      } else {
+        setFeedback("s7", "bad", "Try again. The whole 60 covers 3 same parts. Find 1 same part first.");
+        render();
+      }
+      return;
+    }
+
+    if (screenId === "s10") {
+      if (num === 24) {
+        setFeedback("s10", "good", "Correct. Betty had 20 after the transfer, so 20 + 4 = 24 at the beginning.");
+        render();
+        setTimeout(goNext, 700);
+      } else {
+        setFeedback("s10", "bad", "Try again. Start from Betty's after-transfer number 20, then go back by adding 4.");
+        render();
+      }
+    }
+  }
+
+  function validateRemExample(key){
+    state.checkStates[key] = true;
+    const picked = state.selections[key];
+    if (!picked) {
+      setFeedback(key, "bad", "Choose an answer first.");
+      render();
+      return;
+    }
+    const good = (key === "example-divide3" && picked === "e1") || (key === "example-addBack" && picked === "e4");
+    if (good) setFeedback(key, "good", "Yes. That uses the same thinking.");
+    else setFeedback(key, "bad", "Not yet. Use the same thinking as the original question.");
+    render();
+  }
+
+  function validateRemPractice(key){
+    const picked = state.selections[key];
+    state.checkStates[key] = true;
+    if (!picked) {
+      setFeedback(key, "bad", "Choose an answer first.");
+      render();
+      return;
+    }
+    const r = state.remediation;
+    const correct = r.item.options.find(o => o.id === picked)?.correct;
+    if (correct) {
+      r.streak += 1;
+      setFeedback(key, "good", `Correct. Nice work. Streak: ${r.streak} / 3.`);
+      if (r.streak >= 3) {
+        render();
+        setTimeout(() => {
+          state.remediation = null;
+          if (r.kind === "divide3") {
+            setFeedback("s6", "info", "Good practice. Now try the original question again.");
+            state.selections.s6 = null;
+            state.checkStates.s6 = false;
+          } else {
+            setFeedback("s9", "info", "Good practice. Now try the original question again.");
+            state.selections.s9 = null;
+            state.checkStates.s9 = false;
+          }
+          render();
+        }, 850);
+      } else {
+        render();
+        setTimeout(() => {
+          r.itemIndex += 1;
+          const nextKey = `practice-${r.kind}-${r.itemIndex}`;
+          state.selections[nextKey] = null;
+          state.checkStates[nextKey] = false;
+          render();
+        }, 650);
+      }
+    } else {
+      r.streak = 0;
+      const msg = r.kind === "divide3"
+        ? "Not yet. The whole is split into 3 same parts, so think about dividing by 3."
+        : "Not yet. If someone gave some away, go back by adding that amount back.";
+      setFeedback(key, "bad", `${msg} Streak goes back to 0.`);
+      render();
+    }
+  }
+
+  APP.addEventListener("click", function(event){
+    const btn = event.target.closest("button");
+    if (!btn) return;
+
+    const role = btn.dataset.role;
+
+    if (role === "s1-sentence") {
+      state.selections.s1 = btn.dataset.id;
+      render();
+      return;
+    }
+
+    if (role === "choice") {
+      const screen = btn.dataset.screen;
+      const id = btn.dataset.id;
+      state.selections[screen] = id;
+      render();
+      return;
+    }
+
+    if (role === "back") {
+      goBack();
+      return;
+    }
+
+    if (role === "check-s1") {
+      validateSentenceTap();
+      return;
+    }
+
+    if (role === "check-choice") {
+      validateChoice(btn.dataset.screen);
+      return;
+    }
+
+    if (role === "check-input") {
+      validateInput(btn.dataset.screen);
+      return;
+    }
+
+    if (role === "close-remediation") {
+      state.remediation = null;
+      render();
+      return;
+    }
+
+    if (role === "rem-next") {
+      nextRemediationStage();
+      return;
+    }
+
+    if (role === "check-rem-example") {
+      validateRemExample(btn.dataset.key);
+      return;
+    }
+
+    if (role === "check-rem-practice") {
+      validateRemPractice(btn.dataset.key);
+      return;
+    }
+  });
+
+  APP.addEventListener("input", function(event){
+    const input = event.target.closest("input[data-role='input']");
+    if (!input) return;
+    state.typed[input.dataset.screen] = input.value;
+  });
+
+  readScreenBtn.addEventListener("click", function(){
+    readAloud(screenReadText());
+  });
+
+  stopReadBtn.addEventListener("click", stopReading);
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1292 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>P4 Maths T2 PP2 Q5</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --ink:#15233b;
+    --muted:#55657d;
+    --primary:#1f5eff;
+    --primary-soft:#dce7ff;
+    --success:#127a47;
+    --success-soft:#e4f7ee;
+    --warn:#a25a00;
+    --warn-soft:#fff1de;
+    --danger:#a62424;
+    --danger-soft:#ffe5e5;
+    --border:#d7dfeb;
+    --shadow:0 10px 30px rgba(21,35,59,.08);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.45;
+  }
+  .app-shell{
+    max-width:980px;
+    margin:0 auto;
+    padding:20px 16px 40px;
+  }
+  .topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .pill{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:8px 14px;
+    font-weight:700;
+    box-shadow:var(--shadow);
+  }
+  .progress-wrap{
+    width:100%;
+    background:#e8edf6;
+    border-radius:999px;
+    overflow:hidden;
+    height:14px;
+    margin-top:6px;
+  }
+  .progress-bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--primary), #5d89ff);
+    transition:width .3s ease;
+  }
+  .panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px;
+  }
+  .screen-title{
+    margin:0 0 12px;
+    font-size:1.55rem;
+    line-height:1.2;
+  }
+  .action-box{
+    background:var(--primary);
+    color:#fff;
+    padding:16px 18px;
+    border-radius:16px;
+    font-size:1.2rem;
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .support-box{
+    background:#fff6d8;
+    color:#5b4500;
+    border:1px solid #f1d782;
+    padding:12px 14px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .prompt{
+    font-size:1.08rem;
+    margin:0 0 16px;
+  }
+  .option-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:12px;
+    margin:14px 0 4px;
+  }
+  .option-card, .small-choice{
+    border:2px solid var(--border);
+    border-radius:16px;
+    background:#fff;
+    padding:16px;
+    cursor:pointer;
+    min-height:88px;
+    font-size:1rem;
+    text-align:left;
+    color:var(--ink);
+    touch-action:manipulation;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    box-shadow:0 4px 10px rgba(15,25,40,.04);
+  }
+  .option-card:hover, .small-choice:hover{transform:translateY(-1px)}
+  .option-card.selected, .small-choice.selected{
+    border-color:var(--primary);
+    background:var(--primary-soft);
+    box-shadow:0 0 0 4px rgba(31,94,255,.15);
+  }
+  .button-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+  button{
+    font:inherit;
+  }
+  .btn{
+    appearance:none;
+    border:none;
+    border-radius:14px;
+    padding:12px 16px;
+    font-weight:700;
+    cursor:pointer;
+    touch-action:manipulation;
+  }
+  .btn-primary{
+    background:var(--primary);
+    color:#fff;
+  }
+  .btn-secondary{
+    background:#eef3ff;
+    color:var(--ink);
+    border:1px solid var(--border);
+  }
+  .feedback{
+    margin-top:18px;
+    border-radius:16px;
+    padding:16px;
+    border:1px solid var(--border);
+  }
+  .feedback.success{
+    background:var(--success-soft);
+    color:#0e5b34;
+    border-color:#addfc8;
+  }
+  .feedback.warn{
+    background:var(--warn-soft);
+    color:#7b4500;
+    border-color:#efd0a5;
+  }
+  .feedback.error{
+    background:var(--danger-soft);
+    color:#7a1b1b;
+    border-color:#edb2b2;
+  }
+  details.question-box{
+    margin-top:20px;
+    background:#fbfcff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px 14px;
+  }
+  details summary{
+    cursor:pointer;
+    font-weight:700;
+  }
+  .question-text{
+    margin-top:10px;
+    font-size:1.02rem;
+  }
+  .mini-note{
+    color:var(--muted);
+    font-size:.97rem;
+  }
+  .status-line{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:.96rem;
+  }
+  .division-board{
+    display:grid;
+    gap:12px;
+    margin-top:16px;
+  }
+  .division-row{
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    background:#fbfcff;
+  }
+  .division-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:.92rem;
+  }
+  .tag.good{background:var(--success-soft); color:var(--success)}
+  .tag.bad{background:var(--danger-soft); color:var(--danger)}
+  .bag-line{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+    align-items:flex-start;
+  }
+  .bag{
+    width:64px;
+    min-height:64px;
+    border:2px solid #9ab6ff;
+    background:#edf3ff;
+    border-radius:16px;
+    padding:6px 4px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-size:.9rem;
+    font-weight:700;
+  }
+  .ball-chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:22px;
+    height:22px;
+    border-radius:999px;
+    color:#fff;
+    font-size:.82rem;
+    margin:1px;
+  }
+  .soccer{background:#2355c8}
+  .tennis{background:#1d8d5e}
+  .leftover{
+    border:2px dashed #ff9a9a;
+    background:#fff5f5;
+    color:#8f2222;
+    border-radius:14px;
+    padding:10px 12px;
+    font-weight:700;
+    align-self:center;
+  }
+  .input-wrap{
+    margin-top:12px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  input[type="number"]{
+    font:inherit;
+    padding:14px 16px;
+    border-radius:14px;
+    border:2px solid var(--border);
+    min-width:160px;
+    font-size:1.05rem;
+  }
+  .recap-list{
+    display:grid;
+    gap:10px;
+    margin-top:12px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:16px;
+    background:#fff;
+  }
+  th, td{
+    border:1px solid var(--border);
+    padding:12px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:#eef3ff;
+  }
+  .draw-box{
+    margin-top:16px;
+    border:2px dashed #9ab6ff;
+    border-radius:16px;
+    padding:14px;
+    background:#f7faff;
+  }
+  .footer-note{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:.95rem;
+  }
+  .two-col{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:16px;
+  }
+
+  .hero-card{
+    border:1px solid var(--border);
+    background:linear-gradient(180deg,#f9fbff 0%, #eef4ff 100%);
+    border-radius:20px;
+    padding:16px;
+    margin:10px 0 16px;
+    overflow:hidden;
+    position:relative;
+  }
+  .hero-title{
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .hero-grid{
+    display:grid;
+    gap:12px;
+    grid-template-columns:1fr 1fr;
+  }
+  .hero-mini{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+  }
+  .flow-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .flow-balls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    max-width:280px;
+  }
+  .ball-dot{
+    width:18px;
+    height:18px;
+    border-radius:999px;
+    display:inline-block;
+    animation:bob 1.4s ease-in-out infinite;
+  }
+  .ball-dot:nth-child(2n){animation-delay:.15s}
+  .ball-dot:nth-child(3n){animation-delay:.3s}
+  .ball-dot.soccer{background:#2355c8}
+  .ball-dot.tennis{background:#1d8d5e}
+  .flow-arrow{
+    font-size:1.5rem;
+    font-weight:700;
+    color:var(--primary);
+    animation:slidePulse 1.2s ease-in-out infinite;
+  }
+  .mini-bag-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .mini-bag{
+    width:48px;
+    height:50px;
+    border-radius:14px;
+    border:2px solid #9ab6ff;
+    background:#ffffff;
+    position:relative;
+    overflow:hidden;
+  }
+  .mini-bag::after{
+    content:'';
+    position:absolute;
+    inset:auto 10px 6px 10px;
+    height:6px;
+    border-radius:999px;
+    background:#dce7ff;
+  }
+  .same-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border-radius:999px;
+    background:#e7f7ef;
+    color:#126843;
+    padding:6px 10px;
+    font-weight:700;
+    margin-top:10px;
+  }
+  .choice-pic{
+    display:grid;
+    gap:10px;
+  }
+  .choice-bag-pair{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .picture-card{
+    border:2px solid var(--border);
+    border-radius:18px;
+    background:#fff;
+    padding:14px;
+    cursor:pointer;
+    text-align:left;
+    touch-action:manipulation;
+    transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .picture-card.selected{
+    border-color:var(--primary);
+    background:var(--primary-soft);
+    box-shadow:0 0 0 4px rgba(31,94,255,.15);
+  }
+  .picture-label{
+    font-weight:700;
+    margin-top:8px;
+  }
+  .picture-sub{
+    color:var(--muted);
+    font-size:.95rem;
+    margin-top:4px;
+  }
+  .tiny-count{
+    display:inline-block;
+    min-width:24px;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#eef3ff;
+    font-weight:700;
+    text-align:center;
+    margin-right:4px;
+  }
+  .remainder-scene{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .leftover-demo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    min-height:82px;
+  }
+  .leftover-chip{
+    width:24px;
+    height:24px;
+    border-radius:999px;
+    background:#ff8f8f;
+    box-shadow:0 0 0 4px rgba(255,143,143,.18);
+    animation:wobble 1.1s ease-in-out infinite;
+  }
+  .note-pill{
+    display:inline-flex;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#eef3ff;
+    font-weight:700;
+  }
+  .simple-grid{
+    display:grid;
+    gap:12px;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    margin-top:14px;
+  }
+  @keyframes bob{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-4px)}
+  }
+  @keyframes slidePulse{
+    0%,100%{transform:translateX(0); opacity:.8}
+    50%{transform:translateX(4px); opacity:1}
+  }
+  @keyframes wobble{
+    0%,100%{transform:rotate(0)}
+    25%{transform:rotate(-8deg)}
+    75%{transform:rotate(8deg)}
+  }
+
+  @media (max-width: 760px){
+    .two-col{grid-template-columns:1fr}
+    .hero-grid,.choice-bag-pair,.remainder-scene{grid-template-columns:1fr}
+    .screen-title{font-size:1.35rem}
+    .action-box{font-size:1.08rem}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="pill" id="step-pill">Step 1</div>
+    <div class="pill" id="streak-pill">Remediation streak: 0</div>
+  </div>
+  <div class="progress-wrap" aria-hidden="true"><div class="progress-bar" id="progress-bar"></div></div>
+  <div id="app" class="panel" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+  const questionText = "Ali wants to pack 28 soccer balls and 36 tennis balls into smaller bags of the same size. There must be an equal number of soccer balls in each smaller bag and an equal number of tennis balls in each smaller bag with no remainder. Which one of the following shows a possible number of bags that he needs? Options: 7, 6, 5, 4.";
+  const app = document.getElementById('app');
+  const progressBar = document.getElementById('progress-bar');
+  const stepPill = document.getElementById('step-pill');
+  const streakPill = document.getElementById('streak-pill');
+
+  const screenSequence = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+  const state = {
+    current: 's1',
+    selected: {},
+    attempts: {},
+    feedback: {},
+    correct: {},
+    orders: {},
+    typedValue: '',
+    remediation: {
+      active: false,
+      source: null,
+      sourceLabel: '',
+      streak: 0,
+      index: 0,
+      selected: null,
+      feedback: null
+    }
+  };
+
+  const remediationSet = [
+    {
+      id:'r1',
+      prompt:'Can 12 balls be shared equally into 3 bags with no remainder?',
+      choices:[
+        {id:'yes', text:'Yes. 12 ÷ 3 = 4 exactly.'},
+        {id:'no', text:'No. There will be leftovers.'}
+      ],
+      correct:'yes',
+      explainCorrect:'Yes. 12 can be shared into 3 equal bags with 4 in each bag.',
+      explainWrong:'12 ÷ 3 = 4 exactly, so it does work.'
+    },
+    {
+      id:'r2',
+      prompt:'Can 14 balls be shared equally into 4 bags with no remainder?',
+      choices:[
+        {id:'yes', text:'Yes. It shares equally.'},
+        {id:'no', text:'No. 14 ÷ 4 leaves 2 over.'}
+      ],
+      correct:'no',
+      explainCorrect:'Right. 14 ÷ 4 = 3 remainder 2, so it does not work.',
+      explainWrong:'14 ÷ 4 leaves 2 over, so it does not work.'
+    },
+    {
+      id:'r3',
+      prompt:'Can 18 balls be shared equally into 6 bags with no remainder?',
+      choices:[
+        {id:'yes', text:'Yes. 18 ÷ 6 = 3 exactly.'},
+        {id:'no', text:'No. There will be leftovers.'}
+      ],
+      correct:'yes',
+      explainCorrect:'Right. 18 ÷ 6 = 3 exactly.',
+      explainWrong:'18 ÷ 6 = 3 exactly, so it does work.'
+    }
+  ];
+
+  const screens = {
+    s1: {
+      title:'Look at the bags',
+      action:'Tap the picture that shows what stays the same.',
+      support:'We are looking for one number of bags that works for both 28 and 36.',
+      prompt:'What must stay the same?',
+      type:'picture-select',
+      hero:'same-bags',
+      options:[
+        {id:'samebags', label:'Same number of bags', sub:'Soccer balls and tennis balls are packed into the same number of bags.', pic:'samebags'},
+        {id:'sameballs', label:'Same number of balls in every bag', sub:'This is not what the question says.', pic:'sameballs'}
+      ],
+      correct:'samebags',
+      success:'Yes. The same number of bags must work for both 28 and 36.',
+      wrong:'Look again. The question is about one number of bags that works for both kinds of balls.',
+      next:'s2',
+      remediationAfter: 2
+    },
+    s2: {
+      title:'Nothing left outside',
+      action:'Tap the picture that shows “no remainder”.',
+      support:'If the number of bags works, every ball goes into a bag.',
+      prompt:'Which picture matches “no remainder”?',
+      type:'picture-select',
+      hero:'no-remainder',
+      options:[
+        {id:'noneleft', label:'No balls left outside', sub:'Every ball goes into a bag.', pic:'noneleft'},
+        {id:'oneleft', label:'A ball is left outside', sub:'This means there is a remainder.', pic:'leftone'}
+      ],
+      correct:'noneleft',
+      success:'Correct. “No remainder” means nothing is left over.',
+      wrong:'Check the red ball outside the bag. If something is left outside, there is a remainder.',
+      next:'s3',
+      remediationAfter: 2
+    },
+    s3: {
+      title:'Choose the right check',
+      action:'Tap the kind of number we need.',
+      support:'We are looking for a number that can share both groups exactly.',
+      prompt:'Which description matches the possible number of bags?',
+      type:'select',
+      options:[
+        {id:'factorboth', text:'A number that can divide both 28 and 36 exactly.'},
+        {id:'bigger', text:'A number that is bigger than 36.'},
+        {id:'sum', text:'A number that equals 28 + 36.'},
+        {id:'difference', text:'A number that equals 36 − 28.'}
+      ],
+      correct:'factorboth',
+      success:'Yes. We need a number that divides both 28 and 36 exactly, so it is a common factor of both numbers.',
+      wrong:'We are checking equal sharing, not adding, subtracting, or choosing a bigger number. Which number of bags can both 28 and 36 be divided by exactly?',
+      next:'s4',
+      remediationAfter: 2
+    },
+    s4: {
+      title:'Test 7 bags',
+      action:'Tap the true statement for 7 bags.',
+      support:'A number of bags works only if it shares both 28 and 36 equally.',
+      prompt:'If Ali uses 7 bags, what happens?',
+      type:'select',
+      options:[
+        {id:'both', text:'Both 28 and 36 share equally into 7 bags.'},
+        {id:'only28', text:'Only 28 shares equally into 7 bags.'},
+        {id:'only36', text:'Only 36 shares equally into 7 bags.'},
+        {id:'neither', text:'Neither 28 nor 36 shares equally into 7 bags.'}
+      ],
+      correct:'only28',
+      success:'Right. 28 ÷ 7 = 4 exactly, but 36 ÷ 7 leaves 1 over, so 7 does not work.',
+      wrong:'Check both numbers, not just one. 28 works with 7, but 36 does not.',
+      next:'s5',
+      visual:{bags:7,soccer:{each:4,left:0,exact:true},tennis:{each:5,left:1,exact:false}}
+    },
+    s5: {
+      title:'Test 6 bags',
+      action:'Tap the true statement for 6 bags.',
+      support:'Again, the number must work for both 28 and 36.',
+      prompt:'If Ali uses 6 bags, what happens?',
+      type:'select',
+      options:[
+        {id:'both', text:'Both 28 and 36 share equally into 6 bags.'},
+        {id:'only28', text:'Only 28 shares equally into 6 bags.'},
+        {id:'only36', text:'Only 36 shares equally into 6 bags.'},
+        {id:'neither', text:'Neither 28 nor 36 shares equally into 6 bags.'}
+      ],
+      correct:'only36',
+      success:'Right. 36 ÷ 6 = 6 exactly, but 28 ÷ 6 leaves 4 over, so 6 does not work.',
+      wrong:'Check both numbers carefully. 36 works with 6, but 28 does not.',
+      next:'s6',
+      visual:{bags:6,soccer:{each:4,left:4,exact:false},tennis:{each:6,left:0,exact:true}}
+    },
+    s6: {
+      title:'Test 5 bags',
+      action:'Tap the true statement for 5 bags.',
+      support:'Does 5 divide 28 exactly? Does 5 divide 36 exactly?',
+      prompt:'If Ali uses 5 bags, what happens?',
+      type:'select',
+      options:[
+        {id:'both', text:'Both 28 and 36 share equally into 5 bags.'},
+        {id:'only28', text:'Only 28 shares equally into 5 bags.'},
+        {id:'only36', text:'Only 36 shares equally into 5 bags.'},
+        {id:'neither', text:'Neither 28 nor 36 shares equally into 5 bags.'}
+      ],
+      correct:'neither',
+      success:'Correct. 28 ÷ 5 leaves 3 over and 36 ÷ 5 leaves 1 over, so 5 does not work.',
+      wrong:'Try each number. 5 does not divide 28 exactly and it does not divide 36 exactly.',
+      next:'s7',
+      visual:{bags:5,soccer:{each:5,left:3,exact:false},tennis:{each:7,left:1,exact:false}}
+    },
+    s7: {
+      title:'Test 4 bags',
+      action:'Tap the true statement for 4 bags.',
+      support:'This time, check whether both numbers share equally.',
+      prompt:'If Ali uses 4 bags, what happens?',
+      type:'select',
+      options:[
+        {id:'both', text:'Both 28 and 36 share equally into 4 bags.'},
+        {id:'only28', text:'Only 28 shares equally into 4 bags.'},
+        {id:'only36', text:'Only 36 shares equally into 4 bags.'},
+        {id:'neither', text:'Neither 28 nor 36 shares equally into 4 bags.'}
+      ],
+      correct:'both',
+      success:'Yes. 28 ÷ 4 = 7 exactly and 36 ÷ 4 = 9 exactly, so 4 works.',
+      wrong:'Check again. 28 ÷ 4 and 36 ÷ 4 are both exact.',
+      next:'s8',
+      visual:{bags:4,soccer:{each:7,left:0,exact:true},tennis:{each:9,left:0,exact:true}}
+    },
+    s8: {
+      title:'State the answer',
+      action:'Type the possible number of bags from the options.',
+      support:'Use what you just tested. Which option works for both 28 and 36 with no remainder?',
+      prompt:'Type the number of bags.',
+      type:'input',
+      correctValue:'4',
+      success:'Correct. Among the given options, 4 is the possible number of bags. That matches option 4.',
+      wrong:'Look back at the testing. Only one option divides both 28 and 36 exactly.',
+      next:'s9'
+    },
+    s9: {
+      title:'Check the strategy',
+      action:'Tap the best summary of the method.',
+      support:'The goal is to remember what to do next time.',
+      prompt:'Which sentence best explains the strategy?',
+      type:'select',
+      options:[
+        {id:'sum', text:'Add 28 and 36, then choose the closest option.'},
+        {id:'factorcheck', text:'Test each option to see whether it divides both 28 and 36 exactly with no remainder.'},
+        {id:'difference', text:'Subtract 28 from 36, then use that answer.'},
+        {id:'bigger', text:'Choose the biggest option because bigger numbers hold more balls.'}
+      ],
+      correct:'factorcheck',
+      success:'Exactly. We tested each option to see whether it worked for both numbers with no remainder.',
+      wrong:'Think about what we actually checked on each screen.',
+      next:'s10'
+    },
+    s10: {
+      title:'Corrections table',
+      action:'Study the full systematic listing table.',
+      support:'Draw this table when you do your corrections.',
+      prompt:'This table shows why only 4 works from the given options.',
+      type:'final'
+    }
+  };
+
+  function shuffle(array){
+    const copy = array.slice();
+    for(let i=copy.length-1;i>0;i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function ensureOrder(screen){
+    if(screen.type !== 'select') return screen.options.map(o => o.id);
+    if(!state.orders[screen.title]){
+      state.orders[screen.title] = shuffle(screen.options.map(o => o.id));
+    }
+    return state.orders[screen.title];
+  }
+
+  function getOptionById(screen, id){
+    return screen.options.find(opt => opt.id === id);
+  }
+
+  function renderQuestionBox(){
+    return `
+      <details class="question-box">
+        <summary>Show the question again</summary>
+        <div class="question-text">${questionText}</div>
+      </details>
+    `;
+  }
+
+  function renderVisual(v){
+    if(!v) return '';
+    return `
+      <div class="division-board" aria-label="sharing model">
+        ${renderDivisionRow('28 soccer balls', 'soccer', v.bags, v.soccer.each, v.soccer.left, v.soccer.exact)}
+        ${renderDivisionRow('36 tennis balls', 'tennis', v.bags, v.tennis.each, v.tennis.left, v.tennis.exact)}
+      </div>
+    `;
+  }
+
+  function renderDivisionRow(label, kind, bags, each, leftover, exact){
+    const bagIcons = new Array(bags).fill(0).map(() => {
+      let chips = '';
+      for(let i=0;i<Math.min(each, 10);i++){
+        chips += `<span class="ball-chip ${kind}">${kind === 'soccer' ? 'S' : 'T'}</span>`;
+      }
+      const shortNote = each > 10 ? `<div>${each} in each bag</div>` : `<div>${each} in each bag</div>`;
+      return `<div class="bag">${chips}${shortNote}</div>`;
+    }).join('');
+    const divisionSentence = label.startsWith('28')
+      ? `${28} ÷ ${bags} = ${Math.floor(28/bags)}${leftover ? ` remainder ${leftover}` : ''}`
+      : `${36} ÷ ${bags} = ${Math.floor(36/bags)}${leftover ? ` remainder ${leftover}` : ''}`;
+    return `
+      <div class="division-row">
+        <div class="division-head">
+          <strong>${label}</strong>
+          <span class="tag ${exact ? 'good' : 'bad'}">${exact ? 'works exactly' : 'not exact'}</span>
+        </div>
+        <div>${divisionSentence}</div>
+        <div class="bag-line">
+          ${bagIcons}
+          ${leftover ? `<div class="leftover">${leftover} left over</div>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+
+  function renderHero(kind){
+    if(kind === 'same-bags'){
+      return `
+        <div class="hero-card" aria-hidden="true">
+          <div class="hero-title">Same number of bags for both groups</div>
+          <div class="hero-grid">
+            <div class="hero-mini">
+              <div class="flow-row">
+                <div class="flow-balls">
+                  ${new Array(8).fill(0).map(()=>'<span class="ball-dot soccer"></span>').join('')}
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="mini-bag-row">
+                  <div class="mini-bag"></div><div class="mini-bag"></div><div class="mini-bag"></div>
+                </div>
+              </div>
+              <div class="picture-sub">Soccer balls</div>
+            </div>
+            <div class="hero-mini">
+              <div class="flow-row">
+                <div class="flow-balls">
+                  ${new Array(8).fill(0).map(()=>'<span class="ball-dot tennis"></span>').join('')}
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="mini-bag-row">
+                  <div class="mini-bag"></div><div class="mini-bag"></div><div class="mini-bag"></div>
+                </div>
+              </div>
+              <div class="picture-sub">Tennis balls</div>
+            </div>
+          </div>
+          <div class="same-badge">✓ same number of bags</div>
+        </div>
+      `;
+    }
+    if(kind === 'no-remainder'){
+      return `
+        <div class="hero-card" aria-hidden="true">
+          <div class="hero-title">No remainder means no balls are left outside</div>
+          <div class="remainder-scene">
+            <div class="hero-mini">
+              <div class="leftover-demo">
+                <div class="mini-bag"></div>
+                <div class="mini-bag"></div>
+                <div class="mini-bag"></div>
+                <span class="note-pill">all inside</span>
+              </div>
+            </div>
+            <div class="hero-mini">
+              <div class="leftover-demo">
+                <div class="mini-bag"></div>
+                <div class="mini-bag"></div>
+                <div class="leftover-chip"></div>
+                <span class="note-pill">left outside</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    return '';
+  }
+
+  function renderPictureOption(option, selected){
+    if(option.pic === 'samebags'){
+      return `
+        <div class="choice-pic" aria-hidden="true">
+          <div class="choice-bag-pair">
+            <div class="hero-mini">
+              <div class="flow-row">
+                <span class="tiny-count">28</span>
+                <div class="mini-bag-row"><div class="mini-bag"></div><div class="mini-bag"></div><div class="mini-bag"></div></div>
+              </div>
+            </div>
+            <div class="hero-mini">
+              <div class="flow-row">
+                <span class="tiny-count">36</span>
+                <div class="mini-bag-row"><div class="mini-bag"></div><div class="mini-bag"></div><div class="mini-bag"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="picture-label">${option.label}</div>
+          <div class="picture-sub">${option.sub}</div>
+        </div>
+      `;
+    }
+    if(option.pic === 'sameballs'){
+      return `
+        <div class="choice-pic" aria-hidden="true">
+          <div class="choice-bag-pair">
+            <div class="hero-mini">
+              <div class="flow-row">
+                <span class="tiny-count">4</span>
+                <div class="mini-bag-row"><div class="mini-bag"></div><div class="mini-bag"></div></div>
+              </div>
+            </div>
+            <div class="hero-mini">
+              <div class="flow-row">
+                <span class="tiny-count">4</span>
+                <div class="mini-bag-row"><div class="mini-bag"></div><div class="mini-bag"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="picture-label">${option.label}</div>
+          <div class="picture-sub">${option.sub}</div>
+        </div>
+      `;
+    }
+    if(option.pic === 'noneleft'){
+      return `
+        <div class="choice-pic" aria-hidden="true">
+          <div class="leftover-demo">
+            <div class="mini-bag"></div><div class="mini-bag"></div><div class="mini-bag"></div>
+          </div>
+          <div class="picture-label">${option.label}</div>
+          <div class="picture-sub">${option.sub}</div>
+        </div>
+      `;
+    }
+    if(option.pic === 'leftone'){
+      return `
+        <div class="choice-pic" aria-hidden="true">
+          <div class="leftover-demo">
+            <div class="mini-bag"></div><div class="mini-bag"></div><div class="leftover-chip"></div>
+          </div>
+          <div class="picture-label">${option.label}</div>
+          <div class="picture-sub">${option.sub}</div>
+        </div>
+      `;
+    }
+    return `
+      <div class="choice-pic">
+        <div class="picture-label">${option.label || option.text}</div>
+        ${option.sub ? `<div class="picture-sub">${option.sub}</div>` : ''}
+      </div>
+    `;
+  }
+
+
+  function renderScreen(){
+    if(state.remediation.active){
+      renderRemediation();
+      return;
+    }
+    const screen = screens[state.current];
+    const currentIndex = screenSequence.indexOf(state.current);
+    stepPill.textContent = `Step ${currentIndex + 1} of ${screenSequence.length}`;
+    streakPill.textContent = `Remediation streak: ${state.remediation.streak}`;
+    progressBar.style.width = `${((currentIndex) / (screenSequence.length - 1)) * 100}%`;
+
+    let html = `
+      <h1 class="screen-title">${screen.title}</h1>
+      <div class="action-box">${screen.action}</div>
+      <div class="support-box">${screen.support}</div>
+      ${screen.hero ? renderHero(screen.hero) : ''}
+      <p class="prompt">${screen.prompt}</p>
+      <div class="button-row">
+        <button class="btn btn-secondary" data-action="read-aloud">Read this screen aloud</button>
+      </div>
+    `;
+
+    if(screen.type === 'select' || screen.type === 'picture-select'){
+      const order = ensureOrder(screen);
+      const selected = state.selected[state.current];
+      html += `<div class="${screen.type === 'picture-select' ? 'simple-grid' : 'option-grid'}">`;
+      order.forEach(id => {
+        const opt = getOptionById(screen, id);
+        const selectedClass = selected === id ? 'selected' : '';
+        if(screen.type === 'picture-select'){
+          html += `<button class="picture-card ${selectedClass}" data-action="select-option" data-option-id="${opt.id}" aria-pressed="${selected === id ? 'true':'false'}">${renderPictureOption(opt, selected === id)}</button>`;
+        } else {
+          html += `<button class="option-card ${selectedClass}" data-action="select-option" data-option-id="${opt.id}" aria-pressed="${selected === id ? 'true':'false'}">${opt.text}</button>`;
+        }
+      });
+      html += `</div>
+      <div class="button-row">
+        <button class="btn btn-primary" data-action="check-screen">Check</button>
+      </div>`;
+    }
+
+    if(screen.type === 'input'){
+      html += `
+        <div class="input-wrap">
+          <label for="answer-box"><strong>Number of bags:</strong></label>
+          <input id="answer-box" type="number" inputmode="numeric" min="0" step="1" value="${state.typedValue || ''}" />
+          <button class="btn btn-primary" data-action="check-input">Check</button>
+        </div>
+      `;
+    }
+
+    const fb = state.feedback[state.current];
+    if(fb){
+      html += `
+        <div class="feedback ${fb.kind}">
+          <div><strong>${fb.title}</strong></div>
+          <div>${fb.message}</div>
+          ${screen.visual ? renderVisual(screen.visual) : ''}
+          ${fb.kind === 'success' && screen.type !== 'final' ? `<div class="button-row"><button class="btn btn-primary" data-action="next-screen">Next</button></div>` : ''}
+          ${fb.kind !== 'success' && screen.type === 'select' ? `<div class="status-line">Choose again, then press Check.</div>` : ''}
+        </div>
+      `;
+    }
+
+    if(screen.type === 'final'){
+      html += `
+        <div class="feedback success">
+          <div><strong>Among the given options, 4 works.</strong></div>
+          <div>Notice the wording carefully: there may be other common factors, but from the options given, only 4 works for both 28 and 36.</div>
+        </div>
+
+        <table aria-label="systematic listing table">
+          <thead>
+            <tr>
+              <th>Option tested</th>
+              <th>28 ÷ option</th>
+              <th>Does 28 share equally?</th>
+              <th>36 ÷ option</th>
+              <th>Does 36 share equally?</th>
+              <th>Possible from the given options?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>7</td>
+              <td>28 ÷ 7 = 4</td>
+              <td>Yes</td>
+              <td>36 ÷ 7 = 5 remainder 1</td>
+              <td>No</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>28 ÷ 6 = 4 remainder 4</td>
+              <td>No</td>
+              <td>36 ÷ 6 = 6</td>
+              <td>Yes</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>28 ÷ 5 = 5 remainder 3</td>
+              <td>No</td>
+              <td>36 ÷ 5 = 7 remainder 1</td>
+              <td>No</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>28 ÷ 4 = 7</td>
+              <td>Yes</td>
+              <td>36 ÷ 4 = 9</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="draw-box">
+          <strong>Draw this for your corrections:</strong>
+          <div class="mini-note">Make 6 columns with these headings:</div>
+          <div class="mini-note">Option tested | 28 ÷ option | Does 28 share equally? | 36 ÷ option | Does 36 share equally? | Possible from the given options?</div>
+        </div>
+
+        <div class="footer-note">You can go back through the screens to revise the thinking: understand the wording → choose the right check → test each option → choose the option that works for both numbers with no remainder.</div>
+      `;
+    }
+
+    html += renderQuestionBox();
+    app.innerHTML = html;
+  }
+
+  function renderRemediation(){
+    const item = remediationSet[state.remediation.index];
+    stepPill.textContent = 'Support practice';
+    progressBar.style.width = '20%';
+    streakPill.textContent = `Remediation streak: ${state.remediation.streak} / 3`;
+    let html = `
+      <h1 class="screen-title">Quick support practice</h1>
+      <div class="action-box">Tap Yes or No.</div>
+      <div class="support-box">Build 3 correct in a row, then go back to the main question.</div>
+      <p class="prompt">${item.prompt}</p>
+      <div class="button-row">
+        <button class="btn btn-secondary" data-action="read-aloud-remediation">Read this screen aloud</button>
+      </div>
+      <div class="option-grid">
+        ${item.choices.map(choice => `
+          <button class="option-card ${state.remediation.selected === choice.id ? 'selected' : ''}" data-action="select-remediation" data-option-id="${choice.id}" aria-pressed="${state.remediation.selected === choice.id ? 'true':'false'}">${choice.text}</button>
+        `).join('')}
+      </div>
+      <div class="button-row">
+        <button class="btn btn-primary" data-action="check-remediation">Check</button>
+      </div>
+    `;
+    if(state.remediation.feedback){
+      html += `
+        <div class="feedback ${state.remediation.feedback.kind}">
+          <div><strong>${state.remediation.feedback.title}</strong></div>
+          <div>${state.remediation.feedback.message}</div>
+          ${state.remediation.feedback.kind === 'success' ? `<div class="status-line">Current streak: ${state.remediation.streak} / 3</div>` : '<div class="status-line">The streak resets if the answer is wrong.</div>'}
+          ${state.remediation.feedback.canContinue ? `<div class="button-row"><button class="btn btn-primary" data-action="next-remediation">${state.remediation.streak >= 3 ? 'Return to the question' : 'Next support question'}</button></div>` : ''}
+        </div>
+      `;
+    }
+    html += renderQuestionBox();
+    app.innerHTML = html;
+  }
+
+  function speak(text){
+    if(!('speechSynthesis' in window)){
+      alert('Read-aloud is not available on this device/browser.');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.95;
+    utter.pitch = 1;
+    window.speechSynthesis.speak(utter);
+  }
+
+  function checkCurrentScreen(){
+    const screen = screens[state.current];
+    const choice = state.selected[state.current];
+    if(!choice){
+      state.feedback[state.current] = {kind:'warn', title:'Choose an answer first.', message: screen.type === 'picture-select' ? 'Tap one picture, then press Check.' : 'Tap one option, then press Check.'};
+      renderScreen();
+      return;
+    }
+    state.attempts[state.current] = (state.attempts[state.current] || 0) + 1;
+    if(choice === screen.correct){
+      state.feedback[state.current] = {kind:'success', title:'Correct.', message:screen.success};
+      state.correct[state.current] = true;
+    } else {
+      state.feedback[state.current] = {kind:'error', title:'Not yet.', message:screen.wrong};
+      if(screen.remediationAfter && state.attempts[state.current] >= screen.remediationAfter){
+        state.feedback[state.current].message += ' Let us do a short support practice first.';
+        state.feedback[state.current].launchRemediation = true;
+      }
+    }
+    renderScreen();
+  }
+
+  function goNext(){
+    const screen = screens[state.current];
+    if(state.feedback[state.current] && state.feedback[state.current].launchRemediation){
+      startRemediation(state.current, screen.title);
+      return;
+    }
+    if(screen.next){
+      state.current = screen.next;
+      renderScreen();
+    }
+  }
+
+  function startRemediation(source, label){
+    state.remediation.active = true;
+    state.remediation.source = source;
+    state.remediation.sourceLabel = label;
+    state.remediation.streak = 0;
+    state.remediation.index = 0;
+    state.remediation.selected = null;
+    state.remediation.feedback = null;
+    renderRemediation();
+  }
+
+  function checkRemediation(){
+    const item = remediationSet[state.remediation.index];
+    if(!state.remediation.selected){
+      state.remediation.feedback = {kind:'warn', title:'Choose Yes or No first.', message:'Tap one answer, then press Check.', canContinue:false};
+      renderRemediation();
+      return;
+    }
+    if(state.remediation.selected === item.correct){
+      state.remediation.streak += 1;
+      state.remediation.feedback = {
+        kind:'success',
+        title:'Correct.',
+        message:item.explainCorrect,
+        canContinue:true
+      };
+    } else {
+      state.remediation.streak = 0;
+      state.remediation.feedback = {
+        kind:'error',
+        title:'Not yet.',
+        message:item.explainWrong,
+        canContinue:true
+      };
+    }
+    renderRemediation();
+  }
+
+  function nextRemediation(){
+    if(state.remediation.streak >= 3){
+      state.remediation.active = false;
+      state.remediation.selected = null;
+      state.remediation.feedback = null;
+      state.current = state.remediation.source;
+      state.feedback[state.current] = {kind:'warn', title:'Back to the question.', message:'Good. Now try the main question again using the idea of equal sharing with no remainder.'};
+      renderScreen();
+      return;
+    }
+    state.remediation.index = (state.remediation.index + 1) % remediationSet.length;
+    state.remediation.selected = null;
+    state.remediation.feedback = null;
+    renderRemediation();
+  }
+
+  app.addEventListener('click', function(event){
+    const button = event.target.closest('[data-action]');
+    if(!button) return;
+    const action = button.dataset.action;
+
+    if(action === 'select-option'){
+      state.selected[state.current] = button.dataset.optionId;
+      renderScreen();
+      return;
+    }
+
+    if(action === 'check-screen'){
+      checkCurrentScreen();
+      return;
+    }
+
+    if(action === 'next-screen'){
+      goNext();
+      return;
+    }
+
+    if(action === 'read-aloud'){
+      const screen = screens[state.current];
+      const text = `${screen.title}. ${screen.action}. ${screen.prompt}. ${questionText}`;
+      speak(text);
+      return;
+    }
+
+    if(action === 'check-input'){
+      const input = document.getElementById('answer-box');
+      state.typedValue = input ? String(input.value).trim() : '';
+      const screen = screens[state.current];
+      state.attempts[state.current] = (state.attempts[state.current] || 0) + 1;
+      if(state.typedValue === screen.correctValue){
+        state.feedback[state.current] = {kind:'success', title:'Correct.', message:screen.success};
+        state.correct[state.current] = true;
+      } else {
+        state.feedback[state.current] = {kind:'error', title:'Not yet.', message:screen.wrong};
+      }
+      renderScreen();
+      return;
+    }
+
+    if(action === 'select-remediation'){
+      state.remediation.selected = button.dataset.optionId;
+      renderRemediation();
+      return;
+    }
+
+    if(action === 'check-remediation'){
+      checkRemediation();
+      return;
+    }
+
+    if(action === 'next-remediation'){
+      nextRemediation();
+      return;
+    }
+
+    if(action === 'read-aloud-remediation'){
+      const item = remediationSet[state.remediation.index];
+      speak(`Quick support practice. ${item.prompt}`);
+      return;
+    }
+  });
+
+  renderScreen();
+})();
+</script>
+</body>
+</html>

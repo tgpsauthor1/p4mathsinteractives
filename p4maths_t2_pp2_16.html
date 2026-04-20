@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P4 Maths Interactive - Equal Units and Total Cost</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --text:#18212f;
+    --muted:#536173;
+    --line:#d9e1ec;
+    --primary:#1f6feb;
+    --primary-soft:#e9f2ff;
+    --secondary:#ffefcc;
+    --secondary-border:#f0b84b;
+    --success:#157347;
+    --success-soft:#e9f7ef;
+    --danger:#b42318;
+    --danger-soft:#fdecec;
+    --shadow:0 10px 28px rgba(20,32,55,.10);
+    --unit:42px;
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+  body{min-height:100vh}
+  .app{
+    max-width:980px;
+    margin:0 auto;
+    padding:18px 14px 30px;
+  }
+  .topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .title-wrap h1{
+    font-size:30px;
+    line-height:1.15;
+    margin:0 0 4px;
+  }
+  .title-wrap p{
+    margin:0;
+    color:var(--muted);
+    font-size:16px;
+  }
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  button{
+    font:inherit;
+  }
+  .tool-btn,.nav-btn,.check-btn,.restart-btn{
+    border:none;
+    border-radius:14px;
+    padding:12px 16px;
+    cursor:pointer;
+    touch-action:manipulation;
+    min-height:48px;
+    font-weight:700;
+  }
+  .tool-btn{
+    background:#fff;
+    color:var(--text);
+    box-shadow:var(--shadow);
+  }
+  .tool-btn:hover,.nav-btn:hover,.check-btn:hover,.restart-btn:hover{filter:brightness(.98)}
+  .progress-wrap{
+    background:#fff;
+    border-radius:16px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+  }
+  .progress-text{
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .progress-track{
+    width:100%;
+    height:12px;
+    background:#e9eef5;
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#1f6feb,#58a6ff);
+    width:0%;
+    transition:width .25s ease;
+  }
+  .question-panel{
+    background:#fff;
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:18px;
+    margin-bottom:14px;
+    border:2px solid #dbe7fb;
+  }
+  .question-panel h2{
+    font-size:24px;
+    margin:0 0 10px;
+  }
+  .question-text{
+    font-size:22px;
+    line-height:1.5;
+  }
+  .question-line{
+    margin-bottom:10px;
+  }
+  .main-card{
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    padding:18px;
+  }
+  .screen-title{
+    font-size:24px;
+    margin:0 0 12px;
+  }
+  .action-box{
+    background:var(--primary-soft);
+    border:3px solid var(--primary);
+    color:#12345b;
+    border-radius:18px;
+    padding:16px 18px;
+    font-size:26px;
+    font-weight:800;
+    line-height:1.25;
+    margin-bottom:12px;
+  }
+  .explain-box{
+    background:var(--secondary);
+    border:3px solid var(--secondary-border);
+    border-radius:18px;
+    padding:14px 16px;
+    font-size:18px;
+    line-height:1.4;
+    margin-bottom:16px;
+  }
+  .sentence-stack,.options-grid,.model-grid{
+    display:grid;
+    gap:14px;
+  }
+  .sentence-stack{grid-template-columns:1fr}
+  .options-grid,.model-grid{
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  }
+  .sentence-btn,.option-card,.phrase-btn{
+    width:100%;
+    text-align:left;
+    background:#fff;
+    border:3px solid #cfd8e5;
+    border-radius:18px;
+    padding:16px;
+    cursor:pointer;
+    touch-action:manipulation;
+    box-shadow:0 2px 0 rgba(0,0,0,.03);
+    transition:transform .04s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease;
+    color:var(--text);
+  }
+  .phrase-btn{
+    display:inline-block;
+    width:auto;
+    margin:4px 6px 4px 0;
+    font-size:20px;
+    font-weight:700;
+  }
+  .sentence-btn,.option-card{min-height:76px}
+  .sentence-btn:hover,.option-card:hover,.phrase-btn:hover{border-color:#8eb8ff}
+  .sentence-btn.selected,.option-card.selected,.phrase-btn.selected{
+    border-color:var(--primary);
+    background:var(--primary-soft);
+    box-shadow:0 0 0 4px rgba(31,111,235,.12);
+  }
+  .sentence-btn.correct,.option-card.correct,.phrase-btn.correct{
+    border-color:var(--success);
+    background:var(--success-soft);
+  }
+  .sentence-btn.wrong,.option-card.wrong,.phrase-btn.wrong{
+    border-color:var(--danger);
+    background:var(--danger-soft);
+  }
+  .option-card strong,.sentence-btn strong{
+    display:block;
+    font-size:21px;
+    margin-bottom:6px;
+  }
+  .option-card p,.sentence-btn p{
+    margin:0;
+    font-size:17px;
+    color:var(--muted);
+    line-height:1.35;
+  }
+  .note{
+    color:var(--muted);
+    font-size:16px;
+    margin-top:12px;
+  }
+  .input-wrap{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin:10px 0 14px;
+  }
+  .num-input{
+    font-size:28px;
+    padding:12px 14px;
+    border-radius:16px;
+    border:3px solid #cfd8e5;
+    width:200px;
+    max-width:100%;
+  }
+  .equation{
+    font-size:28px;
+    font-weight:800;
+    background:#fff;
+    border:3px dashed #cfd8e5;
+    border-radius:18px;
+    padding:16px;
+    margin:12px 0;
+    display:inline-block;
+  }
+  .feedback{
+    border-radius:18px;
+    padding:14px 16px;
+    margin:14px 0;
+    font-size:19px;
+    line-height:1.45;
+    font-weight:700;
+  }
+  .feedback.success{background:var(--success-soft); border:3px solid var(--success); color:#0f5132}
+  .feedback.error{background:var(--danger-soft); border:3px solid var(--danger); color:#7a271a}
+  .feedback.info{background:#eef5ff; border:3px solid #7caef7; color:#12345b}
+  .nav-row{
+    display:flex;
+    gap:12px;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-top:16px;
+  }
+  .nav-btn,.check-btn,.restart-btn{
+    background:var(--primary);
+    color:#fff;
+  }
+  .nav-btn.secondary{
+    background:#fff;
+    color:var(--text);
+    border:2px solid #d5deea;
+  }
+  .restart-btn{background:#2d7b46}
+  .check-btn[disabled],.nav-btn[disabled],.tool-btn[disabled]{
+    opacity:.55;
+    cursor:not-allowed;
+  }
+  .model-choice-card{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .choice-title{
+    font-size:20px;
+    font-weight:800;
+  }
+  .choice-sub{
+    color:var(--muted);
+    font-size:16px;
+    line-height:1.35;
+  }
+  .model-box{
+    background:#f8fbff;
+    border:2px solid #d9e7ff;
+    border-radius:16px;
+    padding:14px;
+  }
+  .bar-model{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .bar-row{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    padding-bottom:4px;
+  }
+  .row-label{
+    min-width:140px;
+    font-weight:800;
+    font-size:18px;
+    padding-top:8px;
+  }
+  .unit-strip{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    flex-wrap:nowrap;
+  }
+  .unit{
+    width:var(--unit);
+    flex:0 0 var(--unit);
+    height:44px;
+    background:#9fd0ff;
+    border:2px solid #2b6cb0;
+    border-radius:10px;
+    position:relative;
+  }
+  .unit.same{background:#9fd0ff}
+  .unit.alt{background:#ffd28b; border-color:#c9861a}
+  .unit.bad{background:#ffc4c1; border-color:#c2413a}
+  .unit.unequal.small{width:28px; flex:0 0 28px}
+  .unit.unequal.med{width:46px; flex:0 0 46px}
+  .unit.unequal.big{width:62px; flex:0 0 62px}
+  .unit-label{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:16px;
+    color:#103a67;
+  }
+  .long-bar{
+    width:calc(var(--unit) * 6);
+    min-width:220px;
+    height:44px;
+    background:#9fd0ff;
+    border:2px solid #2b6cb0;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    color:#103a67;
+  }
+  .combined-total{
+    margin-top:10px;
+    padding:12px 14px;
+    border-radius:14px;
+    background:#eef7ee;
+    border:2px solid #98d3a9;
+    font-weight:800;
+    font-size:18px;
+  }
+  .question-inline{
+    font-size:22px;
+    line-height:1.55;
+    background:#fff;
+    border:2px solid #e3e9f2;
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .highlight{
+    background:#fff6d9;
+    padding:2px 6px;
+    border-radius:10px;
+  }
+  .pulse{
+    animation:pulse 1.2s ease-in-out infinite;
+  }
+  .counting .unit{
+    animation:pulse 1.2s ease-in-out infinite;
+  }
+  .counting .unit:nth-child(2){animation-delay:.07s}
+  .counting .unit:nth-child(3){animation-delay:.14s}
+  .counting .unit:nth-child(4){animation-delay:.21s}
+  .counting .unit:nth-child(5){animation-delay:.28s}
+  .counting .unit:nth-child(6){animation-delay:.35s}
+  .counting .unit:nth-child(7){animation-delay:.42s}
+  .counting .unit:nth-child(8){animation-delay:.49s}
+  .counting .unit:nth-child(9){animation-delay:.56s}
+  .counting .unit:nth-child(10){animation-delay:.63s}
+  .counting .unit:nth-child(11){animation-delay:.70s}
+  .counting .unit:nth-child(12){animation-delay:.77s}
+  .counting .unit:nth-child(13){animation-delay:.84s}
+  .tiny{
+    font-size:15px;
+    color:var(--muted);
+  }
+  .remediation{
+    background:#fff8ec;
+    border:3px solid #f0b84b;
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .remediation h3{
+    margin:0 0 8px;
+    font-size:22px;
+  }
+  .streak{
+    display:inline-block;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#fff;
+    border:2px solid #f0b84b;
+    font-weight:800;
+    margin-bottom:10px;
+  }
+  .footer-tip{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:15px;
+  }
+  .hidden{display:none !important}
+  @keyframes pulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.08)}
+  }
+  @media (max-width:700px){
+    .title-wrap h1{font-size:26px}
+    .screen-title{font-size:22px}
+    .question-text,.question-inline{font-size:20px}
+    .action-box{font-size:22px}
+    .row-label{min-width:110px}
+    :root{--unit:36px}
+  }
+</style>
+</head>
+<body>
+<div id="app" class="app" aria-live="polite"></div>
+
+<script>
+(() => {
+  const QUESTION = [
+    "Mrs Koh bought an MP3 player for $156.",
+    "She bought a washing machine that cost 12 times as much as the MP3 player.",
+    "How much did she pay in total for both items?"
+  ];
+
+  const state = {
+    current: 0,
+    questionOpen: true,
+    selections: {},
+    inputs: { units: "", total: "" },
+    attempts: {},
+    feedback: {},
+    solved: {},
+    orders: {},
+    remediation: {
+      active: false,
+      streak: 0,
+      index: 0,
+      items: [],
+      selected: null,
+      feedback: null
+    }
+  };
+
+  const optionBank = {
+    s3: [
+      { id: "unit-mp3", title: "$156 is the cost of 1 equal unit, the MP3 player.", sub: "The MP3 player is 1 equal unit." },
+      { id: "washing", title: "$156 is the cost of the washing machine.", sub: "This mixes up the two items." },
+      { id: "total", title: "$156 is the total cost of both items.", sub: "This does not match the question." }
+    ],
+    s4: [
+      { id: "correct12", title: "12 equal units", sub: "Each unit matches the MP3 player unit." },
+      { id: "oneLong", title: "1 long bar", sub: "This does not show 12 equal units." },
+      { id: "unequal12", title: "12 unequal parts", sub: "The parts should be equal in size." }
+    ],
+    s6: [
+      { id: "mul13", title: "156 × 13", sub: "This matches 13 equal units of $156." },
+      { id: "mul12", title: "156 × 12", sub: "This finds the washing machine only." },
+      { id: "add13", title: "156 + 13", sub: "This mixes a dollar amount and a number of units." },
+      { id: "add12", title: "13 + 12", sub: "This does not use the value of each unit." }
+    ],
+    s8: [
+      { id: "summary", title: "1 unit is $156. The washing machine is 12 equal units. Both items together are 13 equal units. Multiply 156 by 13.", sub: "This is the best summary of the strategy." },
+      { id: "stop12", title: "Multiply 156 by 12 and stop.", sub: "This finds only the washing machine cost." },
+      { id: "add15612", title: "Add 156 and 12.", sub: "This does not match the equal-unit model." },
+      { id: "divide", title: "Divide 156 by 12, then add.", sub: "This does not match the relationship." }
+    ]
+  };
+
+  const remediationItems = [
+    {
+      stem: "1 notebook costs $8. A pack has 4 equal notebooks. Which number sentence matches?",
+      options: [
+        { id: "a", text: "8 × 4", correct: true },
+        { id: "b", text: "8 + 4", correct: false },
+        { id: "c", text: "8 × 3", correct: false }
+      ]
+    },
+    {
+      stem: "1 toy costs $7. There are 5 equal toys altogether. Which number sentence matches?",
+      options: [
+        { id: "a", text: "7 × 5", correct: true },
+        { id: "b", text: "7 + 5", correct: false },
+        { id: "c", text: "5 + 5", correct: false }
+      ]
+    },
+    {
+      stem: "1 ticket costs $9. There are 6 equal tickets altogether. Which number sentence matches?",
+      options: [
+        { id: "a", text: "9 × 6", correct: true },
+        { id: "b", text: "9 + 6", correct: false },
+        { id: "c", text: "9 × 5", correct: false }
+      ]
+    },
+    {
+      stem: "1 pen costs $4. There are 3 equal pens altogether. Which number sentence matches?",
+      options: [
+        { id: "a", text: "4 × 3", correct: true },
+        { id: "b", text: "4 + 3", correct: false },
+        { id: "c", text: "4 × 2", correct: false }
+      ]
+    }
+  ];
+
+  const screens = [
+    { id: "s1", title: "Question analysis", progress: 12.5 },
+    { id: "s2", title: "Find the relationship words", progress: 25 },
+    { id: "s3", title: "What does $156 stand for?", progress: 37.5 },
+    { id: "s4", title: "Choose the matching model", progress: 50 },
+    { id: "s5", title: "How many equal units altogether?", progress: 62.5 },
+    { id: "s6", title: "Choose the number sentence", progress: 75 },
+    { id: "s7", title: "Find the total cost", progress: 87.5 },
+    { id: "s8", title: "Consolidate the strategy", progress: 100 }
+  ];
+
+  function shuffle(array){
+    const copy = array.slice();
+    for(let i=copy.length-1;i>0;i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function prepareOrders(){
+    state.orders.s3 = shuffle(optionBank.s3.map(o => o.id));
+    state.orders.s4 = shuffle(optionBank.s4.map(o => o.id));
+    state.orders.s6 = shuffle(optionBank.s6.map(o => o.id));
+    state.orders.s8 = shuffle(optionBank.s8.map(o => o.id));
+    state.remediation.items = shuffle(remediationItems).slice(0, 3).map(item => {
+      return {
+        stem: item.stem,
+        options: shuffle(item.options.map(o => ({...o})))
+      };
+    });
+  }
+
+  function currentScreen(){
+    return screens[state.current];
+  }
+
+  function attemptCount(key){
+    return state.attempts[key] || 0;
+  }
+
+  function bumpAttempt(key){
+    state.attempts[key] = attemptCount(key) + 1;
+  }
+
+  function setFeedback(screenId, type, message){
+    state.feedback[screenId] = { type, message };
+  }
+
+  function clearFeedback(screenId){
+    delete state.feedback[screenId];
+  }
+
+  function selectedClass(screenId, choiceId){
+    return state.selections[screenId] === choiceId ? "selected" : "";
+  }
+
+  function getOption(list, id){
+    return list.find(item => item.id === id);
+  }
+
+  function sanitizeMoneyInput(value){
+    return value.replace(/[$,\s]/g, "");
+  }
+
+  function speakText(text){
+    if(!("speechSynthesis" in window)){
+      alert("Read aloud is not available on this device.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    utterance.lang = "en-SG";
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function getSpeakText(){
+    const screenId = currentScreen().id;
+    const commonQuestion = "Question. " + QUESTION.join(" ");
+    const map = {
+      s1: commonQuestion + " Tap the sentence that tells what to find.",
+      s2: commonQuestion + " Tap the words that show how the washing machine cost compares with the MP3 player.",
+      s3: commonQuestion + " Choose what 156 dollars stands for.",
+      s4: commonQuestion + " Tap the model that matches 12 times as much.",
+      s5: commonQuestion + " Count the equal units for both items altogether, then type the total number of equal units.",
+      s6: commonQuestion + " Now there are 13 equal units altogether. Choose the number sentence that matches the model.",
+      s7: commonQuestion + " Type the total amount paid for both items.",
+      s8: commonQuestion + " Choose the best summary of the strategy."
+    };
+    if(state.remediation.active){
+      const item = state.remediation.items[state.remediation.index];
+      return "Quick practice. " + item.stem;
+    }
+    return map[screenId];
+  }
+
+  function renderQuestionPanel(forceOpen = false){
+    const isOpen = forceOpen || state.questionOpen || state.current === 0;
+    return `
+      <section class="question-panel ${isOpen ? "" : "hidden"}" id="questionPanel">
+        <h2>Clean question</h2>
+        <div class="question-text">
+          ${QUESTION.map(line => `<div class="question-line">${line}</div>`).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderUnit(labelText = "", cls = "same"){
+    return `<div class="unit ${cls}">${labelText ? `<div class="unit-label">${labelText}</div>` : ""}</div>`;
+  }
+
+  function renderModel(type, opts = {}){
+    if(type === "correct12"){
+      return `
+        <div class="bar-model">
+          <div class="bar-row">
+            <div class="row-label">MP3 player</div>
+            <div class="unit-strip">${renderUnit("$156")}</div>
+          </div>
+          <div class="bar-row">
+            <div class="row-label">Washing machine</div>
+            <div class="unit-strip">${Array.from({length:12}, () => renderUnit("", "same")).join("")}</div>
+          </div>
+        </div>
+      `;
+    }
+    if(type === "oneLong"){
+      return `
+        <div class="bar-model">
+          <div class="bar-row">
+            <div class="row-label">MP3 player</div>
+            <div class="unit-strip">${renderUnit("$156")}</div>
+          </div>
+          <div class="bar-row">
+            <div class="row-label">Washing machine</div>
+            <div class="unit-strip"><div class="long-bar">1 long bar</div></div>
+          </div>
+        </div>
+      `;
+    }
+    if(type === "unequal12"){
+      const pattern = ["small","med","big","small","med","big","small","big","med","small","big","med"];
+      return `
+        <div class="bar-model">
+          <div class="bar-row">
+            <div class="row-label">MP3 player</div>
+            <div class="unit-strip">${renderUnit("$156")}</div>
+          </div>
+          <div class="bar-row">
+            <div class="row-label">Washing machine</div>
+            <div class="unit-strip">${pattern.map(size => `<div class="unit unequal ${size} bad"></div>`).join("")}</div>
+          </div>
+        </div>
+      `;
+    }
+    if(type === "combined13"){
+      const countingClass = opts.counting ? "counting" : "";
+      return `
+        <div class="bar-model ${countingClass}">
+          <div class="bar-row">
+            <div class="row-label">MP3 player</div>
+            <div class="unit-strip">${renderUnit("$156")}</div>
+          </div>
+          <div class="bar-row">
+            <div class="row-label">Washing machine</div>
+            <div class="unit-strip">${Array.from({length:12}, () => renderUnit("", "same")).join("")}</div>
+          </div>
+          <div class="combined-total pulse">Both items together = 13 equal units altogether</div>
+        </div>
+      `;
+    }
+    if(type === "s5model"){
+      const countingClass = opts.counting ? "counting" : "";
+      return `
+        <div class="bar-model ${countingClass}">
+          <div class="bar-row">
+            <div class="row-label">MP3 player</div>
+            <div class="unit-strip">${renderUnit("$156")}</div>
+          </div>
+          <div class="bar-row">
+            <div class="row-label">Washing machine</div>
+            <div class="unit-strip">${Array.from({length:12}, () => renderUnit("", "same")).join("")}</div>
+          </div>
+        </div>
+      `;
+    }
+    return "";
+  }
+
+  function renderFeedback(screenId){
+    const fb = state.feedback[screenId];
+    if(!fb){ return ""; }
+    return `<div class="feedback ${fb.type}">${fb.message}</div>`;
+  }
+
+  function renderOptionCards(screenId, bankKey, renderer){
+    const order = state.orders[screenId];
+    const list = optionBank[bankKey];
+    return order.map(id => renderer(getOption(list, id))).join("");
+  }
+
+  function screen1(){
+    return `
+      <h2 class="screen-title">Step 1 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Tap the sentence that tells what to find.</div>
+      <div class="explain-box">We are not solving yet. First, we must notice what the question is asking for.</div>
+      <div class="question-inline">
+        <div class="sentence-stack">
+          <button class="sentence-btn ${selectedClass('s1','line1')}" data-action="select" data-screen="s1" data-choice="line1">
+            <strong>${QUESTION[0]}</strong>
+            <p>This sentence tells the cost of one item.</p>
+          </button>
+          <button class="sentence-btn ${selectedClass('s1','line2')}" data-action="select" data-screen="s1" data-choice="line2">
+            <strong>${QUESTION[1]}</strong>
+            <p>This sentence tells how the second item compares with the first item.</p>
+          </button>
+          <button class="sentence-btn ${selectedClass('s1','line3')}" data-action="select" data-screen="s1" data-choice="line3">
+            <strong>${QUESTION[2]}</strong>
+            <p>This sentence tells the final amount we need to find.</p>
+          </button>
+        </div>
+      </div>
+      ${renderFeedback('s1')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s1" ${state.selections.s1 ? "" : "disabled"}>Check</button>
+        ${state.solved.s1 ? `<button class="nav-btn" data-action="next">Next</button>` : ``}
+      </div>
+    `;
+  }
+
+  function screen2(){
+    const attempts = attemptCount('s2');
+    const help = attempts >= 1 ? ` <span class="highlight">12 times as much as the MP3 player</span>` : ` 12 times as much as the MP3 player`;
+    return `
+      <h2 class="screen-title">Step 2 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Tap the words that show how the washing machine cost compares with the MP3 player.</div>
+      <div class="explain-box">Look for the clue words that tell the relationship, not the total and not the item name.</div>
+      <div class="question-inline">
+        <div class="question-line">${QUESTION[0]}</div>
+        <div class="question-line">
+          She bought a washing machine that cost
+          <button class="phrase-btn ${selectedClass('s2','phrase-correct')}" data-action="select" data-screen="s2" data-choice="phrase-correct">12 times as much as the MP3 player</button>.
+        </div>
+        <div class="question-line">
+          <button class="phrase-btn ${selectedClass('s2','phrase-item')}" data-action="select" data-screen="s2" data-choice="phrase-item">washing machine</button>
+          <button class="phrase-btn ${selectedClass('s2','phrase-total')}" data-action="select" data-screen="s2" data-choice="phrase-total">in total</button>
+          <button class="phrase-btn ${selectedClass('s2','phrase-cost')}" data-action="select" data-screen="s2" data-choice="phrase-cost">$156</button>
+        </div>
+      </div>
+      ${attempts >= 2 ? `<div class="note">Stronger clue: In the second sentence, the relationship words tell how many equal MP3-player units the washing machine costs.</div>` : ``}
+      ${renderFeedback('s2')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s2" ${state.selections.s2 ? "" : "disabled"}>Check</button>
+        ${state.solved.s2 ? `<button class="nav-btn" data-action="next">Next</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+    `;
+  }
+
+  function screen3(){
+    return `
+      <h2 class="screen-title">Step 3 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Choose what <span class="highlight">$156</span> stands for.</div>
+      <div class="explain-box">We need to track what each number refers to before we build the model.</div>
+      <div class="options-grid">
+        ${renderOptionCards('s3', 's3', option => `
+          <button class="option-card ${selectedClass('s3', option.id)}" data-action="select" data-screen="s3" data-choice="${option.id}">
+            <strong>${option.title}</strong>
+            <p>${option.sub}</p>
+          </button>
+        `)}
+      </div>
+      ${renderFeedback('s3')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s3" ${state.selections.s3 ? "" : "disabled"}>Check</button>
+        ${state.solved.s3 ? `<button class="nav-btn" data-action="next">Next</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+    `;
+  }
+
+  function screen4(){
+    const attempts = attemptCount('s4');
+    return `
+      <h2 class="screen-title">Step 4 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Tap the model that matches <span class="highlight">12 times as much</span>.</div>
+      <div class="explain-box">If one item is 1 equal unit, then 12 times as much must be shown as 12 equal units of the same size.</div>
+      <div class="model-grid">
+        ${renderOptionCards('s4', 's4', option => `
+          <button class="option-card model-choice-card ${selectedClass('s4', option.id)}" data-action="select" data-screen="s4" data-choice="${option.id}">
+            <div class="choice-title">${option.title}</div>
+            <div class="model-box">${renderModel(option.id)}</div>
+            <div class="choice-sub">${option.sub}</div>
+          </button>
+        `)}
+      </div>
+      ${attempts >= 2 ? `<div class="feedback info">Stronger clue: In a times-as-much model, the parts must be equal because each part matches the MP3 player unit.</div>` : ``}
+      ${renderFeedback('s4')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s4" ${state.selections.s4 ? "" : "disabled"}>Check</button>
+        ${state.solved.s4 ? `<button class="nav-btn" data-action="next">Next</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+    `;
+  }
+
+  function screen5(){
+    const attempts = attemptCount('s5');
+    return `
+      <h2 class="screen-title">Step 5 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Type the total number of equal units for both items altogether.</div>
+      <div class="explain-box">Do not stop at the washing machine. Count the MP3 player unit too.</div>
+      <div class="model-box">${renderModel('s5model', { counting: attempts >= 1 })}</div>
+      <div class="input-wrap">
+        <label for="unitsInput" class="tiny">Number of equal units altogether</label>
+        <input id="unitsInput" class="num-input" inputmode="numeric" autocomplete="off" data-action="input-units" value="${escapeHtml(state.inputs.units)}" placeholder="Type here">
+      </div>
+      ${attempts >= 2 ? `<div class="note">Stronger clue: Count 1 unit for the MP3 player and 12 equal units for the washing machine.</div>` : ``}
+      ${renderFeedback('s5')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s5" ${state.inputs.units.trim() ? "" : "disabled"}>Check</button>
+        ${state.solved.s5 ? `<button class="nav-btn" data-action="next">Next</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+    `;
+  }
+
+  function renderRemediation(){
+    const item = state.remediation.items[state.remediation.index];
+    return `
+      <section class="remediation">
+        <h3>Quick practice before you try the question again</h3>
+        <div class="streak">Need 3 correct in a row · Current streak: ${state.remediation.streak}</div>
+        <div class="action-box">Choose the number sentence that matches the equal units.</div>
+        <div class="explain-box">Look at how many equal units there are altogether and how much 1 unit is worth.</div>
+        <div class="question-inline">${item.stem}</div>
+        <div class="options-grid">
+          ${item.options.map((option, idx) => `
+            <button class="option-card ${state.remediation.selected === idx ? "selected" : ""}" data-action="select-remediation" data-choice="${idx}">
+              <strong>${option.text}</strong>
+            </button>
+          `).join("")}
+        </div>
+        ${state.remediation.feedback ? `<div class="feedback ${state.remediation.feedback.type}">${state.remediation.feedback.message}</div>` : ``}
+        <div class="nav-row">
+          <button class="check-btn" data-action="check-remediation" ${state.remediation.selected === null ? "disabled" : ""}>Check</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function screen6(){
+    return `
+      <h2 class="screen-title">Step 6 of 8 · ${currentScreen().title}</h2>
+      ${state.remediation.active ? renderRemediation() : ""}
+      <div class="action-box">Choose the number sentence that matches the model now.</div>
+      <div class="explain-box">The model now shows both items together. First notice what the model shows. Then choose the number sentence that matches.</div>
+      <div class="model-box">${renderModel('combined13')}</div>
+      <div class="options-grid">
+        ${renderOptionCards('s6', 's6', option => `
+          <button class="option-card ${selectedClass('s6', option.id)}" data-action="select" data-screen="s6" data-choice="${option.id}">
+            <strong>${option.title}</strong>
+            <p>${option.sub}</p>
+          </button>
+        `)}
+      </div>
+      ${renderFeedback('s6')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s6" ${state.selections.s6 ? "" : "disabled"} ${state.remediation.active ? "disabled" : ""}>Check</button>
+        ${state.solved.s6 ? `<button class="nav-btn" data-action="next">Next</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+    `;
+  }
+
+  function screen7(){
+    const attempts = attemptCount('s7');
+    return `
+      <h2 class="screen-title">Step 7 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Type the total amount paid for both items.</div>
+      <div class="explain-box">Now use the number sentence to find the total cost. This answer must be the total for both items.</div>
+      <div class="equation">156 × 13 = ?</div>
+      <div class="input-wrap">
+        <label for="totalInput" class="tiny">Total cost in dollars</label>
+        <input id="totalInput" class="num-input" inputmode="numeric" autocomplete="off" data-action="input-total" value="${escapeHtml(state.inputs.total)}" placeholder="Type here">
+      </div>
+      ${attempts >= 2 ? `<div class="note">Calculation hint: You can split 13 into 10 and 3.</div>` : ``}
+      ${attempts >= 3 ? `<div class="note">Another hint: Check that your answer is more than 12 × 156 because it must include the MP3 player too.</div>` : ``}
+      ${renderFeedback('s7')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s7" ${state.inputs.total.trim() ? "" : "disabled"}>Check</button>
+        ${state.solved.s7 ? `<button class="nav-btn" data-action="next">Next</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+    `;
+  }
+
+  function screen8(){
+    return `
+      <h2 class="screen-title">Step 8 of 8 · ${currentScreen().title}</h2>
+      <div class="action-box">Choose the best summary of the strategy.</div>
+      <div class="explain-box">Keep the recap short. Focus on the key idea: show the equal units first, then find the total asked for.</div>
+      <div class="options-grid">
+        ${renderOptionCards('s8', 's8', option => `
+          <button class="option-card ${selectedClass('s8', option.id)}" data-action="select" data-screen="s8" data-choice="${option.id}">
+            <strong>${option.title}</strong>
+            <p>${option.sub}</p>
+          </button>
+        `)}
+      </div>
+      ${renderFeedback('s8')}
+      <div class="nav-row">
+        <button class="check-btn" data-action="check" data-screen="s8" ${state.selections.s8 ? "" : "disabled"}>Check</button>
+        ${state.solved.s8 ? `<button class="restart-btn" data-action="restart">Restart</button>` : `<button class="nav-btn secondary" data-action="back">Back</button>`}
+      </div>
+      ${state.solved.s8 ? `<div class="feedback success">Well done. Strategy to remember: 1 unit is $156, the washing machine is 12 equal units, both items together are 13 equal units, so multiply 156 by 13.</div>` : ``}
+      <div class="footer-tip">You can use the read aloud button and the question button on every screen.</div>
+    `;
+  }
+
+  function escapeHtml(value){
+    return String(value)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  function renderScreen(){
+    const id = currentScreen().id;
+    const map = { s1: screen1, s2: screen2, s3: screen3, s4: screen4, s5: screen5, s6: screen6, s7: screen7, s8: screen8 };
+    return map[id]();
+  }
+
+  function render(){
+    const screen = currentScreen();
+    const app = document.getElementById("app");
+    app.innerHTML = `
+      <div class="topbar">
+        <div class="title-wrap">
+          <h1>P4 Maths Interactive</h1>
+          <p>Equal units, times as much, and total cost</p>
+        </div>
+        <div class="controls">
+          <button class="tool-btn" data-action="toggle-question">${state.questionOpen || state.current === 0 ? "Hide question" : "Show question"}</button>
+          <button class="tool-btn" data-action="read-aloud">Read aloud</button>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-text">${screen.title}</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${screen.progress}%"></div></div>
+      </div>
+      ${renderQuestionPanel(state.current === 0)}
+      <main class="main-card">
+        ${renderScreen()}
+      </main>
+    `;
+  }
+
+  function checkScreen(screenId){
+    clearFeedback(screenId);
+
+    if(screenId === "s1"){
+      bumpAttempt(screenId);
+      if(state.selections.s1 === "line3"){
+        state.solved.s1 = true;
+        setFeedback(screenId, "success", "Yes. We need the total paid for both items.");
+      } else {
+        setFeedback(screenId, "error", "Look for the sentence that asks for the final answer, not the information that is given.");
+      }
+      return render();
+    }
+
+    if(screenId === "s2"){
+      bumpAttempt(screenId);
+      if(state.selections.s2 === "phrase-correct"){
+        state.solved.s2 = true;
+        setFeedback(screenId, "success", "Yes. These words show the relationship. The washing machine costs 12 equal MP3-player units.");
+      } else {
+        setFeedback(screenId, "error", attemptCount(screenId) >= 2
+          ? "Look again at the second sentence. The clue words tell how the washing machine cost compares with the MP3 player."
+          : "Try again. Tap the relationship words, not the item name and not the final question.");
+      }
+      return render();
+    }
+
+    if(screenId === "s3"){
+      bumpAttempt(screenId);
+      if(state.selections.s3 === "unit-mp3"){
+        state.solved.s3 = true;
+        setFeedback(screenId, "success", "Yes. The MP3 player is 1 equal unit, and that 1 unit costs $156.");
+      } else {
+        setFeedback(screenId, "error", "Go back to the first sentence. Which item costs $156?");
+      }
+      return render();
+    }
+
+    if(screenId === "s4"){
+      bumpAttempt(screenId);
+      if(state.selections.s4 === "correct12"){
+        state.solved.s4 = true;
+        setFeedback(screenId, "success", "Yes. '12 times as much' means 12 equal units.");
+      } else {
+        setFeedback(screenId, "error", attemptCount(screenId) >= 2
+          ? "The parts must be equal because each part matches the MP3 player unit."
+          : "Try again. The washing machine must be shown with 12 equal units.");
+      }
+      return render();
+    }
+
+    if(screenId === "s5"){
+      bumpAttempt(screenId);
+      const value = sanitizeMoneyInput(state.inputs.units);
+      if(value === "13"){
+        state.solved.s5 = true;
+        setFeedback(screenId, "success", "Yes. 1 unit for the MP3 player and 12 equal units for the washing machine make 13 equal units altogether.");
+      } else {
+        setFeedback(screenId, "error", attemptCount(screenId) >= 2
+          ? "Count 1 unit for the MP3 player and 12 equal units for the washing machine."
+          : "Recount the equal units. Do not stop at the washing machine.");
+      }
+      return render();
+    }
+
+    if(screenId === "s6"){
+      bumpAttempt(screenId);
+      if(state.selections.s6 === "mul13"){
+        state.solved.s6 = true;
+        setFeedback(screenId, "success", "Yes. There are 13 equal units altogether, and each unit is worth $156.");
+      } else {
+        if(attemptCount(screenId) === 1){
+          setFeedback(screenId, "error", "Look at the model again. It shows both items together, not just the washing machine.");
+        } else {
+          state.remediation.active = true;
+          state.remediation.streak = 0;
+          state.remediation.index = 0;
+          state.remediation.selected = null;
+          state.remediation.feedback = { type: "info", message: "We will practise matching equal units to the correct number sentence, then you can try the original question again." };
+          setFeedback(screenId, "error", "Let's do a quick practice first.");
+        }
+      }
+      return render();
+    }
+
+    if(screenId === "s7"){
+      bumpAttempt(screenId);
+      const value = sanitizeMoneyInput(state.inputs.total);
+      if(value === "2028"){
+        state.solved.s7 = true;
+        setFeedback(screenId, "success", "Yes. Mrs Koh paid $2028 in total.");
+      } else {
+        setFeedback(screenId, "error", attemptCount(screenId) >= 3
+          ? "Check that your answer includes both items. The final answer must be the total paid."
+          : attemptCount(screenId) >= 2
+            ? "Try splitting 13 into 10 and 3, then check that the answer is for both items."
+            : "Try again. Use the number sentence that matches the model.");
+      }
+      return render();
+    }
+
+    if(screenId === "s8"){
+      bumpAttempt(screenId);
+      if(state.selections.s8 === "summary"){
+        state.solved.s8 = true;
+        setFeedback(screenId, "success", "Yes. First show the equal units, then decide whether the question wants one item, the bigger item, or the total.");
+      } else {
+        setFeedback(screenId, "error", "Choose the summary that uses equal units and ends with the total for both items.");
+      }
+      return render();
+    }
+  }
+
+  function checkRemediation(){
+    const item = state.remediation.items[state.remediation.index];
+    const selected = item.options[state.remediation.selected];
+    if(selected.correct){
+      state.remediation.streak += 1;
+      if(state.remediation.streak >= 3){
+        state.remediation.active = false;
+        state.remediation.feedback = null;
+        state.remediation.selected = null;
+        setFeedback("s6", "info", "Nice practice. Now try the original question again.");
+      } else {
+        state.remediation.feedback = {
+          type: "success",
+          message: `Correct. ${selected.text} matches the equal units. Keep going.`
+        };
+        state.remediation.selected = null;
+        state.remediation.index = (state.remediation.index + 1) % state.remediation.items.length;
+      }
+    } else {
+      state.remediation.streak = 0;
+      state.remediation.feedback = {
+        type: "error",
+        message: "Not yet. Look for how much 1 unit is worth and how many equal units there are altogether."
+      };
+      state.remediation.selected = null;
+    }
+    render();
+  }
+
+  function nextScreen(){
+    if(state.current < screens.length - 1){
+      state.current += 1;
+      clearFeedback(currentScreen().id);
+      render();
+    }
+  }
+
+  function backScreen(){
+    if(state.current > 0){
+      state.current -= 1;
+      clearFeedback(currentScreen().id);
+      render();
+    }
+  }
+
+  function restart(){
+    state.current = 0;
+    state.questionOpen = true;
+    state.selections = {};
+    state.inputs = { units: "", total: "" };
+    state.attempts = {};
+    state.feedback = {};
+    state.solved = {};
+    state.remediation = {
+      active: false,
+      streak: 0,
+      index: 0,
+      items: [],
+      selected: null,
+      feedback: null
+    };
+    prepareOrders();
+    render();
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target.closest("[data-action]");
+    if(!target) return;
+
+    const action = target.dataset.action;
+
+    if(action === "toggle-question"){
+      state.questionOpen = !state.questionOpen;
+      render();
+      return;
+    }
+
+    if(action === "read-aloud"){
+      speakText(getSpeakText());
+      return;
+    }
+
+    if(action === "select"){
+      const screenId = target.dataset.screen;
+      const choice = target.dataset.choice;
+      state.selections[screenId] = choice;
+      clearFeedback(screenId);
+      render();
+      return;
+    }
+
+    if(action === "check"){
+      checkScreen(target.dataset.screen);
+      return;
+    }
+
+    if(action === "next"){
+      nextScreen();
+      return;
+    }
+
+    if(action === "back"){
+      backScreen();
+      return;
+    }
+
+    if(action === "restart"){
+      restart();
+      return;
+    }
+
+    if(action === "select-remediation"){
+      state.remediation.selected = Number(target.dataset.choice);
+      render();
+      return;
+    }
+
+    if(action === "check-remediation"){
+      checkRemediation();
+      return;
+    }
+  });
+
+  function syncTypedInputUI(screenId){
+    const feedbackEl = document.querySelector(".feedback");
+    if(feedbackEl){
+      feedbackEl.remove();
+    }
+    const checkBtn = document.querySelector(`[data-action="check"][data-screen="${screenId}"]`);
+    if(checkBtn){
+      if(screenId === "s5"){
+        checkBtn.disabled = !state.inputs.units.trim();
+      }
+      if(screenId === "s7"){
+        checkBtn.disabled = !state.inputs.total.trim();
+      }
+    }
+  }
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    const action = target.dataset.action;
+    if(action === "input-units"){
+      state.inputs.units = target.value;
+      clearFeedback("s5");
+      syncTypedInputUI("s5");
+    }
+    if(action === "input-total"){
+      state.inputs.total = target.value;
+      clearFeedback("s7");
+      syncTypedInputUI("s7");
+    }
+  });
+
+  prepareOrders();
+  render();
+})();
+</script>
+</body>
+</html>
