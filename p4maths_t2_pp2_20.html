@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P4 Maths T2 PP2 Q20 Interactive</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --ink:#132238;
+      --muted:#4c617c;
+      --line:#c9d5e6;
+      --primary:#1f6fe5;
+      --primary-soft:#e9f2ff;
+      --accent:#f59e0b;
+      --accent-soft:#fff3db;
+      --success:#157347;
+      --success-soft:#e7f7ee;
+      --danger:#b42318;
+      --danger-soft:#fdecec;
+      --shadow:0 10px 24px rgba(19,34,56,0.08);
+      --radius:18px;
+    }
+
+    * { box-sizing:border-box; }
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
+    body { min-height:100vh; }
+    button, input, select { font:inherit; }
+    button { touch-action:manipulation; cursor:pointer; }
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+    .title-wrap h1{
+      margin:0 0 4px;
+      font-size:1.5rem;
+      line-height:1.2;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:0.98rem;
+    }
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .toolbtn{
+      background:#fff;
+      border:2px solid var(--line);
+      padding:10px 14px;
+      border-radius:12px;
+      min-height:48px;
+      font-weight:700;
+      color:var(--ink);
+      box-shadow:var(--shadow);
+    }
+    .toolbtn.primary{
+      background:var(--primary);
+      color:white;
+      border-color:var(--primary);
+    }
+    .progress-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px 16px;
+      margin-bottom:16px;
+    }
+    .progress-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .progress-label{
+      font-weight:700;
+    }
+    .progress-track{
+      width:100%;
+      height:12px;
+      background:#e8edf6;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--primary), #6ba8ff);
+      transition:width 0.3s ease;
+    }
+
+    .screen-grid{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:16px;
+    }
+    @media (max-width: 940px){
+      .screen-grid{
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+
+    .question-panel summary,
+    .notes-panel summary{
+      cursor:pointer;
+      font-weight:700;
+      color:var(--ink);
+      padding:4px 0;
+      list-style:none;
+    }
+    .question-panel summary::-webkit-details-marker,
+    .notes-panel summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .question-text{
+      margin-top:10px;
+      line-height:1.55;
+      color:var(--ink);
+    }
+    .question-text .q-part{
+      margin-top:10px;
+      padding-left:8px;
+      border-left:4px solid #dbe8ff;
+    }
+
+    .task-box{
+      background:var(--primary-soft);
+      border:2px solid #b8d4ff;
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .task-label{
+      color:var(--primary);
+      font-weight:800;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      font-size:.84rem;
+    }
+    .task-text{
+      font-size:1.18rem;
+      line-height:1.35;
+      font-weight:800;
+    }
+
+    .help-box{
+      background:var(--accent-soft);
+      border:2px solid #ffd48a;
+      border-radius:16px;
+      padding:12px 14px;
+      margin-bottom:12px;
+      color:#6b4900;
+    }
+
+    .mini-tag{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef3fb;
+      color:var(--ink);
+      font-size:.9rem;
+      font-weight:700;
+      margin-right:8px;
+      margin-bottom:8px;
+    }
+
+    .feedback{
+      border-radius:16px;
+      padding:12px 14px;
+      margin-top:12px;
+      display:none;
+      line-height:1.45;
+      font-weight:700;
+    }
+    .feedback.show{ display:block; }
+    .feedback.success{
+      background:var(--success-soft);
+      border:2px solid #a7dfbf;
+      color:var(--success);
+    }
+    .feedback.error{
+      background:var(--danger-soft);
+      border:2px solid #f1b3ae;
+      color:var(--danger);
+    }
+    .feedback.info{
+      background:#eef5ff;
+      border:2px solid #bfd6ff;
+      color:#174ea6;
+    }
+
+    .input-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:10px;
+    }
+    .answer-input{
+      min-width:220px;
+      max-width:280px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:2px solid var(--line);
+      min-height:50px;
+      background:white;
+    }
+    .answer-input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(31,111,229,0.12);
+    }
+
+    .action-btn, .next-btn, .secondary-btn{
+      min-height:50px;
+      padding:12px 16px;
+      border-radius:14px;
+      border:none;
+      font-weight:800;
+    }
+    .action-btn{
+      background:var(--primary);
+      color:white;
+    }
+    .secondary-btn{
+      background:white;
+      border:2px solid var(--line);
+      color:var(--ink);
+    }
+    .next-btn{
+      background:var(--success);
+      color:white;
+      display:none;
+    }
+    .next-btn.show{ display:inline-block; }
+
+    .choices{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    .choice{
+      background:white;
+      border:2px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      min-height:58px;
+      text-align:left;
+      font-weight:700;
+      color:var(--ink);
+      width:100%;
+      box-shadow:0 2px 0 rgba(19,34,56,0.03);
+    }
+    .choice.selected{
+      border-color:var(--primary);
+      background:var(--primary-soft);
+      box-shadow:0 0 0 4px rgba(31,111,229,0.12);
+    }
+    .choice.correct{
+      border-color:var(--success);
+      background:var(--success-soft);
+    }
+    .choice.wrong{
+      border-color:var(--danger);
+      background:var(--danger-soft);
+    }
+
+    .graph-wrap{
+      position:relative;
+      background:#fff;
+      border:2px solid #d8e2f1;
+      border-radius:18px;
+      padding:10px;
+      overflow:hidden;
+    }
+    .graph-controls{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .graph-btn{
+      border:2px solid var(--line);
+      background:white;
+      padding:10px 12px;
+      border-radius:12px;
+      min-height:46px;
+      font-weight:800;
+      color:var(--ink);
+    }
+    .graph-btn.selected{
+      border-color:var(--primary);
+      background:var(--primary-soft);
+      box-shadow:0 0 0 4px rgba(31,111,229,0.12);
+    }
+
+    .legend{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .hint-list{
+      margin:8px 0 0 18px;
+      padding:0;
+      line-height:1.45;
+    }
+
+    .sort-zone{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    .sortable-list{
+      min-height:90px;
+      border:2px dashed #b7c8de;
+      border-radius:16px;
+      padding:12px;
+      background:#f8fbff;
+      display:grid;
+      gap:10px;
+    }
+    .sort-item{
+      border:2px solid var(--line);
+      background:white;
+      border-radius:14px;
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+    }
+    .sort-item button{
+      border:2px solid var(--line);
+      background:white;
+      border-radius:10px;
+      padding:8px 10px;
+      min-height:42px;
+      min-width:44px;
+    }
+
+    .small-note{
+      color:var(--muted);
+      font-size:0.95rem;
+      line-height:1.45;
+    }
+
+    .footer-nav{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .sr-only{
+      position:absolute!important;
+      width:1px;height:1px;
+      padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+    }
+
+    svg text{
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    .screen-title{
+      margin:0 0 12px;
+      font-size:1.25rem;
+      line-height:1.25;
+    }
+
+    .recap-card{
+      background:#f8fbff;
+      border:2px solid #d7e6ff;
+      border-radius:16px;
+      padding:12px;
+      margin-top:10px;
+    }
+
+    .summary-box{
+      background:#eef8f1;
+      border:2px solid #b9e2c7;
+      border-radius:16px;
+      padding:14px;
+      margin-top:10px;
+      line-height:1.5;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:600px){
+      .two-col{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="title-wrap">
+      <h1>P4 Maths Interactive: Line Graph Reading</h1>
+      <div class="subtitle">For weaker and average-progress learners. Read carefully, trace carefully, answer in the correct form.</div>
+    </div>
+    <div class="toolbar">
+      <button class="toolbtn" id="toggleQuestionBtn" type="button">Show / hide question</button>
+      <button class="toolbtn" id="readBtn" type="button">🔊 Read this screen</button>
+      <button class="toolbtn primary" id="restartBtn" type="button">Restart</button>
+    </div>
+  </div>
+
+  <div class="progress-card">
+    <div class="progress-row">
+      <div class="progress-label" id="progressText">Screen 1 of 15</div>
+      <div class="small-note" id="screenName">See the task clearly</div>
+    </div>
+    <div class="progress-track" aria-hidden="true">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="panel">
+      <h2 class="screen-title" id="screenTitle">Loading…</h2>
+      <div class="task-box">
+        <div class="task-label">Your job now</div>
+        <div class="task-text" id="taskText"></div>
+      </div>
+
+      <div class="help-box" id="helpBox">
+        <strong>Helpful reminder:</strong>
+        <span id="helpText"></span>
+      </div>
+
+      <div id="dynamicArea"></div>
+
+      <div class="feedback" id="feedbackBox" aria-live="polite"></div>
+
+      <div class="footer-nav">
+        <button class="secondary-btn" id="backBtn" type="button">← Back</button>
+        <button class="next-btn" id="nextBtn" type="button">Next →</button>
+      </div>
+    </div>
+
+    <div>
+      <details class="panel question-panel" id="questionPanel" open>
+        <summary>Question</summary>
+        <div class="question-text" id="questionText">
+          <p><strong>Question 20</strong></p>
+          <p>The line graph shows the amount of water in the tank from <strong>3 p.m. to 7 p.m.</strong> The tank was <strong>completely filled with water to the brim at 7 p.m.</strong></p>
+          <p>The graph is called <strong>Volume of water</strong>.</p>
+          <div class="q-part"><strong>(a)</strong> What was the <strong>capacity</strong> of the tank?</div>
+          <div class="q-part"><strong>(b)</strong> At what <strong>time</strong> was the tank <strong>half filled</strong> with water?</div>
+          <div class="q-part"><strong>(c)</strong> What was the <strong>increase</strong> in the volume of water from <strong>5 p.m. to 6 p.m.</strong>?</div>
+        </div>
+      </details>
+
+      <div class="panel notes-panel">
+        <details open>
+          <summary>Strategy</summary>
+          <div class="small-note">
+            <span class="mini-tag">Read the words carefully</span>
+            <span class="mini-tag">Trace on the graph</span>
+            <span class="mini-tag">Check the answer form</span>
+            <span class="mini-tag">Count the small gaps</span>
+          </div>
+          <ul class="hint-list">
+            <li>Do not choose the top number on the axis unless the graph point shows it.</li>
+            <li>For graph reading, follow the path: <strong>axis label → point → other axis</strong>.</li>
+            <li>For part (b), the answer is a <strong>time</strong>, not an amount.</li>
+            <li>For part (c), find the two readings first, then find the <strong>increase</strong>.</li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="panel">
+        <div class="graph-wrap">
+          <svg id="graphSvg" viewBox="0 0 520 420" width="100%" role="img" aria-labelledby="graphTitle graphDesc">
+            <title id="graphTitle">Line graph of volume of water from 3 p.m. to 7 p.m.</title>
+            <desc id="graphDesc">A line graph with time on the horizontal axis and volume of water in litres on the vertical axis. Points are at 3 p.m. zero litres, 4 p.m. sixty litres, 5 p.m. eighty litres, 6 p.m. one hundred and twelve litres, and 7 p.m. one hundred and twenty litres.</desc>
+          </svg>
+        </div>
+        <div class="graph-controls" id="graphControls" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const appState = {
+    currentScreen: 0,
+    completed: new Set(),
+    selectedChoice: null,
+    graphSelection: null,
+    graphMode: null,
+    typed: {},
+    speakEnabled: 'speechSynthesis' in window,
+    sortItems: [],
+    extra: {
+      gapCount: null,
+      miniChoice: null
+    }
+  };
+
+  const screens = [
+    {
+      title: "Screen 1: See the task clearly",
+      shortName: "See the task clearly",
+      task: "Tap the sentence that tells you the tank was full.",
+      help: "Read the words above the graph carefully before reading any value.",
+      mode: "textChoice",
+      prompt: "Which sentence tells you the tank was full?",
+      choices: [
+        { id: "c1", text: "The line graph shows the amount of water in the tank from 3 p.m. to 7 p.m.", correct: false },
+        { id: "c2", text: "The tank was completely filled with water to the brim at 7 p.m.", correct: true }
+      ],
+      success: "Yes. “To the brim at 7 p.m.” tells us the tank was full at 7 p.m.",
+      wrong: "Try again. Which sentence tells you the tank was full?",
+      speak: "Tap the sentence that tells you the tank was full."
+    },
+    {
+      title: "Screen 2: Match the clue to the graph",
+      shortName: "Match clue to graph",
+      task: "Tap 7 p.m. on the real graph.",
+      help: "Use the clue about the tank being full at 7 p.m. Then trace to the point and across to the vertical axis.",
+      mode: "graphTap",
+      graphMode: "tap-time-7",
+      success: "Good. The clue points us to 7 p.m. Now the graph trace shows the reading at that time.",
+      wrong: "Look at the horizontal axis. Tap 7 p.m.",
+      speak: "Tap seven p m on the real graph."
+    },
+    {
+      title: "Screen 3: Solve part (a)",
+      shortName: "Solve part a",
+      task: "Type the capacity of the tank.",
+      help: "The tank was full at 7 p.m. Read the point at 7 p.m. carefully.",
+      mode: "input",
+      inputId: "a_capacity",
+      placeholder: "Type your answer",
+      checker: (value) => {
+        const v = normalize(value);
+        if (["120", "120l", "120ℓ", "120litres", "120liter", "120liters"].includes(v)) {
+          return { ok: true, msg: "Correct. The capacity of the tank was 120 ℓ." };
+        }
+        if (v === "140" || v === "140l" || v === "140ℓ") {
+          return { ok: false, msg: "140 is the top number printed on the axis. Read the point at 7 p.m., not the biggest number on the scale." };
+        }
+        return { ok: false, msg: "Check the point at 7 p.m. Trace to the vertical axis again." };
+      },
+      speak: "Type the capacity of the tank."
+    },
+    {
+      title: "Screen 4: Prepare for part (b)",
+      shortName: "Find half of 120",
+      task: "Type half of 120.",
+      help: "Half filled means half of the full capacity.",
+      mode: "input",
+      inputId: "b_half",
+      placeholder: "Type half of 120",
+      checker: (value) => {
+        const v = normalize(value);
+        if (v === "60" || v === "60l" || v === "60ℓ") {
+          return { ok: true, msg: "Yes. Half of 120 ℓ is 60 ℓ." };
+        }
+        return { ok: false, msg: "Find half of 120. Half of 12 tens is 6 tens." };
+      },
+      speak: "Type half of one hundred and twenty."
+    },
+    {
+      title: "Screen 5: Check the answer form",
+      shortName: "Check answer form",
+      task: "Choose the kind of answer needed for part (b).",
+      help: "Read the question words: 'At what time'.",
+      mode: "textChoice",
+      prompt: "What kind of answer do you need for part (b)?",
+      choices: [
+        { id: "time", text: "a time", correct: true },
+        { id: "amount", text: "an amount of water", correct: false }
+      ],
+      success: "Correct. Part (b) asks for a time.",
+      wrong: "Look again at the words 'At what time'.",
+      speak: "Choose the kind of answer needed for part b."
+    },
+    {
+      title: "Screen 6: Find the graph location for half full",
+      shortName: "Find 60 litres",
+      task: "Tap 60 ℓ on the real graph.",
+      help: "Start from 60 ℓ on the vertical axis. Then trace across to the point and down to the time.",
+      mode: "graphTap",
+      graphMode: "tap-volume-60",
+      success: "Well done. The trace leads to the time when the tank was half filled.",
+      wrong: "Tap 60 ℓ on the vertical axis.",
+      speak: "Tap sixty litres on the real graph."
+    },
+    {
+      title: "Screen 7: Solve part (b)",
+      shortName: "Solve part b",
+      task: "Type the time when the tank was half filled.",
+      help: "The graph shows 60 ℓ at one time. Answer with a time, not a volume.",
+      mode: "input",
+      inputId: "b_time",
+      placeholder: "Type the time",
+      checker: (value) => {
+        const v = normalize(value);
+        if (["4pm", "4p.m.", "4p.m", "4 pm"].includes(v)) {
+          return { ok: true, msg: "Correct. The tank was half filled at 4 p.m." };
+        }
+        if (["60", "60l", "60ℓ", "60litres"].includes(v)) {
+          return { ok: false, msg: "60 ℓ is the amount. The question asks for the time." };
+        }
+        return { ok: false, msg: "Trace from 60 ℓ across to the point, then down to the horizontal axis." };
+      },
+      speak: "Type the time when the tank was half filled."
+    },
+    {
+      title: "Screen 8: Start part (c)",
+      shortName: "Tap 5 p.m.",
+      task: "Tap 5 p.m. on the real graph.",
+      help: "For part (c), read the amount at 5 p.m. first.",
+      mode: "graphTap",
+      graphMode: "tap-time-5",
+      success: "Good. The trace shows the amount at 5 p.m.",
+      wrong: "Tap 5 p.m. on the horizontal axis.",
+      speak: "Tap five p m on the real graph."
+    },
+    {
+      title: "Screen 9: Record the amount at 5 p.m.",
+      shortName: "Amount at 5 p.m.",
+      task: "Type the amount of water at 5 p.m.",
+      help: "Trace from 5 p.m. to the point, then to the vertical axis.",
+      mode: "input",
+      inputId: "c_5pm",
+      placeholder: "Type the amount",
+      checker: (value) => {
+        const v = normalize(value);
+        if (["80", "80l", "80ℓ", "80litres"].includes(v)) {
+          return { ok: true, msg: "Correct. The amount at 5 p.m. was 80 ℓ." };
+        }
+        return { ok: false, msg: "Check the point at 5 p.m. again and trace to the vertical axis." };
+      },
+      speak: "Type the amount of water at five p m."
+    },
+    {
+      title: "Screen 10: Derive the small interval value",
+      shortName: "Count the gaps",
+      task: "Count the equal gaps from 0 to 20, then find the value of 1 gap.",
+      help: "Do not guess. Count the small spaces from 0 to 20 carefully.",
+      mode: "twoInputs",
+      inputs: [
+        {
+          id: "gap_count",
+          label: "How many equal gaps are there from 0 to 20?",
+          placeholder: "Type the number of gaps"
+        },
+        {
+          id: "gap_value",
+          label: "What is the value of 1 gap?",
+          placeholder: "Type the value of 1 gap"
+        }
+      ],
+      checker: (values) => {
+        const a = normalize(values.gap_count);
+        const b = normalize(values.gap_value);
+        if (a === "5" && (b === "4" || b === "4l" || b === "4ℓ")) {
+          return { ok: true, msg: "Correct. There are 5 equal gaps from 0 to 20, so each gap is worth 4 ℓ." };
+        }
+        if (a !== "5") {
+          return { ok: false, msg: "Count the small gaps from 0 to 20 carefully." };
+        }
+        return { ok: false, msg: "20 ÷ 5 = 4, so each small gap is worth 4 ℓ." };
+      },
+      speak: "Count the equal gaps from zero to twenty, then find the value of one gap."
+    },
+    {
+      title: "Screen 11: Read 6 p.m. accurately",
+      shortName: "Tap 6 p.m.",
+      task: "Tap 6 p.m. on the real graph.",
+      help: "The point is above 100 ℓ. Use the small gaps to read it accurately.",
+      mode: "graphTap",
+      graphMode: "tap-time-6",
+      success: "Good. The point is 3 small gaps above 100 ℓ.",
+      wrong: "Tap 6 p.m. on the horizontal axis.",
+      speak: "Tap six p m on the real graph."
+    },
+    {
+      title: "Screen 12: Record the amount at 6 p.m.",
+      shortName: "Amount at 6 p.m.",
+      task: "Type the amount of water at 6 p.m.",
+      help: "It is 3 small gaps above 100 ℓ. Each gap is worth 4 ℓ.",
+      mode: "input",
+      inputId: "c_6pm",
+      placeholder: "Type the amount",
+      checker: (value) => {
+        const v = normalize(value);
+        if (["112", "112l", "112ℓ", "112litres"].includes(v)) {
+          return { ok: true, msg: "Correct. The amount at 6 p.m. was 112 ℓ." };
+        }
+        if (["110", "120", "100"].includes(v)) {
+          return { ok: false, msg: "Use the small gaps. The point is 3 gaps above 100 ℓ, and each gap is worth 4 ℓ." };
+        }
+        return { ok: false, msg: "Start at 100 ℓ, then add 3 small gaps of 4 ℓ each." };
+      },
+      speak: "Type the amount of water at six p m."
+    },
+    {
+      title: "Screen 13: Solve part (c)",
+      shortName: "Solve part c",
+      task: "Type the increase from 5 p.m. to 6 p.m.",
+      help: "Use the two amounts you found: 80 ℓ and 112 ℓ. Increase means find the difference.",
+      mode: "input",
+      inputId: "c_increase",
+      placeholder: "Type the increase",
+      checker: (value) => {
+        const v = normalize(value);
+        if (["32", "32l", "32ℓ", "32litres"].includes(v)) {
+          return { ok: true, msg: "Correct. The increase was 32 ℓ." };
+        }
+        if (["112", "112l", "112ℓ"].includes(v)) {
+          return { ok: false, msg: "112 ℓ is the amount at 6 p.m. The question asks for the increase from 5 p.m. to 6 p.m." };
+        }
+        if (["30", "30l", "30ℓ"].includes(v)) {
+          return { ok: false, msg: "Check the value of 1 small gap again. Each small gap is 4 ℓ." };
+        }
+        return { ok: false, msg: "Find the difference: 112 − 80." };
+      },
+      speak: "Type the increase from five p m to six p m."
+    },
+    {
+      title: "Screen 14: Consolidate the strategy",
+      shortName: "Put the steps in order",
+      task: "Put the line-graph reading steps in the correct order.",
+      help: "Use the strategy you practised in this interactive.",
+      mode: "sort",
+      success: "Well done. This is the strategy: read the words carefully, find the correct place on the axis, trace to the point, trace to the other axis, then check the answer form.",
+      wrong: "Try again. Put the steps in the order you would use to answer a line graph question.",
+      speak: "Put the line graph reading steps in the correct order."
+    },
+    {
+      title: "Screen 15: Try one independently",
+      shortName: "Independent check",
+      task: "Answer the mini graph question by yourself.",
+      help: "Use the same strategy without the guided tracing.",
+      mode: "miniCheck",
+      speak: "Answer the mini graph question by yourself."
+    }
+  ];
+
+  const orderGoal = [
+    "Read the question words carefully",
+    "Find the correct time or amount on the axis",
+    "Trace to the graph point",
+    "Trace to the other axis",
+    "Check the answer form"
+  ];
+
+  const questionPanel = document.getElementById('questionPanel');
+  const toggleQuestionBtn = document.getElementById('toggleQuestionBtn');
+  const readBtn = document.getElementById('readBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const progressText = document.getElementById('progressText');
+  const screenName = document.getElementById('screenName');
+  const progressFill = document.getElementById('progressFill');
+  const screenTitle = document.getElementById('screenTitle');
+  const taskText = document.getElementById('taskText');
+  const helpText = document.getElementById('helpText');
+  const dynamicArea = document.getElementById('dynamicArea');
+  const feedbackBox = document.getElementById('feedbackBox');
+  const nextBtn = document.getElementById('nextBtn');
+  const backBtn = document.getElementById('backBtn');
+  const graphControls = document.getElementById('graphControls');
+
+  const graphSvg = document.getElementById('graphSvg');
+
+  const graph = {
+    left: 88,
+    right: 460,
+    top: 40,
+    bottom: 340,
+    x: { "3 p.m.": 88, "4 p.m.": 181, "5 p.m.": 274, "6 p.m.": 367, "7 p.m.": 460 },
+    values: { 0: 340, 20: 290, 40: 240, 60: 190, 80: 140, 100: 90, 120: 40, 140: -10 }, // y for labeled reference
+    pointY: { "3 p.m.": 340, "4 p.m.": 190, "5 p.m.": 140, "6 p.m.": 60, "7 p.m.": 40 }
+  };
+
+  function normalize(str){
+    return String(str || "")
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/litre?s?/g, "litres")
+      .replace(/ltrs?/g, "l")
+      .trim();
+  }
+
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, ch => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[ch]));
+  }
+
+  function setFeedback(kind, msg){
+    feedbackBox.className = `feedback show ${kind}`;
+    feedbackBox.innerHTML = msg;
+  }
+
+  function clearFeedback(){
+    feedbackBox.className = 'feedback';
+    feedbackBox.innerHTML = '';
+  }
+
+  function completeCurrent(){
+    appState.completed.add(appState.currentScreen);
+    nextBtn.classList.add('show');
+  }
+
+  function renderGraph(mode){
+    const lines = [];
+    const gridY = [340,290,240,190,140,90,40];
+    const yLabels = [0,20,40,60,80,100,120,140];
+    const xLabels = ["3 p.m.","4 p.m.","5 p.m.","6 p.m.","7 p.m."];
+
+    lines.push(`<rect x="0" y="0" width="520" height="420" fill="#ffffff"/>`);
+    lines.push(`<text x="260" y="24" text-anchor="middle" font-size="22" font-weight="700" fill="#132238">Volume of water</text>`);
+    lines.push(`<line x1="${graph.left}" y1="${graph.top}" x2="${graph.left}" y2="${graph.bottom}" stroke="#132238" stroke-width="3"/>`);
+    lines.push(`<line x1="${graph.left}" y1="${graph.bottom}" x2="${graph.right}" y2="${graph.bottom}" stroke="#132238" stroke-width="3"/>`);
+
+    for(let i = 0; i <= 5; i++){
+      const y = graph.bottom - (i * 10);
+      lines.push(`<line x1="${graph.left-8}" y1="${y}" x2="${graph.left}" y2="${y}" stroke="#6c7d95" stroke-width="2"/>`);
+    }
+    for(let i = 0; i <= 35; i++){
+      const y = graph.bottom - (i * (300/35));
+      const isBig = i % 5 === 0;
+      lines.push(`<line x1="${graph.left-(isBig?10:6)}" y1="${y}" x2="${graph.left}" y2="${y}" stroke="${isBig?'#6c7d95':'#a9b7c8'}" stroke-width="${isBig?2:1}"/>`);
+      if (i < 35) {
+        lines.push(`<line x1="${graph.left}" y1="${y}" x2="${graph.right}" y2="${y}" stroke="#edf2f9" stroke-width="1"/>`);
+      }
+    }
+
+    xLabels.forEach(label => {
+      const x = graph.x[label];
+      lines.push(`<line x1="${x}" y1="${graph.top}" x2="${x}" y2="${graph.bottom}" stroke="#e6edf7" stroke-width="1"/>`);
+    });
+
+    [0,20,40,60,80,100,120,140].forEach(value => {
+      const y = graph.bottom - (value * 2.5);
+      lines.push(`<text x="${graph.left-16}" y="${y+6}" text-anchor="end" font-size="18" font-weight="700" fill="#132238">${value}</text>`);
+    });
+
+    lines.push(`<text x="24" y="210" font-size="16" font-weight="700" fill="#132238">Volume of</text>`);
+    lines.push(`<text x="24" y="230" font-size="16" font-weight="700" fill="#132238">water in the</text>`);
+    lines.push(`<text x="24" y="250" font-size="16" font-weight="700" fill="#132238">tank (ℓ)</text>`);
+
+    xLabels.forEach(label => {
+      const x = graph.x[label];
+      const selected = appState.graphSelection === label;
+      lines.push(`
+        <g data-graph-type="time" data-value="${label}" class="graph-target ${selected ? 'selected':''}">
+          <rect x="${x-34}" y="${graph.bottom+8}" width="68" height="34" rx="10" fill="${selected ? '#e9f2ff' : '#ffffff'}" stroke="${selected ? '#1f6fe5' : '#c9d5e6'}" stroke-width="2"></rect>
+          <text x="${x}" y="${graph.bottom+30}" text-anchor="middle" font-size="16" font-weight="700" fill="#132238">${label}</text>
+        </g>
+      `);
+    });
+
+    const pointData = [
+      { label: "3 p.m.", value: 0 },
+      { label: "4 p.m.", value: 60 },
+      { label: "5 p.m.", value: 80 },
+      { label: "6 p.m.", value: 112 },
+      { label: "7 p.m.", value: 120 }
+    ];
+    let path = pointData.map((p, idx) => `${idx===0?'M':'L'} ${graph.x[p.label]} ${graph.bottom - p.value * 2.5}`).join(' ');
+    lines.push(`<path d="${path}" fill="none" stroke="#132238" stroke-width="4"/>`);
+    pointData.forEach(p => {
+      const x = graph.x[p.label];
+      const y = graph.bottom - p.value * 2.5;
+      lines.push(`<circle cx="${x}" cy="${y}" r="6.5" fill="#132238"/>`);
+    });
+
+    // Tappable value 60 label area
+    const y60 = graph.bottom - 60 * 2.5;
+    const valueSelected = appState.graphSelection === "60 litres";
+    lines.push(`
+      <g data-graph-type="volume" data-value="60 litres" class="graph-target ${valueSelected ? 'selected':''}">
+        <rect x="${graph.left-74}" y="${y60-16}" width="58" height="30" rx="10" fill="${valueSelected ? '#e9f2ff' : '#ffffff'}" stroke="${valueSelected ? '#1f6fe5' : '#c9d5e6'}" stroke-width="2"></rect>
+        <text x="${graph.left-45}" y="${y60+5}" text-anchor="middle" font-size="18" font-weight="700" fill="#132238">60</text>
+      </g>
+    `);
+
+    if (mode === "tap-time-7" && appState.graphSelection === "7 p.m.") {
+      const x = graph.x["7 p.m."];
+      const y = graph.bottom - 120*2.5;
+      lines.push(`<line x1="${x}" y1="${graph.bottom}" x2="${x}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<line x1="${x}" y1="${y}" x2="${graph.left}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<rect x="${x-42}" y="${y-52}" width="92" height="34" rx="10" fill="#1f6fe5"></rect>`);
+      lines.push(`<text x="${x+4}" y="${y-29}" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">120 ℓ</text>`);
+    }
+
+    if (mode === "tap-volume-60" && appState.graphSelection === "60 litres") {
+      const x = graph.x["4 p.m."];
+      const y = graph.bottom - 60*2.5;
+      lines.push(`<line x1="${graph.left}" y1="${y}" x2="${x}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<line x1="${x}" y1="${y}" x2="${x}" y2="${graph.bottom}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<rect x="${x-38}" y="${graph.bottom+46}" width="78" height="34" rx="10" fill="#1f6fe5"></rect>`);
+      lines.push(`<text x="${x+1}" y="${graph.bottom+68}" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">4 p.m.</text>`);
+    }
+
+    if (mode === "tap-time-5" && appState.graphSelection === "5 p.m.") {
+      const x = graph.x["5 p.m."];
+      const y = graph.bottom - 80*2.5;
+      lines.push(`<line x1="${x}" y1="${graph.bottom}" x2="${x}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<line x1="${x}" y1="${y}" x2="${graph.left}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<rect x="${graph.left+8}" y="${y-20}" width="80" height="34" rx="10" fill="#1f6fe5"></rect>`);
+      lines.push(`<text x="${graph.left+48}" y="${y+2}" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">80 ℓ</text>`);
+    }
+
+    if (mode === "tap-time-6" && appState.graphSelection === "6 p.m.") {
+      const x = graph.x["6 p.m."];
+      const y = graph.bottom - 112*2.5;
+      const y100 = graph.bottom - 100*2.5;
+      lines.push(`<line x1="${x}" y1="${graph.bottom}" x2="${x}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      lines.push(`<line x1="${x}" y1="${y}" x2="${graph.left}" y2="${y}" stroke="#1f6fe5" stroke-width="4" stroke-dasharray="8 6"/>`);
+      for(let i=1;i<=3;i++){
+        const gy = y100 - i*10;
+        lines.push(`<rect x="${graph.left+2}" y="${gy-5}" width="18" height="10" fill="rgba(245,158,11,0.28)" stroke="#f59e0b" stroke-width="1.5"/>`);
+      }
+      lines.push(`<rect x="${graph.left+24}" y="${y-22}" width="140" height="36" rx="10" fill="#f59e0b"></rect>`);
+      lines.push(`<text x="${graph.left+94}" y="${y+1}" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">3 small gaps above 100 ℓ</text>`);
+    }
+
+    graphSvg.innerHTML = lines.join('');
+    bindGraphTargets();
+    renderGraphControls(mode);
+  }
+
+  function renderGraphControls(mode){
+    const tips = [];
+    if(mode === "tap-time-7"){
+      tips.push('<div class="small-note">Tap the real <strong>7 p.m.</strong> label on the graph.</div>');
+    } else if(mode === "tap-volume-60"){
+      tips.push('<div class="small-note">Tap the real <strong>60</strong> on the vertical axis.</div>');
+    } else if(mode === "tap-time-5"){
+      tips.push('<div class="small-note">Tap the real <strong>5 p.m.</strong> label on the graph.</div>');
+    } else if(mode === "tap-time-6"){
+      tips.push('<div class="small-note">Tap the real <strong>6 p.m.</strong> label on the graph.</div>');
+    } else {
+      tips.push('<div class="small-note">Use the graph to support your thinking.</div>');
+    }
+    graphControls.innerHTML = tips.join('');
+  }
+
+  function bindGraphTargets(){
+    graphSvg.querySelectorAll('[data-graph-type]').forEach(el => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', () => {
+        const type = el.getAttribute('data-graph-type');
+        const value = el.getAttribute('data-value');
+        appState.graphSelection = value;
+        renderGraph(screens[appState.currentScreen].graphMode);
+        const current = screens[appState.currentScreen];
+        if(current.mode !== 'graphTap') return;
+        const expected = expectedGraphSelection(current.graphMode);
+        if(value === expected){
+          setFeedback('success', current.success);
+          completeCurrent();
+        } else {
+          setFeedback('error', current.wrong);
+          nextBtn.classList.remove('show');
+        }
+      });
+    });
+  }
+
+  function expectedGraphSelection(mode){
+    switch(mode){
+      case "tap-time-7": return "7 p.m.";
+      case "tap-volume-60": return "60 litres";
+      case "tap-time-5": return "5 p.m.";
+      case "tap-time-6": return "6 p.m.";
+      default: return null;
+    }
+  }
+
+  function renderTextChoice(screen){
+    const ordered = appState.typed[`order_${appState.currentScreen}`] || shuffle(screen.choices).map(c => c.id);
+    appState.typed[`order_${appState.currentScreen}`] = ordered;
+    const choices = ordered.map(id => screen.choices.find(c => c.id === id));
+    dynamicArea.innerHTML = `
+      <div class="small-note">${escapeHtml(screen.prompt)}</div>
+      <div class="choices">
+        ${choices.map(choice => `
+          <button type="button" class="choice ${appState.selectedChoice === choice.id ? 'selected' : ''}" data-choice-id="${choice.id}">
+            ${escapeHtml(choice.text)}
+          </button>
+        `).join('')}
+      </div>
+      <div class="input-row">
+        <button type="button" class="action-btn" id="checkChoiceBtn">Check</button>
+      </div>
+    `;
+    dynamicArea.querySelectorAll('[data-choice-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        appState.selectedChoice = btn.getAttribute('data-choice-id');
+        renderCurrentScreenBody(false);
+      });
+    });
+    document.getElementById('checkChoiceBtn').addEventListener('click', () => {
+      const choice = screen.choices.find(c => c.id === appState.selectedChoice);
+      if(!choice){
+        setFeedback('info', "Choose one answer first.");
+        return;
+      }
+      if(choice.correct){
+        setFeedback('success', screen.success);
+        completeCurrent();
+      } else {
+        setFeedback('error', screen.wrong);
+        nextBtn.classList.remove('show');
+      }
+    });
+  }
+
+  function renderInput(screen){
+    const currentVal = appState.typed[screen.inputId] || '';
+    dynamicArea.innerHTML = `
+      <div class="small-note">Type your answer below.</div>
+      <div class="input-row">
+        <label class="sr-only" for="${screen.inputId}">${escapeHtml(screen.task)}</label>
+        <input class="answer-input" id="${screen.inputId}" type="text" value="${escapeHtml(currentVal)}" placeholder="${escapeHtml(screen.placeholder || '')}" autocomplete="off" />
+        <button type="button" class="action-btn" id="checkInputBtn">Check</button>
+      </div>
+    `;
+    const input = document.getElementById(screen.inputId);
+    input.addEventListener('input', () => {
+      appState.typed[screen.inputId] = input.value;
+    });
+    input.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        document.getElementById('checkInputBtn').click();
+      }
+    });
+    document.getElementById('checkInputBtn').addEventListener('click', () => {
+      const result = screen.checker(input.value);
+      if(result.ok){
+        setFeedback('success', result.msg);
+        completeCurrent();
+      } else {
+        setFeedback('error', result.msg);
+        nextBtn.classList.remove('show');
+      }
+    });
+  }
+
+  function renderTwoInputs(screen){
+    const values = {};
+    screen.inputs.forEach(i => values[i.id] = appState.typed[i.id] || '');
+    dynamicArea.innerHTML = `
+      <div class="two-col">
+        ${screen.inputs.map(i => `
+          <div>
+            <label for="${i.id}" class="small-note"><strong>${escapeHtml(i.label)}</strong></label>
+            <input class="answer-input" id="${i.id}" type="text" value="${escapeHtml(values[i.id])}" placeholder="${escapeHtml(i.placeholder || '')}" autocomplete="off" />
+          </div>
+        `).join('')}
+      </div>
+      <div class="input-row">
+        <button type="button" class="action-btn" id="checkTwoBtn">Check</button>
+      </div>
+    `;
+    screen.inputs.forEach(i => {
+      const el = document.getElementById(i.id);
+      el.addEventListener('input', () => appState.typed[i.id] = el.value);
+      el.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          document.getElementById('checkTwoBtn').click();
+        }
+      });
+    });
+    document.getElementById('checkTwoBtn').addEventListener('click', () => {
+      const data = {};
+      screen.inputs.forEach(i => data[i.id] = document.getElementById(i.id).value);
+      const result = screen.checker(data);
+      if(result.ok){
+        setFeedback('success', result.msg);
+        completeCurrent();
+      } else {
+        setFeedback('error', result.msg);
+        nextBtn.classList.remove('show');
+      }
+    });
+  }
+
+  function renderSort(screen){
+    if(!appState.sortItems.length){
+      appState.sortItems = shuffle(orderGoal);
+    }
+    dynamicArea.innerHTML = `
+      <div class="small-note">Move the steps until they are in the best order.</div>
+      <div class="sort-zone">
+        <div class="sortable-list" id="sortList">
+          ${appState.sortItems.map((item, index) => `
+            <div class="sort-item" data-index="${index}">
+              <span>${escapeHtml(item)}</span>
+              <span>
+                <button type="button" class="move-btn" data-dir="up" data-index="${index}" aria-label="Move up">↑</button>
+                <button type="button" class="move-btn" data-dir="down" data-index="${index}" aria-label="Move down">↓</button>
+              </span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="input-row">
+          <button type="button" class="action-btn" id="checkSortBtn">Check</button>
+        </div>
+      </div>
+    `;
+    dynamicArea.querySelectorAll('.move-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = Number(btn.getAttribute('data-index'));
+        const dir = btn.getAttribute('data-dir');
+        const arr = [...appState.sortItems];
+        const swap = dir === 'up' ? index - 1 : index + 1;
+        if(swap < 0 || swap >= arr.length) return;
+        [arr[index], arr[swap]] = [arr[swap], arr[index]];
+        appState.sortItems = arr;
+        renderCurrentScreenBody(false);
+      });
+    });
+    document.getElementById('checkSortBtn').addEventListener('click', () => {
+      const ok = orderGoal.every((item, idx) => appState.sortItems[idx] === item);
+      if(ok){
+        setFeedback('success', screen.success);
+        completeCurrent();
+      } else {
+        setFeedback('error', screen.wrong);
+        nextBtn.classList.remove('show');
+      }
+    });
+  }
+
+  function renderMiniCheck(){
+    const orderKey = `mini_order`;
+    const optionOrder = appState.typed[orderKey] || shuffle(["3 p.m.","4 p.m.","5 p.m.","6 p.m."]);
+    appState.typed[orderKey] = optionOrder;
+
+    const val1 = appState.typed['mini_a'] || '';
+    const val2 = appState.typed['mini_b'] || '';
+    const choice = appState.extra.miniChoice;
+
+    dynamicArea.innerHTML = `
+      <div class="recap-card">
+        <div class="small-note"><strong>Mini graph question</strong></div>
+        <p class="small-note" style="margin-top:8px;">
+          A small line graph shows the number of stickers in a box from 3 p.m. to 6 p.m.  
+          The box had <strong>30 stickers at 3 p.m.</strong>, <strong>50 stickers at 4 p.m.</strong>, 
+          <strong>70 stickers at 5 p.m.</strong>, and <strong>90 stickers at 6 p.m.</strong>.
+        </p>
+        <p class="small-note"><strong>(i)</strong> At what time were there <strong>70 stickers</strong>?</p>
+        <div class="choices">
+          ${optionOrder.map(opt => `
+            <button type="button" class="choice ${choice === opt ? 'selected' : ''}" data-mini-choice="${opt}">${escapeHtml(opt)}</button>
+          `).join('')}
+        </div>
+        <p class="small-note" style="margin-top:12px;"><strong>(ii)</strong> What was the <strong>increase</strong> in the number of stickers from 4 p.m. to 6 p.m.?</p>
+        <div class="input-row">
+          <input class="answer-input" id="miniIncrease" type="text" value="${escapeHtml(val2)}" placeholder="Type the increase" />
+        </div>
+        <p class="small-note" style="margin-top:12px;"><strong>(iii)</strong> What is the best strategy?</p>
+        <div class="input-row">
+          <input class="answer-input" id="miniStrategy" type="text" value="${escapeHtml(val1)}" placeholder="Type a short strategy" />
+        </div>
+        <div class="input-row">
+          <button type="button" class="action-btn" id="checkMiniBtn">Check</button>
+        </div>
+      </div>
+      <div class="summary-box">
+        <strong>Consolidate the strategy</strong><br>
+        Read the question words carefully. Find the correct place on the graph. Trace to the point. Trace to the other axis. Check whether the answer should be a time, an amount, or an increase.
+      </div>
+    `;
+
+    dynamicArea.querySelectorAll('[data-mini-choice]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        appState.extra.miniChoice = btn.getAttribute('data-mini-choice');
+        renderCurrentScreenBody(false);
+      });
+    });
+
+    const miniInc = document.getElementById('miniIncrease');
+    const miniStr = document.getElementById('miniStrategy');
+    miniInc.addEventListener('input', () => appState.typed['mini_b'] = miniInc.value);
+    miniStr.addEventListener('input', () => appState.typed['mini_a'] = miniStr.value);
+
+    document.getElementById('checkMiniBtn').addEventListener('click', () => {
+      const timeOk = appState.extra.miniChoice === "5 p.m.";
+      const incOk = ["40", "40stickers"].includes(normalize(miniInc.value));
+      const strategy = normalize(miniStr.value);
+      const strategyOk =
+        strategy.includes("read") &&
+        (strategy.includes("trace") || strategy.includes("point")) &&
+        (strategy.includes("axis") || strategy.includes("time") || strategy.includes("answerform"));
+
+      if(timeOk && incOk && strategyOk){
+        setFeedback('success', "Excellent. You answered the mini graph question independently and stated the strategy clearly.");
+        completeCurrent();
+      } else if(!timeOk){
+        setFeedback('error', "For part (i), look for 70 stickers, then match it to the time.");
+        nextBtn.classList.remove('show');
+      } else if(!incOk){
+        setFeedback('error', "For part (ii), find the two readings first: 50 and 90. Then find the increase.");
+        nextBtn.classList.remove('show');
+      } else {
+        setFeedback('error', "For part (iii), write a short strategy such as: read the words, trace on the graph, then check the answer form.");
+        nextBtn.classList.remove('show');
+      }
+    });
+  }
+
+  function renderCurrentScreenBody(resetSelection = true){
+    clearFeedback();
+    nextBtn.classList.remove('show');
+
+    if(resetSelection){
+      appState.selectedChoice = null;
+      appState.graphSelection = null;
+    }
+
+    const screen = screens[appState.currentScreen];
+    screenTitle.textContent = screen.title;
+    taskText.textContent = screen.task;
+    helpText.textContent = screen.help;
+    progressText.textContent = `Screen ${appState.currentScreen + 1} of ${screens.length}`;
+    screenName.textContent = screen.shortName;
+    progressFill.style.width = `${((appState.currentScreen + 1) / screens.length) * 100}%`;
+
+    if(screen.mode === 'graphTap'){
+      renderGraph(screen.graphMode);
+      dynamicArea.innerHTML = `<div class="small-note">Tap on the graph itself, not on a separate button.</div>`;
+    } else {
+      renderGraph(null);
+      if(screen.mode === 'textChoice') renderTextChoice(screen);
+      if(screen.mode === 'input') renderInput(screen);
+      if(screen.mode === 'twoInputs') renderTwoInputs(screen);
+      if(screen.mode === 'sort') renderSort(screen);
+      if(screen.mode === 'miniCheck') renderMiniCheck();
+    }
+
+    if(appState.completed.has(appState.currentScreen)){
+      nextBtn.classList.add('show');
+    }
+
+    backBtn.disabled = appState.currentScreen === 0;
+    nextBtn.textContent = appState.currentScreen === screens.length - 1 ? "Finish" : "Next →";
+  }
+
+  function goToScreen(index){
+    if(index < 0 || index >= screens.length) return;
+    appState.currentScreen = index;
+    renderCurrentScreenBody(true);
+  }
+
+  toggleQuestionBtn.addEventListener('click', () => {
+    questionPanel.open = !questionPanel.open;
+  });
+
+  readBtn.addEventListener('click', () => {
+    const screen = screens[appState.currentScreen];
+    const text = `${screen.title}. ${screen.task}. ${screen.help}`;
+    if(!appState.speakEnabled){
+      setFeedback('info', "Read-aloud is not available in this browser.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    window.speechSynthesis.speak(utterance);
+  });
+
+  restartBtn.addEventListener('click', () => {
+    if(!confirm('Restart the whole interactive?')) return;
+    appState.currentScreen = 0;
+    appState.completed = new Set();
+    appState.selectedChoice = null;
+    appState.graphSelection = null;
+    appState.typed = {};
+    appState.sortItems = [];
+    appState.extra = { gapCount: null, miniChoice: null };
+    renderCurrentScreenBody(true);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if(appState.currentScreen < screens.length - 1){
+      goToScreen(appState.currentScreen + 1);
+    } else {
+      setFeedback('success', 'You have finished the interactive. Great job reading carefully, tracing carefully, and checking the answer form.');
+      nextBtn.classList.remove('show');
+    }
+  });
+
+  backBtn.addEventListener('click', () => {
+    if(appState.currentScreen > 0){
+      goToScreen(appState.currentScreen - 1);
+    }
+  });
+
+  renderCurrentScreenBody(true);
+})();
+</script>
+</body>
+</html>
