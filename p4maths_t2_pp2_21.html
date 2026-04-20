@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>P4 Maths Interactive - Books Problem</title>
+<style>
+  :root{
+    --bg:#f6f8fc;
+    --card:#ffffff;
+    --ink:#17324d;
+    --muted:#5b6e82;
+    --line:#d7e2ee;
+    --blue:#1769e0;
+    --blue-2:#0f56b8;
+    --orange:#f59e0b;
+    --orange-2:#fff3dd;
+    --green:#1f8a4c;
+    --green-bg:#e8f8ee;
+    --red:#b42318;
+    --red-bg:#fff1ef;
+    --purple:#7c3aed;
+    --teal:#0f766e;
+    --tap:#eef5ff;
+    --selected:#d9ebff;
+    --shadow:0 10px 28px rgba(23,50,77,.08);
+    --unit-w:96px;
+    --unit-h:48px;
+    --extra-w:58px;
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  body{min-height:100vh;}
+  .app{
+    max-width:980px;margin:0 auto;padding:18px 14px 28px;
+  }
+  .topbar{
+    display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .title{
+    font-size:clamp(1.25rem,2.5vw,1.8rem);font-weight:700;
+  }
+  .progress-wrap{
+    width:100%;background:#e9eef5;border-radius:999px;height:14px;overflow:hidden;border:1px solid #d9e2ec;
+  }
+  .progress{
+    height:100%;background:linear-gradient(90deg,var(--blue),#5da6ff);width:0%;transition:width .25s ease;
+  }
+  .small{
+    color:var(--muted);font-size:.98rem;
+  }
+  .toolbar{
+    display:flex;gap:10px;flex-wrap:wrap;
+  }
+  button, .buttonish{
+    font:inherit;border:none;border-radius:14px;padding:12px 16px;cursor:pointer;
+    background:var(--blue);color:#fff;box-shadow:var(--shadow);touch-action:manipulation;
+  }
+  button.secondary{
+    background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none;
+  }
+  button.ghost{
+    background:#f0f6ff;color:var(--blue-2);box-shadow:none;border:2px solid #cfe2ff;
+  }
+  button.warn{
+    background:#fff4e5;color:#9a6700;border:2px solid #ffd38a;box-shadow:none;
+  }
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow);
+  }
+  .question-card{
+    margin-bottom:14px;
+  }
+  .question-lines{
+    display:grid;gap:8px;font-size:1.05rem;line-height:1.55;
+  }
+  .main-grid{
+    display:grid;gap:14px;
+  }
+  .action-box{
+    background:#eaf3ff;border:2px solid #cfe2ff;border-radius:18px;padding:16px;
+    font-size:clamp(1.18rem,2.9vw,1.7rem);font-weight:700;
+  }
+  .support-box{
+    background:var(--orange-2);border:2px solid #ffd08a;border-radius:16px;padding:14px;
+    color:#7a5200;font-size:1rem;line-height:1.45;
+  }
+  .visual-box{
+    background:#fbfdff;border:2px solid #e0e8f3;border-radius:18px;padding:16px;min-height:180px;
+  }
+  .options-grid{
+    display:grid;gap:12px;
+  }
+  .options-grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+  .options-grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+  .option-card{
+    background:#fff;border:3px solid var(--line);border-radius:18px;padding:16px;text-align:left;
+    min-height:72px;color:var(--ink);cursor:pointer;touch-action:manipulation;
+    display:flex;gap:10px;align-items:flex-start;justify-content:flex-start;
+    transition:transform .08s ease,border-color .08s ease,background .08s ease;
+    user-select:none;
+  }
+  .option-card:hover{transform:translateY(-1px);}
+  .option-card.selected{
+    border-color:var(--blue);background:var(--selected);box-shadow:0 0 0 3px rgba(23,105,224,.08) inset;
+  }
+  .option-card.correct{
+    border-color:var(--green);background:var(--green-bg);
+  }
+  .option-card.wrong{
+    border-color:var(--red);background:var(--red-bg);
+  }
+  .badge{
+    width:30px;height:30px;border-radius:999px;background:#eef2f6;color:#37506a;display:grid;place-items:center;font-weight:700;
+    flex:0 0 auto;
+  }
+  .option-card.selected .badge{background:var(--blue);color:#fff;}
+  .sentence-card{font-size:1.05rem;line-height:1.5;}
+  .name-cards{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
+  .input-wrap{
+    display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  }
+  .answer-input{
+    width:220px;max-width:100%;font-size:1.25rem;padding:14px 16px;border-radius:16px;border:3px solid var(--line);
+  }
+  .feedback{
+    border-radius:18px;padding:14px 16px;line-height:1.45;font-size:1rem;display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.good{background:var(--green-bg);border:2px solid #9fd8b2;color:#11552d;}
+  .feedback.bad{background:var(--red-bg);border:2px solid #f1b5aa;color:#7a2015;}
+  .feedback.hint{background:#f0f7ff;border:2px solid #cfe2ff;color:#184b92;}
+  .nav{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;
+  }
+
+  /* Model bars */
+  .bar-scene{
+    display:grid;gap:14px;align-items:center;justify-content:start;
+  }
+  .row{
+    display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center;
+  }
+  .row .label{
+    font-weight:700;
+  }
+  .bar{
+    display:flex;align-items:center;gap:0;flex-wrap:nowrap;
+    min-height:64px;
+  }
+  .segment{
+    position:relative;min-width:var(--unit-w);height:var(--unit-h);border:3px solid #7890ab;
+    background:#f8fbff;color:#27496b;display:flex;align-items:center;justify-content:center;
+    font-weight:700;cursor:default;user-select:none;touch-action:manipulation;
+  }
+  .segment.unit{
+    width:var(--unit-w);
+  }
+  .segment.extra{
+    width:var(--extra-w);min-width:var(--extra-w);background:#fff3dd;border-color:#cf8c00;color:#8a5400;
+  }
+  .segment + .segment{margin-left:4px;}
+  .segment.tap{
+    cursor:pointer;
+  }
+  .segment.tap:hover{filter:brightness(.99)}
+  .segment.selected{
+    outline:4px solid rgba(23,105,224,.2);border-color:var(--blue);background:var(--selected);
+  }
+  .segment.extra.selected{
+    border-color:#d97706;background:#ffe7b2;outline:4px solid rgba(249,157,7,.15);
+  }
+  .segment.correct{
+    border-color:var(--green);background:#dcf4e6;
+  }
+  .segment.wrong{
+    border-color:var(--red);background:#ffe2dd;
+  }
+  .segment .tiny{
+    font-size:.88rem;text-align:center;padding:0 6px;
+  }
+  .segment .micro{
+    font-size:.8rem;text-align:center;padding:0 6px;
+  }
+  .brace-note{
+    margin-top:12px;font-weight:700;color:#365674;
+  }
+  .pulse{
+    animation:pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.03);}
+    100%{transform:scale(1);}
+  }
+
+  /* Model choice cards */
+  .mini-choice{
+    display:grid;gap:8px;
+  }
+  .mini-row{
+    display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:nowrap;
+  }
+  .mini-unit,.mini-extra{
+    border:2px solid #7890ab;border-radius:8px;height:22px;
+  }
+  .mini-unit{width:52px;background:#edf5ff;}
+  .mini-extra{width:30px;background:#fff2d8;border-color:#cf8c00;}
+  .mini-label{
+    font-size:.92rem;color:var(--muted);text-align:center;
+  }
+
+  .step-chip{
+    display:inline-flex;align-items:center;gap:8px;background:#eef5ff;border:2px solid #cfe2ff;color:#174d8e;
+    border-radius:999px;padding:8px 12px;font-weight:700;
+  }
+
+  /* Overlay remediation */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;
+    padding:18px;z-index:20;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18);
+  }
+  .modal h2{margin:.2rem 0 .6rem;font-size:1.35rem}
+  .modal .streak{
+    display:inline-block;background:#eef8f2;color:#11673a;border:2px solid #b7e5c6;border-radius:999px;padding:8px 12px;font-weight:700;margin-bottom:8px;
+  }
+  .mini-practice{
+    margin-top:12px;background:#fbfdff;border:2px solid #e1eaf5;border-radius:18px;padding:14px;
+  }
+  .close-row{
+    display:flex;justify-content:flex-end;margin-top:12px;
+  }
+  .footer-note{
+    margin-top:12px;color:var(--muted);font-size:.95rem;
+  }
+  .kbd{
+    display:inline-block;background:#f3f5f7;border:1px solid #d6dde5;border-bottom-width:3px;padding:2px 8px;border-radius:8px;font-weight:700;
+  }
+
+  @media (max-width: 720px){
+    :root{
+      --unit-w:72px;
+      --unit-h:44px;
+      --extra-w:46px;
+    }
+    .row{grid-template-columns:72px 1fr;}
+    .segment .tiny,.segment .micro{font-size:.74rem}
+    .app{padding:12px 10px 22px}
+    .card{padding:14px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <div class="title">Books Problem Interactive</div>
+      <div class="small" id="screenCounter">Screen 1 of 14</div>
+    </div>
+    <div class="toolbar">
+      <button class="secondary" data-action="toggleQuestion">Show question</button>
+      <button class="ghost" data-action="speak">Read aloud</button>
+      <button class="warn" data-action="reset">Start again</button>
+    </div>
+  </div>
+  <div class="progress-wrap" aria-hidden="true"><div class="progress" id="progressBar"></div></div>
+  <div id="questionMount"></div>
+  <div id="appMount"></div>
+</div>
+
+<div class="overlay" id="remediationOverlay" aria-hidden="true">
+  <div class="modal">
+    <div id="remediationMount"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const questionLines = [
+    "Jack, David and Bala had 3,470 books altogether.",
+    "David had 285 more books than Bala.",
+    "Jack had 3 times as many books as David.",
+    "How many books did Bala have?"
+  ];
+
+  const screens = [
+    {
+      id: "s1",
+      prompt: "Who are we finding?",
+      support: "Read the last sentence carefully. Tap the name of the person whose books we need to find.",
+      type: "singleOption",
+      columns: 3,
+      options: [
+        {id:"jack", label:"Jack"},
+        {id:"david", label:"David"},
+        {id:"bala", label:"Bala"}
+      ],
+      correct: "bala",
+      good: "Yes. We are finding Bala's books.",
+      hint: "Read the last sentence again. It asks, “How many books did Bala have?”"
+    },
+    {
+      id: "s2",
+      prompt: "Tap the sentence that tells the total altogether.",
+      support: "Look for the sentence with the word “altogether”.",
+      type: "singleOption",
+      columns: 1,
+      optionStyle: "sentence",
+      options: [
+        {id:"total", label:questionLines[0]},
+        {id:"compare", label:questionLines[1]},
+        {id:"times", label:questionLines[2]},
+        {id:"ask", label:questionLines[3]}
+      ],
+      correct: "total",
+      good: "Yes. 3,470 is the total for all 3 boys together.",
+      hint: "The total clue is in the sentence with the word “altogether”."
+    },
+    {
+      id: "s3",
+      prompt: "Tap the sentence that compares David and Bala.",
+      support: "Find the sentence that tells how David and Bala are related.",
+      type: "singleOption",
+      columns: 1,
+      optionStyle: "sentence",
+      options: [
+        {id:"total", label:questionLines[0]},
+        {id:"compare", label:questionLines[1]},
+        {id:"times", label:questionLines[2]},
+        {id:"ask", label:questionLines[3]}
+      ],
+      correct: "compare",
+      good: "Yes. David is bigger than Bala by 285 books.",
+      hint: "Look for the sentence with both names: David and Bala."
+    },
+    {
+      id: "s4",
+      prompt: "Tap the part that shows 285 more than Bala.",
+      support: "The extra part is the piece that David has but Bala does not have.",
+      type: "modelTapSingle",
+      visual: "compareModel",
+      correct: "david-extra",
+      good: "Yes. That extra piece shows the 285 more part.",
+      hint: "Tap the unmatched extra piece on David's bar, not the equal Bala-sized piece."
+    },
+    {
+      id: "s5",
+      prompt: "Choose the picture that matches “Jack had 3 times as many books as David.”",
+      support: "Jack must be 3 equal David-sized groups.",
+      type: "singleOption",
+      columns: 3,
+      optionStyle: "modelChoice",
+      options: [
+        {id:"A", model:"threeDavids"},
+        {id:"B", model:"threeBalas"},
+        {id:"C", model:"davidPlusThreeExtras"}
+      ],
+      correct: "A",
+      good: "Yes. Jack is made of 3 equal David-sized groups.",
+      hint: "Jack is compared to David, so each group must be the same size as David."
+    },
+    {
+      id: "s6",
+      prompt: "Tap every part that is the same size as Bala's bar.",
+      support: "These are the equal Bala-sized units. Count the equal units across Bala, David and Jack.",
+      type: "modelTapMulti",
+      visual: "fullModel",
+      targetIds: ["b1","d1","j1","j2","j3"],
+      good: "Yes. There are 5 equal Bala-sized units altogether.",
+      hint: "Tap the 1 unit in Bala, the 1 equal unit in David, and the 3 equal Bala-sized units inside Jack."
+    },
+    {
+      id: "s7",
+      prompt: "Tap every 285-more part.",
+      support: "Count the extra 285 parts: 1 in David and 3 in Jack.",
+      type: "modelTapMulti",
+      visual: "fullModel",
+      targetIds: ["de","je1","je2","je3"],
+      good: "Yes. There are 4 extra 285 parts altogether.",
+      hint: "There is 1 extra 285 part in David and each David-sized group inside Jack also has one."
+    },
+    {
+      id: "s8",
+      prompt: "Which number sentence finds the total of the 4 extra 285 parts?",
+      support: "Use the number of extra parts you just counted.",
+      type: "singleOption",
+      columns: 2,
+      options: [
+        {id:"4x285", label:"4 × 285"},
+        {id:"5x285", label:"5 × 285"},
+        {id:"3x285", label:"3 × 285"},
+        {id:"3470-285", label:"3,470 − 285"}
+      ],
+      correct: "4x285",
+      good: "Yes. The 4 extra 285 parts together make 1,140.",
+      hint: "You counted 4 extra parts, so use 4 with 285."
+    },
+    {
+      id: "s9",
+      prompt: "The 1,140 extra books are included in 3,470. What should we do first?",
+      support: "Think about the model. We want to remove the extra parts so only equal Bala-sized units are left.",
+      type: "singleOption",
+      columns: 2,
+      options: [
+        {id:"add", label:"Add"},
+        {id:"subtract", label:"Subtract"},
+        {id:"multiply", label:"Multiply"},
+        {id:"divide", label:"Divide"}
+      ],
+      correct: "subtract",
+      good: "Yes. Remove the 4 extra 285 parts from the total first.",
+      hint: "If those extra parts are inside the total, we need to remove them."
+    },
+    {
+      id: "s10",
+      prompt: "Type how many books are left after removing the 4 extra parts.",
+      support: "Work out 3,470 − 1,140.",
+      type: "numberInput",
+      expected: "2330",
+      good: "Yes. 2,330 books are left.",
+      hint: "Try subtracting carefully. First remove 1,000, then remove 140."
+    },
+    {
+      id: "s11",
+      prompt: "What does 2,330 stand for now?",
+      support: "After the extra parts are removed, only equal Bala-sized units are left.",
+      type: "singleOption",
+      columns: 2,
+      options: [
+        {id:"balaOnly", label:"Bala's books"},
+        {id:"davidOnly", label:"David's books"},
+        {id:"fiveUnits", label:"5 equal Bala-sized units"},
+        {id:"fourExtras", label:"4 extra 285 parts"}
+      ],
+      correct: "fiveUnits",
+      good: "Yes. 2,330 is the value of 5 equal Bala-sized units.",
+      hint: "Ask yourself: after removing the extras, what is left in the model?"
+    },
+    {
+      id: "s12",
+      prompt: "What should we do to find 1 Bala-sized unit from 5 equal units?",
+      support: "If 2,330 is shared across 5 equal units, which operation finds 1 unit?",
+      type: "singleOption",
+      columns: 2,
+      options: [
+        {id:"add", label:"Add"},
+        {id:"subtract", label:"Subtract"},
+        {id:"multiply", label:"Multiply"},
+        {id:"divide", label:"Divide"}
+      ],
+      correct: "divide",
+      good: "Yes. We divide by 5 to find 1 equal Bala-sized unit.",
+      hint: "When a total is split into equal units, division finds 1 unit."
+    },
+    {
+      id: "s13",
+      prompt: "Type Bala's number of books.",
+      support: "Work out 2,330 ÷ 5.",
+      type: "numberInput",
+      expected: "466",
+      good: "Yes. Bala had 466 books.",
+      hint: "Think of 2,300 ÷ 5 and 30 ÷ 5, then combine."
+    },
+    {
+      id: "s14",
+      prompt: "Which sentence best explains the strategy?",
+      support: "Choose the sentence that matches what the model showed us.",
+      type: "singleOption",
+      columns: 1,
+      optionStyle: "sentence",
+      options: [
+        {id:"best", label:"Count the extra 285 parts, remove them from the total, then divide the 5 equal units."},
+        {id:"wrong1", label:"Add 285 to every bar, then multiply by 3."},
+        {id:"wrong2", label:"Divide 3,470 by 3, then subtract 285."}
+      ],
+      correct: "best",
+      good: "Yes. That is the strategy: remove the 4 extra 285 parts, then divide the 5 equal Bala-sized units.",
+      hint: "Think about the 4 extra 285 parts and the 5 equal Bala-sized units."
+    }
+  ];
+
+  const remediationBank = {
+    s7: {
+      title: "Let's practise counting the extra parts.",
+      intro: "Each bigger bar has one equal unit and one extra part. Count only the extra parts.",
+      visualType: "extraCount",
+      items: [
+        {
+          prompt: "Lina has 1 unit. Amir has 1 unit + 4 more. Zed has 2 times as many as Amir. How many extra 4 parts are there altogether?",
+          options: [
+            {id:"2", label:"2"},
+            {id:"3", label:"3"},
+            {id:"4", label:"4"},
+            {id:"5", label:"5"}
+          ],
+          correct:"3",
+          explainer:"Amir has 1 extra 4 part. Zed has 2 copies of Amir, so Zed has 2 more extra 4 parts. Altogether: 3 extra parts."
+        },
+        {
+          prompt: "Nia has 1 unit. Bo has 1 unit + 5 more. Kai has 3 times as many as Bo. How many extra 5 parts are there altogether?",
+          options: [
+            {id:"3", label:"3"},
+            {id:"4", label:"4"},
+            {id:"5", label:"5"},
+            {id:"6", label:"6"}
+          ],
+          correct:"4",
+          explainer:"Bo has 1 extra 5 part. Kai has 3 copies of Bo, so Kai has 3 more extra 5 parts. Altogether: 4 extra parts."
+        },
+        {
+          prompt: "Uma has 1 unit. Dev has 1 unit + 2 more. Ren has 2 times as many as Dev. How many extra 2 parts are there altogether?",
+          options: [
+            {id:"2", label:"2"},
+            {id:"3", label:"3"},
+            {id:"4", label:"4"},
+            {id:"5", label:"5"}
+          ],
+          correct:"3",
+          explainer:"Dev has 1 extra 2 part. Ren has 2 copies of Dev, so Ren has 2 more extra 2 parts. Altogether: 3 extra parts."
+        }
+      ]
+    },
+    s11: {
+      title: "Let's practise saying what is left.",
+      intro: "After the extra parts are removed, the remaining total stands for equal units, not for just 1 unit.",
+      visualType: "leftoverMeaning",
+      items: [
+        {
+          prompt: "After 3 extra parts are removed, 24 cubes are left as 4 equal boxes. What does 24 stand for now?",
+          options: [
+            {id:"oneBox", label:"1 equal box"},
+            {id:"fourBoxes", label:"4 equal boxes"},
+            {id:"threeExtras", label:"3 extra parts"},
+            {id:"nothing", label:"Nothing is left"}
+          ],
+          correct:"fourBoxes",
+          explainer:"24 is the total of all 4 equal boxes together."
+        },
+        {
+          prompt: "After the extra parts are removed, 30 apples are left as 5 equal bags. What does 30 stand for now?",
+          options: [
+            {id:"oneBag", label:"1 equal bag"},
+            {id:"fiveBags", label:"5 equal bags"},
+            {id:"extras", label:"Only the extra parts"},
+            {id:"largerBag", label:"The biggest bag"}
+          ],
+          correct:"fiveBags",
+          explainer:"30 is the value of all 5 equal bags together."
+        },
+        {
+          prompt: "After the extra pieces are removed, 18 counters are left as 3 equal groups. What does 18 stand for now?",
+          options: [
+            {id:"oneGroup", label:"1 equal group"},
+            {id:"threeGroups", label:"3 equal groups"},
+            {id:"difference", label:"The difference only"},
+            {id:"none", label:"No groups"}
+          ],
+          correct:"threeGroups",
+          explainer:"18 is the total of the 3 equal groups together."
+        }
+      ]
+    },
+    s12: {
+      title: "Let's practise choosing the operation for 1 unit.",
+      intro: "If a total stands for several equal units, use the operation that finds 1 equal unit.",
+      visualType: "divideChoice",
+      items: [
+        {
+          prompt: "20 counters are left as 4 equal boxes. Which operation finds 1 box?",
+          options: [
+            {id:"add", label:"Add"},
+            {id:"subtract", label:"Subtract"},
+            {id:"multiply", label:"Multiply"},
+            {id:"divide", label:"Divide"}
+          ],
+          correct:"divide",
+          explainer:"20 is split into 4 equal boxes, so division finds 1 box."
+        },
+        {
+          prompt: "36 marbles are left as 6 equal bags. Which operation finds 1 bag?",
+          options: [
+            {id:"add", label:"Add"},
+            {id:"subtract", label:"Subtract"},
+            {id:"multiply", label:"Multiply"},
+            {id:"divide", label:"Divide"}
+          ],
+          correct:"divide",
+          explainer:"36 stands for 6 equal bags, so divide by 6 to find 1 bag."
+        },
+        {
+          prompt: "45 cubes are left as 5 equal rows. Which operation finds 1 row?",
+          options: [
+            {id:"add", label:"Add"},
+            {id:"subtract", label:"Subtract"},
+            {id:"multiply", label:"Multiply"},
+            {id:"divide", label:"Divide"}
+          ],
+          correct:"divide",
+          explainer:"A total shared into equal rows means divide to find 1 row."
+        }
+      ]
+    }
+  };
+
+  const state = {
+    current: 0,
+    questionOpen: false,
+    selected: {},
+    inputValues: {},
+    completed: {},
+    feedback: {},
+    attempts: {},
+    optionOrder: {},
+    remediation: null,
+    speechEnabled: 'speechSynthesis' in window
+  };
+
+  const appMount = document.getElementById('appMount');
+  const questionMount = document.getElementById('questionMount');
+  const remediationOverlay = document.getElementById('remediationOverlay');
+  const remediationMount = document.getElementById('remediationMount');
+  const progressBar = document.getElementById('progressBar');
+  const screenCounter = document.getElementById('screenCounter');
+
+  function shuffleIds(ids){
+    const a = ids.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function ensureOptionOrder(screen){
+    if(state.optionOrder[screen.id]) return state.optionOrder[screen.id];
+    const ids = screen.options.map(o => o.id);
+    const order = shuffleIds(ids);
+    state.optionOrder[screen.id] = order;
+    return order;
+  }
+
+  function getScreen(){ return screens[state.current]; }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#39;');
+  }
+
+  function questionHtml(){
+    if(!state.questionOpen) return '';
+    return `
+      <div class="card question-card">
+        <div class="step-chip">Question</div>
+        <div class="question-lines" style="margin-top:12px;">
+          ${questionLines.map(line => `<div>${escapeHtml(line)}</div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCompareModel(){
+    const sel = state.selected.s4;
+    const checked = !!state.feedback.s4;
+    return `
+      <div class="bar-scene">
+        <div class="row">
+          <div class="label">Bala</div>
+          <div class="bar">
+            <div class="segment unit"><span class="tiny">Bala</span></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">David</div>
+          <div class="bar">
+            <div class="segment unit"><span class="tiny">Same as Bala</span></div>
+            <div class="segment extra tap ${sel==='david-extra' ? 'selected' : ''}" data-action="selectSegment" data-screen="s4" data-id="david-extra">
+              <span class="tiny">?</span>
+            </div>
+          </div>
+        </div>
+        <div class="brace-note">Tap the unmatched extra piece.</div>
+      </div>
+    `;
+  }
+
+  function fullModel(showLabels = false){
+    const picked = state.selected[getScreen().id] || [];
+    const isMulti = Array.isArray(picked);
+    function seg(id, kind, label){
+      const selected = isMulti ? picked.includes(id) : picked === id;
+      const classes = `segment ${kind} tap ${selected ? 'selected' : ''}`;
+      const content = showLabels ? label : (kind === 'extra' ? '<span class="micro">extra part</span>' : '<span class="micro">equal unit</span>');
+      return `<div class="${classes}" data-action="selectSegment" data-screen="${getScreen().id}" data-id="${id}">${content}</div>`;
+    }
+    return `
+      <div class="bar-scene">
+        <div class="row">
+          <div class="label">Bala</div>
+          <div class="bar">
+            ${seg('b1','unit', '<span class="tiny">1 unit</span>')}
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">David</div>
+          <div class="bar">
+            ${seg('d1','unit', '<span class="tiny">1 unit</span>')}
+            ${seg('de','extra', '<span class="tiny">285</span>')}
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Jack</div>
+          <div class="bar">
+            ${seg('j1','unit', '<span class="tiny">1 unit</span>')}
+            ${seg('je1','extra', '<span class="tiny">285</span>')}
+            ${seg('j2','unit', '<span class="tiny">1 unit</span>')}
+            ${seg('je2','extra', '<span class="tiny">285</span>')}
+            ${seg('j3','unit', '<span class="tiny">1 unit</span>')}
+            ${seg('je3','extra', '<span class="tiny">285</span>')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function modelChoiceHtml(option){
+    if(option.model === 'threeDavids'){
+      return `
+        <div class="mini-choice">
+          <div class="mini-row"><div class="mini-unit"></div><div class="mini-extra"></div></div>
+          <div class="mini-row"><div class="mini-unit"></div><div class="mini-extra"></div></div>
+          <div class="mini-row"><div class="mini-unit"></div><div class="mini-extra"></div></div>
+          <div class="mini-label">3 equal David-sized groups</div>
+        </div>`;
+    }
+    if(option.model === 'threeBalas'){
+      return `
+        <div class="mini-choice">
+          <div class="mini-row"><div class="mini-unit"></div></div>
+          <div class="mini-row"><div class="mini-unit"></div></div>
+          <div class="mini-row"><div class="mini-unit"></div></div>
+          <div class="mini-label">3 equal Bala-sized groups</div>
+        </div>`;
+    }
+    return `
+      <div class="mini-choice">
+        <div class="mini-row"><div class="mini-unit"></div><div class="mini-extra"></div><div class="mini-extra"></div><div class="mini-extra"></div></div>
+        <div class="mini-label">1 David-sized group and 3 extra parts</div>
+      </div>`;
+  }
+
+  function renderVisual(screen){
+    switch(screen.visual){
+      case 'compareModel':
+        return renderCompareModel();
+      case 'fullModel':
+        if(screen.id === 's11' || screen.id === 's12'){
+          return `
+          <div class="bar-scene">
+            <div class="row"><div class="label">Left now</div>
+              <div class="bar">
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+              </div>
+            </div>
+            <div class="brace-note">After the extra parts are removed, only 5 equal Bala-sized units are left.</div>
+          </div>`;
+        }
+        return fullModel(screen.id === 's7');
+      default:
+        if(screen.id === 's9'){
+          return `
+            <div class="bar-scene">
+              <div class="row">
+                <div class="label">Total</div>
+                <div class="bar">
+                  <div class="segment unit"><span class="tiny">1 unit</span></div>
+                  <div class="segment extra pulse"><span class="tiny">285</span></div>
+                  <div class="segment unit"><span class="tiny">1 unit</span></div>
+                  <div class="segment unit"><span class="tiny">1 unit</span></div>
+                  <div class="segment extra pulse"><span class="tiny">285</span></div>
+                  <div class="segment unit"><span class="tiny">1 unit</span></div>
+                  <div class="segment extra pulse"><span class="tiny">285</span></div>
+                  <div class="segment unit"><span class="tiny">1 unit</span></div>
+                  <div class="segment extra pulse"><span class="tiny">285</span></div>
+                </div>
+              </div>
+              <div class="brace-note">The orange pieces are the 4 extra 285 parts inside the total.</div>
+            </div>
+          `;
+        }
+        if(screen.id === 's10'){
+          return `
+            <div class="bar-scene">
+              <div class="row"><div class="label">Total</div><div class="bar">
+                <div class="segment unit"><span class="tiny">5 equal units</span></div>
+                <div class="segment extra"><span class="tiny">1,140 extras</span></div>
+              </div></div>
+              <div class="brace-note">Work out what is left after removing the extra 1,140.</div>
+            </div>`;
+        }
+        if(screen.id === 's13'){
+          return `
+            <div class="bar-scene">
+              <div class="row"><div class="label">Left now</div><div class="bar">
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+                <div class="segment unit"><span class="tiny">1 unit</span></div>
+              </div></div>
+              <div class="brace-note">2,330 stands for 5 equal units. Find 1 unit.</div>
+            </div>`;
+        }
+        return '';
+    }
+  }
+
+  function renderOptions(screen){
+    if(screen.type === 'singleOption'){
+      const order = ensureOptionOrder(screen);
+      const colsClass = screen.columns === 1 ? '' : (screen.columns === 3 ? 'cols-3' : 'cols-2');
+      return `
+        <div class="options-grid ${colsClass} ${screen.optionStyle === 'sentence' ? '' : ''}">
+          ${order.map((id, idx) => {
+            const option = screen.options.find(o => o.id === id);
+            const selected = state.selected[screen.id] === id ? 'selected' : '';
+            let body = '';
+            if(screen.optionStyle === 'modelChoice'){
+              body = modelChoiceHtml(option);
+            } else {
+              body = `<div>${escapeHtml(option.label)}</div>`;
+            }
+            return `
+              <div class="option-card ${selected} ${screen.optionStyle === 'sentence' ? 'sentence-card' : ''}" data-action="selectOption" data-screen="${screen.id}" data-id="${id}" role="button" aria-pressed="${selected ? 'true':'false'}">
+                <div class="badge">${String.fromCharCode(65 + idx)}</div>
+                ${body}
+              </div>
+            `;
+          }).join('')}
+        </div>`;
+    }
+    if(screen.type === 'numberInput'){
+      const val = state.inputValues[screen.id] || '';
+      return `
+        <div class="input-wrap">
+          <input class="answer-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+            data-action="inputAnswer" data-screen="${screen.id}" value="${escapeHtml(val)}" aria-label="Type your answer" />
+          <button data-action="check">Check</button>
+        </div>
+      `;
+    }
+    if(screen.type === 'modelTapSingle' || screen.type === 'modelTapMulti'){
+      return `
+        <div class="footer-note">Tap the model. Then press <span class="kbd">Check</span>.</div>
+      `;
+    }
+    return '';
+  }
+
+  function screenHtml(screen){
+    const feedback = state.feedback[screen.id];
+    const showCheckButton = screen.type !== 'numberInput';
+    const selectionMade = hasSelection(screen);
+    const disabledCheck = selectionMade ? '' : 'disabled';
+    return `
+      <div class="card">
+        <div class="main-grid">
+          <div class="action-box">${escapeHtml(screen.prompt)}</div>
+          <div class="support-box">${escapeHtml(screen.support)}</div>
+          <div class="visual-box">${renderVisual(screen)}</div>
+          ${renderOptions(screen)}
+          ${showCheckButton ? `<div class="nav"><div></div><button data-action="check" ${disabledCheck}>Check</button></div>` : ''}
+          <div class="feedback ${feedback ? 'show ' + feedback.kind : ''}">${feedback ? feedback.text : ''}</div>
+          <div class="nav">
+            <button class="secondary" data-action="prev" ${state.current===0 ? 'disabled':''}>Back</button>
+            <button data-action="next" ${state.completed[screen.id] ? '' : 'disabled'}>${state.current === screens.length-1 ? 'Finish' : 'Next'}</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function hasSelection(screen){
+    if(screen.type === 'numberInput'){
+      return (state.inputValues[screen.id] || '').trim().length > 0;
+    }
+    if(screen.type === 'modelTapMulti'){
+      return Array.isArray(state.selected[screen.id]) && state.selected[screen.id].length > 0;
+    }
+    return !!state.selected[screen.id];
+  }
+
+  function render(){
+    questionMount.innerHTML = questionHtml();
+    const screen = getScreen();
+    appMount.innerHTML = screenHtml(screen);
+    progressBar.style.width = `${((state.current+1)/screens.length)*100}%`;
+    screenCounter.textContent = `Screen ${state.current + 1} of ${screens.length}`;
+    document.querySelector('[data-action="toggleQuestion"]').textContent = state.questionOpen ? 'Hide question' : 'Show question';
+    const speakButton = document.querySelector('[data-action="speak"]');
+    if(!state.speechEnabled) speakButton.disabled = true;
+  }
+
+  function setFeedback(screenId, kind, text){
+    state.feedback[screenId] = {kind, text};
+    render();
+  }
+
+  function selectOption(screenId, optionId){
+    state.selected[screenId] = optionId;
+    state.feedback[screenId] = null;
+    render();
+  }
+
+  function selectSegment(screenId, id){
+    const screen = screens.find(s => s.id === screenId);
+    state.feedback[screenId] = null;
+    if(screen.type === 'modelTapMulti'){
+      const cur = Array.isArray(state.selected[screenId]) ? state.selected[screenId].slice() : [];
+      const idx = cur.indexOf(id);
+      if(idx >= 0) cur.splice(idx,1); else cur.push(id);
+      state.selected[screenId] = cur;
+    } else {
+      state.selected[screenId] = id;
+    }
+    render();
+  }
+
+  function normalizeNumber(v){
+    return String(v).replace(/,/g,'').trim();
+  }
+
+  function checkCurrent(){
+    const screen = getScreen();
+    if(!hasSelection(screen)) return;
+    const attempt = (state.attempts[screen.id] || 0) + 1;
+    state.attempts[screen.id] = attempt;
+
+    let correct = false;
+
+    if(screen.type === 'singleOption'){
+      correct = state.selected[screen.id] === screen.correct;
+    } else if(screen.type === 'numberInput'){
+      correct = normalizeNumber(state.inputValues[screen.id]) === screen.expected;
+    } else if(screen.type === 'modelTapSingle'){
+      correct = state.selected[screen.id] === screen.correct;
+    } else if(screen.type === 'modelTapMulti'){
+      const picked = Array.isArray(state.selected[screen.id]) ? state.selected[screen.id].slice().sort() : [];
+      const target = screen.targetIds.slice().sort();
+      correct = picked.length === target.length && picked.every((v,i)=>v===target[i]);
+    }
+
+    if(correct){
+      state.completed[screen.id] = true;
+      let text = screen.good;
+      if(screen.id === 's13'){
+        text += " You can check: David had 751 books and Jack had 2,253 books. Together they make 3,470.";
+      }
+      setFeedback(screen.id, 'good', text);
+      return;
+    }
+
+    state.completed[screen.id] = false;
+
+    const useRemediation = ['s7','s11','s12'].includes(screen.id) && attempt >= 2;
+    if(useRemediation){
+      openRemediation(screen.id);
+      return;
+    }
+
+    if(screen.type === 'numberInput'){
+      setFeedback(screen.id, 'hint', screen.hint);
+    } else {
+      setFeedback(screen.id, attempt === 1 ? 'hint' : 'bad', screen.hint);
+    }
+  }
+
+  function nextScreen(){
+    if(state.current < screens.length - 1){
+      state.current += 1;
+      window.scrollTo({top:0, behavior:'smooth'});
+      render();
+    }
+  }
+
+  function prevScreen(){
+    if(state.current > 0){
+      state.current -= 1;
+      window.scrollTo({top:0, behavior:'smooth'});
+      render();
+    }
+  }
+
+  function resetAll(){
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+    state.current = 0;
+    state.questionOpen = false;
+    state.selected = {};
+    state.inputValues = {};
+    state.completed = {};
+    state.feedback = {};
+    state.attempts = {};
+    state.optionOrder = {};
+    state.remediation = null;
+    remediationOverlay.classList.remove('show');
+    render();
+  }
+
+  function getReadAloudText(){
+    const s = getScreen();
+    const fb = state.feedback[s.id]?.text ? " " + state.feedback[s.id].text : "";
+    return questionLines.join(" ") + " " + s.prompt + " " + s.support + fb;
+  }
+
+  function speakCurrent(){
+    if(!state.speechEnabled) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(getReadAloudText());
+    utter.rate = 0.95;
+    utter.pitch = 1;
+    window.speechSynthesis.speak(utter);
+  }
+
+  function remediationVisual(type){
+    if(type === 'extraCount'){
+      return `
+      <div class="visual-box" style="margin-top:10px;">
+        <div class="bar-scene">
+          <div class="row"><div class="label">Unit person</div><div class="bar"><div class="segment unit"><span class="tiny">1 unit</span></div></div></div>
+          <div class="row"><div class="label">Bigger person</div><div class="bar"><div class="segment unit"><span class="tiny">1 unit</span></div><div class="segment extra pulse"><span class="tiny">extra</span></div></div></div>
+          <div class="brace-note">Count only the orange extra parts.</div>
+        </div>
+      </div>`;
+    }
+    if(type === 'leftoverMeaning'){
+      return `
+      <div class="visual-box" style="margin-top:10px;">
+        <div class="bar-scene">
+          <div class="row"><div class="label">Left now</div><div class="bar">
+            <div class="segment unit pulse"><span class="tiny">1 unit</span></div>
+            <div class="segment unit pulse"><span class="tiny">1 unit</span></div>
+            <div class="segment unit pulse"><span class="tiny">1 unit</span></div>
+            <div class="segment unit pulse"><span class="tiny">1 unit</span></div>
+          </div></div>
+          <div class="brace-note">The leftover total stands for all the equal units together.</div>
+        </div>
+      </div>`;
+    }
+    return `
+      <div class="visual-box" style="margin-top:10px;">
+        <div class="bar-scene">
+          <div class="row"><div class="label">Total</div><div class="bar">
+            <div class="segment unit"><span class="tiny">1</span></div>
+            <div class="segment unit"><span class="tiny">1</span></div>
+            <div class="segment unit"><span class="tiny">1</span></div>
+            <div class="segment unit"><span class="tiny">1</span></div>
+          </div></div>
+          <div class="brace-note">If a total is shared across equal units, divide to find 1 unit.</div>
+        </div>
+      </div>`;
+  }
+
+  function openRemediation(screenId){
+    const bank = remediationBank[screenId];
+    state.remediation = {
+      screenId,
+      streak: 0,
+      itemIndex: 0,
+      selected: null,
+      feedback: "",
+      feedbackKind: "hint",
+      order: {}
+    };
+    bank.items.forEach((item, idx) => {
+      state.remediation.order[idx] = shuffleIds(item.options.map(o => o.id));
+    });
+    renderRemediation();
+    remediationOverlay.classList.add('show');
+  }
+
+  function closeRemediation(){
+    state.remediation = null;
+    remediationOverlay.classList.remove('show');
+    render();
+  }
+
+  function renderRemediation(){
+    const r = state.remediation;
+    const bank = remediationBank[r.screenId];
+    const item = bank.items[r.itemIndex];
+    const order = r.order[r.itemIndex];
+    remediationMount.innerHTML = `
+      <h2>${escapeHtml(bank.title)}</h2>
+      <div class="support-box">${escapeHtml(bank.intro)}</div>
+      ${remediationVisual(bank.visualType)}
+      <div class="streak">Practice streak: ${r.streak} / 3</div>
+      <div class="mini-practice">
+        <div class="action-box" style="font-size:1.15rem;padding:14px;">${escapeHtml(item.prompt)}</div>
+        <div class="options-grid cols-2" style="margin-top:12px;">
+          ${order.map((id, idx) => {
+            const option = item.options.find(o => o.id === id);
+            const selected = r.selected === id ? 'selected' : '';
+            return `
+              <div class="option-card ${selected}" data-remed-action="pick" data-id="${id}">
+                <div class="badge">${String.fromCharCode(65 + idx)}</div>
+                <div>${escapeHtml(option.label)}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        <div class="nav" style="margin-top:12px;">
+          <div></div>
+          <button data-remed-action="check" ${r.selected ? '' : 'disabled'}>Check practice</button>
+        </div>
+        <div class="feedback ${r.feedback ? 'show ' + r.feedbackKind : ''}" style="margin-top:12px;">${r.feedback || ''}</div>
+      </div>
+      <div class="close-row">
+        <button class="secondary" data-remed-action="close">Close</button>
+      </div>
+      <div class="footer-note">Get 3 correct in a row, then return to the main question.</div>
+    `;
+  }
+
+  function remediationPick(id){
+    state.remediation.selected = id;
+    state.remediation.feedback = "";
+    renderRemediation();
+  }
+
+  function remediationCheck(){
+    const r = state.remediation;
+    const bank = remediationBank[r.screenId];
+    const item = bank.items[r.itemIndex];
+    const correct = r.selected === item.correct;
+    if(correct){
+      r.streak += 1;
+      r.feedbackKind = 'good';
+      r.feedback = `Correct. ${item.explainer}`;
+      if(r.streak >= 3){
+        setTimeout(() => {
+          closeRemediation();
+          setFeedback(r.screenId, 'hint', "Good practice. Go back to the main question and try again.");
+        }, 650);
+        renderRemediation();
+        return;
+      }
+      r.itemIndex = (r.itemIndex + 1) % bank.items.length;
+      r.selected = null;
+      setTimeout(renderRemediation, 350);
+      renderRemediation();
+    } else {
+      r.streak = 0;
+      r.feedbackKind = 'bad';
+      r.feedback = `Not yet. ${item.explainer}`;
+      renderRemediation();
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const optionEl = e.target.closest('[data-action="selectOption"]');
+    if(optionEl){
+      selectOption(optionEl.dataset.screen, optionEl.dataset.id);
+      return;
+    }
+    const segmentEl = e.target.closest('[data-action="selectSegment"]');
+    if(segmentEl){
+      selectSegment(segmentEl.dataset.screen, segmentEl.dataset.id);
+      return;
+    }
+    const btn = e.target.closest('[data-action]');
+    if(btn){
+      const action = btn.dataset.action;
+      if(action === 'toggleQuestion'){
+        state.questionOpen = !state.questionOpen;
+        render();
+      } else if(action === 'speak'){
+        speakCurrent();
+      } else if(action === 'reset'){
+        resetAll();
+      } else if(action === 'check'){
+        checkCurrent();
+      } else if(action === 'next'){
+        nextScreen();
+      } else if(action === 'prev'){
+        prevScreen();
+      }
+      return;
+    }
+
+    const remedPick = e.target.closest('[data-remed-action="pick"]');
+    if(remedPick){
+      remediationPick(remedPick.dataset.id);
+      return;
+    }
+    const remedBtn = e.target.closest('[data-remed-action]');
+    if(remedBtn){
+      const action = remedBtn.dataset.remedAction;
+      if(action === 'check') remediationCheck();
+      if(action === 'close') closeRemediation();
+    }
+  });
+
+  document.addEventListener('input', (e) => {
+    const input = e.target.closest('[data-action="inputAnswer"]');
+    if(input){
+      state.inputValues[input.dataset.screen] = input.value;
+      state.feedback[input.dataset.screen] = null;
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      const active = document.activeElement;
+      if(active && active.matches('[data-action="inputAnswer"]')){
+        checkCurrent();
+      }
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
