@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P4 Maths Interactive - Possible Totals</title>
+  <style>
+    :root{
+      --bg:#f7f9fc;
+      --card:#ffffff;
+      --ink:#123;
+      --muted:#506070;
+      --line:#d8e0ea;
+      --primary:#0b5fff;
+      --primary-soft:#eaf2ff;
+      --accent:#ff8a00;
+      --accent-soft:#fff1df;
+      --good:#138a36;
+      --good-soft:#e8f7ed;
+      --warn:#c62828;
+      --warn-soft:#fdeaea;
+      --shadow:0 10px 25px rgba(12,34,56,.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#f9fbff 0%, #eef4fb 100%);
+      color:var(--ink);
+      min-height:100vh;
+    }
+
+    button, input{
+      font:inherit;
+    }
+
+    .app{
+      max-width:1100px;
+      margin:0 auto;
+      padding:16px;
+    }
+
+    .topbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand-badge{
+      width:54px;
+      height:54px;
+      border-radius:16px;
+      background:linear-gradient(135deg,#ffd08a,#ff9d2f);
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.15;
+    }
+
+    .brand p{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .tool-btn, .nav-btn, .check-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      min-height:48px;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+      touch-action:manipulation;
+    }
+
+    .tool-btn:hover, .nav-btn:hover, .check-btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .tool-btn{
+      background:#fff;
+      color:var(--ink);
+    }
+
+    .tool-btn.primary, .check-btn{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .tool-btn.secondary{
+      background:#fff3e6;
+      color:#8a4c00;
+    }
+
+    .tool-btn:focus-visible, .nav-btn:focus-visible, .check-btn:focus-visible,
+    .option-card:focus-visible, .total-chip:focus-visible, .match-chip:focus-visible,
+    .icon-btn:focus-visible, .small-btn:focus-visible{
+      outline:4px solid #96baff;
+      outline-offset:2px;
+    }
+
+    .question-panel{
+      background:var(--card);
+      border:2px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px 18px;
+      margin-bottom:14px;
+      display:none;
+      animation:fadeIn .25s ease;
+    }
+
+    .question-panel.show{
+      display:block;
+    }
+
+    .question-panel h2{
+      margin:0 0 10px;
+      font-size:22px;
+    }
+
+    .question-box{
+      background:#f8fbff;
+      border:2px dashed #c8d8ef;
+      border-radius:14px;
+      padding:14px;
+      font-size:20px;
+      line-height:1.45;
+    }
+
+    .progress-wrap{
+      background:#dfe8f3;
+      border-radius:999px;
+      height:14px;
+      overflow:hidden;
+      margin-bottom:14px;
+      box-shadow:inset 0 2px 5px rgba(0,0,0,.08);
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#0b5fff,#4b86ff);
+      transition:width .35s ease;
+    }
+
+    .screen-shell{
+      background:var(--card);
+      border:2px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .screen-header{
+      padding:18px 20px 0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .screen-kicker{
+      color:var(--primary);
+      font-weight:700;
+      font-size:16px;
+    }
+
+    .screen-counter{
+      color:var(--muted);
+      font-size:16px;
+      font-weight:700;
+    }
+
+    .screen-main{
+      padding:14px 20px 20px;
+      display:grid;
+      grid-template-columns:minmax(260px, 1fr) minmax(280px, 1.25fr);
+      gap:18px;
+      align-items:start;
+    }
+
+    .left-col{
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+
+    .action-card{
+      background:var(--primary-soft);
+      border:2px solid #bdd2ff;
+      border-radius:20px;
+      padding:18px;
+      animation:slideIn .25s ease;
+    }
+
+    .action-card h2{
+      margin:0;
+      font-size:31px;
+      line-height:1.2;
+    }
+
+    .help-card{
+      background:var(--accent-soft);
+      border:2px solid #ffd19f;
+      border-radius:20px;
+      padding:14px 16px;
+    }
+
+    .help-card h3{
+      margin:0 0 8px;
+      font-size:18px;
+      color:#7b4d00;
+    }
+
+    .help-card p{
+      margin:0;
+      color:#6a5540;
+      font-size:18px;
+      line-height:1.35;
+    }
+
+    .visual-card, .response-card, .feedback-card{
+      background:#fff;
+      border:2px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+    }
+
+    .visual-card{
+      min-height:350px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:flex-start;
+    }
+
+    .response-card{
+      min-height:170px;
+    }
+
+    .feedback-card{
+      min-height:96px;
+      display:flex;
+      align-items:flex-start;
+      font-size:20px;
+      line-height:1.35;
+    }
+
+    .feedback-card.good{
+      background:var(--good-soft);
+      border-color:#a8dfb8;
+      color:#125c29;
+    }
+
+    .feedback-card.bad{
+      background:var(--warn-soft);
+      border-color:#f3b4b4;
+      color:#7d1717;
+    }
+
+    .feedback-card.neutral{
+      background:#f7fbff;
+      border-color:#cfe0f4;
+      color:#345;
+    }
+
+    .option-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .option-card, .total-chip, .match-chip{
+      width:100%;
+      border:2px solid #ccd7e7;
+      border-radius:18px;
+      background:#fff;
+      padding:16px 18px;
+      text-align:left;
+      cursor:pointer;
+      min-height:64px;
+      box-shadow:0 4px 12px rgba(10,25,40,.05);
+      transition:transform .15s ease, border-color .15s ease, background .15s ease;
+      color:var(--ink);
+      touch-action:manipulation;
+    }
+
+    .option-card:hover, .total-chip:hover, .match-chip:hover{
+      transform:translateY(-1px);
+    }
+
+    .option-card.selected, .total-chip.selected, .match-chip.selected{
+      border-color:var(--primary);
+      background:#eef4ff;
+      box-shadow:0 0 0 4px rgba(11,95,255,.10);
+    }
+
+    .option-card .small{
+      display:block;
+      margin-top:6px;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .bag-visual{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      align-items:flex-end;
+    }
+
+    .bag{
+      width:76px;
+      height:92px;
+      border-radius:18px 18px 24px 24px;
+      background:linear-gradient(180deg,#ead7b6,#d5b98a);
+      border:3px solid #8a6c45;
+      position:relative;
+      box-shadow:0 8px 12px rgba(0,0,0,.08);
+      animation:popIn .3s ease both;
+    }
+
+    .bag::before{
+      content:"";
+      position:absolute;
+      top:-8px;
+      left:14px;
+      right:14px;
+      height:16px;
+      border-radius:12px;
+      background:#8a6c45;
+    }
+
+    .bag-label{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      font-weight:700;
+      color:#4e3a20;
+    }
+
+    .loose-group{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .orange-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      max-width:240px;
+    }
+
+    .orange-dot{
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, #ffd38a, #ff9300 65%, #d86900 100%);
+      border:2px solid #b35600;
+      position:relative;
+      animation:bounceIn .35s ease both;
+    }
+
+    .orange-dot::after{
+      content:"";
+      position:absolute;
+      top:-5px;
+      left:12px;
+      width:5px;
+      height:8px;
+      background:#4e8c3a;
+      border-radius:5px;
+      transform:rotate(15deg);
+    }
+
+    .visual-label{
+      font-size:19px;
+      font-weight:700;
+      color:#5f4a1d;
+      background:#fff4df;
+      border:2px solid #f5d08b;
+      border-radius:12px;
+      padding:8px 12px;
+      display:inline-flex;
+      align-self:flex-start;
+    }
+
+    .math-line{
+      font-size:22px;
+      font-weight:700;
+      background:#f8fbff;
+      border:2px solid #dbe6f5;
+      border-radius:14px;
+      padding:12px 14px;
+      display:inline-block;
+    }
+
+    .row-card{
+      border:2px solid #d9e3f1;
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
+      display:grid;
+      gap:12px;
+      animation:fadeIn .25s ease;
+    }
+
+    .row-head{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      font-size:20px;
+      font-weight:700;
+    }
+
+    .input-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+
+    .number-input{
+      width:110px;
+      min-height:56px;
+      border-radius:14px;
+      border:2px solid #b8c8dc;
+      padding:8px 12px;
+      font-size:28px;
+      font-weight:700;
+      text-align:center;
+      background:#fff;
+    }
+
+    .number-input.correct{
+      border-color:var(--good);
+      background:#eefaf1;
+    }
+
+    .number-input.wrong{
+      border-color:var(--warn);
+      background:#fff2f2;
+    }
+
+    .small-btn{
+      border:none;
+      border-radius:12px;
+      background:#eef4ff;
+      color:var(--primary);
+      padding:10px 12px;
+      min-height:44px;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+
+    .columns{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+
+    .column-box{
+      border:2px solid #dae4f3;
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
+      min-height:180px;
+    }
+
+    .column-box h3{
+      margin:0 0 12px;
+      font-size:20px;
+      line-height:1.25;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .total-chip{
+      width:auto;
+      min-width:82px;
+      text-align:center;
+      justify-content:center;
+      font-size:24px;
+      font-weight:700;
+      padding:14px 16px;
+    }
+
+    .match-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .match-column{
+      border:2px solid #dce6f5;
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
+    }
+
+    .match-column h3{
+      margin:0 0 12px;
+      font-size:20px;
+    }
+
+    .match-chip{
+      text-align:center;
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .match-line{
+      min-height:44px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size:26px;
+      font-weight:700;
+      color:var(--good);
+      opacity:0;
+      transform:scale(.9);
+      transition:opacity .25s ease, transform .25s ease;
+    }
+
+    .match-line.show{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    .stop-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:999px;
+      background:#fff0f0;
+      border:2px solid #f3b4b4;
+      color:#8b1717;
+      font-size:20px;
+      font-weight:700;
+      animation:pulse 1.1s ease infinite;
+    }
+
+    .step-strip{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .step-card{
+      flex:1 1 180px;
+      border:2px solid #d7e2f0;
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
+    }
+
+    .step-card .num{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:var(--primary);
+      color:#fff;
+      font-weight:700;
+      margin-bottom:10px;
+      font-size:22px;
+    }
+
+    .step-card h4{
+      margin:0 0 6px;
+      font-size:19px;
+    }
+
+    .step-card p{
+      margin:0;
+      font-size:18px;
+      line-height:1.3;
+      color:#44576c;
+    }
+
+    .badge-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .check-badge{
+      border:2px solid #b3dfbf;
+      background:#edf9f0;
+      color:#155b2a;
+      border-radius:16px;
+      padding:12px 14px;
+      font-size:18px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .icon-btn{
+      width:52px;
+      height:52px;
+      border:none;
+      border-radius:14px;
+      background:#fff;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      touch-action:manipulation;
+    }
+
+    .nav-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:0 20px 20px;
+      flex-wrap:wrap;
+    }
+
+    .nav-btn{
+      background:#fff;
+      color:var(--ink);
+    }
+
+    .nav-btn[disabled], .check-btn[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .check-btn{
+      min-width:150px;
+    }
+
+    .nav-right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .subtle{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.35;
+    }
+
+    .help-reveal{
+      margin-top:12px;
+      border:2px dashed #f5c385;
+      background:#fff7eb;
+      border-radius:16px;
+      padding:14px;
+      animation:fadeIn .25s ease;
+    }
+
+    .help-reveal h4{
+      margin:0 0 8px;
+      font-size:20px;
+      color:#7a4a00;
+    }
+
+    .help-reveal p, .help-reveal li{
+      font-size:18px;
+      line-height:1.35;
+      color:#6b5331;
+    }
+
+    .help-reveal ul{
+      margin:8px 0 0 22px;
+      padding:0;
+    }
+
+    .finish-panel{
+      margin-top:12px;
+      border:2px solid #b7d7c1;
+      background:#eefaf2;
+      border-radius:16px;
+      padding:14px;
+      font-size:19px;
+      color:#1a5d2e;
+      animation:fadeIn .25s ease;
+    }
+
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+    @keyframes popIn{
+      from{opacity:0; transform:translateY(10px) scale(.92);}
+      to{opacity:1; transform:translateY(0) scale(1);}
+    }
+
+    @keyframes bounceIn{
+      from{opacity:0; transform:translateY(8px) scale(.8);}
+      to{opacity:1; transform:translateY(0) scale(1);}
+    }
+
+    @keyframes fadeIn{
+      from{opacity:0}
+      to{opacity:1}
+    }
+
+    @keyframes slideIn{
+      from{opacity:0; transform:translateX(-8px)}
+      to{opacity:1; transform:translateX(0)}
+    }
+
+    @keyframes pulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.03)}
+    }
+
+    @media (max-width: 860px){
+      .screen-main{
+        grid-template-columns:1fr;
+      }
+      .visual-card{
+        min-height:unset;
+      }
+      .action-card h2{
+        font-size:28px;
+      }
+      .question-box{
+        font-size:18px;
+      }
+      .columns, .match-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 560px){
+      .brand h1{font-size:24px}
+      .action-card h2{font-size:24px}
+      .screen-header, .screen-main, .nav-row{padding-left:14px; padding-right:14px}
+      .screen-main{padding-bottom:14px}
+      .feedback-card{font-size:18px}
+      .number-input{width:92px; font-size:24px}
+      .bag{width:66px; height:82px}
+      .bag-label{font-size:24px}
+      .orange-dot{width:24px; height:24px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true">🍊</div>
+        <div>
+          <h1>Possible Totals Interactive</h1>
+          <p>Build two lists. Compare the totals. Stop at the first match.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" id="toggleQuestionBtn" type="button">Show question</button>
+        <button class="tool-btn secondary" id="readQuestionBtn" type="button">Read question aloud</button>
+        <button class="tool-btn primary" id="readPageBtn" type="button">Read page aloud</button>
+        <button class="tool-btn" id="stopReadBtn" type="button">Stop reading</button>
+        <button class="tool-btn" id="restartBtn" type="button">Restart</button>
+      </div>
+    </div>
+
+    <div class="question-panel" id="questionPanel" aria-live="polite">
+      <h2>The question</h2>
+      <div class="question-box" id="questionBox"></div>
+    </div>
+
+    <div class="progress-wrap" aria-label="Progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="screen-shell" aria-live="polite">
+      <div class="screen-header">
+        <div>
+          <div class="screen-kicker" id="screenKicker">Interactive maths</div>
+          <div class="subtle" id="screenTitleSubtle">Take one step at a time.</div>
+        </div>
+        <div class="screen-counter" id="screenCounter">Screen 1 of 10</div>
+      </div>
+
+      <div class="screen-main">
+        <div class="left-col">
+          <section class="action-card" aria-labelledby="actionHeading">
+            <h2 id="actionHeading"></h2>
+          </section>
+
+          <section class="help-card" aria-labelledby="helpHeading">
+            <h3 id="helpHeading">Helpful reminder</h3>
+            <p id="helpText"></p>
+          </section>
+
+          <section class="response-card" id="responseCard" aria-label="Response area"></section>
+          <section class="feedback-card neutral" id="feedbackCard" aria-live="polite">Choose an answer, then press <strong style="margin-left:6px;">Check</strong>.</section>
+        </div>
+
+        <section class="visual-card" id="visualCard" aria-label="Visual support area"></section>
+      </div>
+
+      <div class="nav-row">
+        <div class="subtle" id="navHint">Your action for this screen is shown in the blue box.</div>
+        <div class="nav-right">
+          <button class="check-btn" id="checkBtn" type="button">Check</button>
+          <button class="nav-btn" id="nextBtn" type="button" disabled>Next</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const questionText = "Jamie has a box of oranges. If she packs all the oranges in bags of 8, she will have 6 oranges remaining. If she packs all the oranges in bags of 5, she will have 2 oranges remaining. What is the least number of oranges Jamie has in the box?";
+
+    const screens = [
+      {
+        id: "r1",
+        type: "mcq",
+        kicker: "Screen 1",
+        title: "What is the problem asking for?",
+        help: "Choose the best meaning before you start solving.",
+        options: [
+          { id: "bags8", text: "The number of bags of 8" },
+          { id: "total", text: "The least number of oranges in the box" },
+          { id: "bags5", text: "The number of bags of 5" }
+        ],
+        correct: "total",
+        feedback: {
+          correct: "Yes. We need the total number of oranges, not the number of bags.",
+          wrong1: "Look at the last sentence. What must we find?",
+          wrong2: "The question wants the total number of oranges in the box."
+        },
+        explanationHTML: `
+          <div class="help-reveal">
+            <h4>Look carefully at the last sentence.</h4>
+            <p>The problem is not asking for the number of bags. It is asking for the <strong>least number of oranges in the box</strong>.</p>
+          </div>
+        `
+      },
+      {
+        id: "r2",
+        type: "mcq",
+        kicker: "Screen 2",
+        title: "What does “6 oranges remaining” mean here?",
+        help: "Think about what is left after making full bags of 8.",
+        options: [
+          { id: "bags", text: "6 bags are filled" },
+          { id: "left", text: "6 oranges are left after full bags of 8" },
+          { id: "ineach", text: "There are 6 oranges in each bag" }
+        ],
+        correct: "left",
+        feedback: {
+          correct: "Yes. The 6 are loose oranges left over.",
+          wrong1: "Think: after filling full bags of 8, what is left outside the bags?",
+          wrong2: "The 6 do not mean bags. They mean 6 loose oranges are still left."
+        },
+        explanationHTML: `
+          <div class="help-reveal">
+            <h4>Read the clue in two parts.</h4>
+            <ul>
+              <li>Full bags of 8</li>
+              <li>Then 6 oranges are still left</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        id: "r3",
+        type: "multiinput",
+        kicker: "Screen 3",
+        title: "First multiply. Then add 6 left.",
+        help: "For each row, first find the oranges in the full bags. Then add the 6 loose oranges.",
+        rows: [
+          { id: "r3a", bags: 1, bagSize: 8, remainder: 6, answer: 14 },
+          { id: "r3b", bags: 2, bagSize: 8, remainder: 6, answer: 22 },
+          { id: "r3c", bags: 3, bagSize: 8, remainder: 6, answer: 30 }
+        ],
+        feedback: {
+          correct: "Good. You multiplied first, then added the 6 left to make each possible total.",
+          wrong1: "First multiply: number of bags × 8. Then add the 6 oranges left.",
+          wrong2: "Use two steps for each row: multiply the full bags first, then add the 6 loose oranges."
+        },
+        helper: {
+          title: "Worked example",
+          html: `<p>Try a row with more than 1 bag.</p>
+                 <p><strong>2 bags of 8</strong> means <strong>2 × 8 = 16</strong>.</p>
+                 <p>Then add the oranges left: <strong>16 + 6 = 22</strong>.</p>`
+        }
+      },
+      {
+        id: "r4",
+        type: "mcq",
+        kicker: "Screen 4",
+        title: "What does “2 oranges remaining” mean here?",
+        help: "Think about what is left after making full bags of 5.",
+        options: [
+          { id: "bags", text: "2 bags are filled" },
+          { id: "left", text: "2 oranges are left after full bags of 5" },
+          { id: "ineach", text: "There are 2 oranges in each bag" }
+        ],
+        correct: "left",
+        feedback: {
+          correct: "Yes. The 2 are loose oranges left over.",
+          wrong1: "Think: after filling full bags of 5, what is left outside the bags?",
+          wrong2: "The 2 do not mean bags. They mean 2 loose oranges are still left."
+        },
+        explanationHTML: `
+          <div class="help-reveal">
+            <h4>Read the clue in two parts.</h4>
+            <ul>
+              <li>Full bags of 5</li>
+              <li>Then 2 oranges are still left</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        id: "r5",
+        type: "multiinput",
+        kicker: "Screen 5",
+        title: "First multiply. Then add 2 left.",
+        help: "For each row, first find the oranges in the full bags. Then add the 2 loose oranges.",
+        rows: [
+          { id: "r5a", bags: 1, bagSize: 5, remainder: 2, answer: 7 },
+          { id: "r5b", bags: 2, bagSize: 5, remainder: 2, answer: 12 },
+          { id: "r5c", bags: 3, bagSize: 5, remainder: 2, answer: 17 },
+          { id: "r5d", bags: 4, bagSize: 5, remainder: 2, answer: 22 }
+        ],
+        feedback: {
+          correct: "Good. You multiplied first, then added the 2 left to make each possible total.",
+          wrong1: "First multiply: number of bags × 5. Then add the 2 oranges left.",
+          wrong2: "Use two steps for each row: multiply the full bags first, then add the 2 loose oranges."
+        },
+        helper: {
+          title: "Worked example",
+          html: `<p>Try a row with more than 1 bag.</p>
+                 <p><strong>3 bags of 5</strong> means <strong>3 × 5 = 15</strong>.</p>
+                 <p>Then add the oranges left: <strong>15 + 2 = 17</strong>.</p>`
+        }
+      },
+      {
+        id: "r6",
+        type: "mcq",
+        kicker: "Screen 6",
+        title: "Which numbers should we compare now?",
+        help: "Think about what each row shows after you finished the lists.",
+        options: [
+          { id: "sizes", text: "The numbers 8 and 5" },
+          { id: "multiples", text: "The bag multiples only" },
+          { id: "totals", text: "The total numbers in both lists" }
+        ],
+        correct: "totals",
+        feedback: {
+          correct: "Yes. We compare the totals, because the question asks for the total oranges.",
+          wrong1: "Check what each row shows now. Is it only the bags, or the whole total?",
+          wrong2: "Compare the total numbers. The question is asking for the total oranges."
+        },
+        explanationHTML: `
+          <div class="help-reveal">
+            <h4>What do the lists show?</h4>
+            <p>The finished rows show <strong>possible total numbers of oranges</strong>. So those are the numbers to compare.</p>
+          </div>
+        `
+      },
+      {
+        id: "r7",
+        type: "match",
+        kicker: "Screen 7",
+        title: "Tap the first total that appears in both lists.",
+        help: "Start from the top and look for the first matching total.",
+        leftTotals: [14, 22, 30],
+        rightTotals: [7, 12, 17, 22],
+        correct: 22,
+        feedback: {
+          correct: "Yes. 22 appears in both lists.",
+          wrong1: "Look from the top. We want the first total that matches in both lists.",
+          wrong2: "The first common total is the first number you can find in both completed lists."
+        }
+      },
+      {
+        id: "r8",
+        type: "mcq",
+        kicker: "Screen 8",
+        title: "Why can we stop at 22?",
+        help: "Think about the word least.",
+        options: [
+          { id: "even", text: "Because 22 is even" },
+          { id: "first", text: "Because 22 is the first total in both lists" },
+          { id: "bigger", text: "Because 22 is bigger than 17" }
+        ],
+        correct: "first",
+        feedback: {
+          correct: "Yes. The question asks for the least number, so we stop at the first common total.",
+          wrong1: "Least means the smallest correct total.",
+          wrong2: "We stop at 22 because it is the first total that works in both lists."
+        },
+        explanationHTML: `
+          <div class="help-reveal">
+            <h4>Least means smallest.</h4>
+            <p>When you compare the two lists from the top, the <strong>first common total</strong> is the least possible answer.</p>
+          </div>
+        `
+      },
+      {
+        id: "r9",
+        type: "singleinput",
+        kicker: "Screen 9",
+        title: "Type the least number of oranges.",
+        help: "Use the first total that fits both clues.",
+        answer: 22,
+        feedback: {
+          correct: "22 is correct.",
+          wrong1: "Check the first total that appears in both lists.",
+          wrong2: "The least number is the first common total in the two lists."
+        }
+      },
+      {
+        id: "r10",
+        type: "mcq",
+        kicker: "Screen 10",
+        title: "Which strategy fits this kind of question best?",
+        help: "Choose the strategy to remember for a similar problem.",
+        options: [
+          { id: "lists", text: "Make two lists of possible totals and stop at the first common total" },
+          { id: "addall", text: "Add all the numbers in the question" },
+          { id: "bigger", text: "Use only the bigger bag size first" }
+        ],
+        correct: "lists",
+        feedback: {
+          correct: "Yes. That is the strategy to remember.",
+          wrong1: "Think about what helped both clues work at the same time.",
+          wrong2: "A good strategy here is to make possible totals for each clue, compare them, and stop at the first match."
+        },
+        explanationHTML: `
+          <div class="help-reveal">
+            <h4>Strategy check</h4>
+            <p>This kind of problem works well when you:</p>
+            <ul>
+              <li>make possible totals for the first clue</li>
+              <li>make possible totals for the second clue</li>
+              <li>compare the totals and stop at the first match</li>
+            </ul>
+          </div>
+        `
+      }
+    ];
+
+    const state = {
+      screenIndex: 0,
+      questionOpen: false,
+      screenStates: {}
+    };
+
+    const questionPanel = document.getElementById("questionPanel");
+    const questionBox = document.getElementById("questionBox");
+    const toggleQuestionBtn = document.getElementById("toggleQuestionBtn");
+    const readQuestionBtn = document.getElementById("readQuestionBtn");
+    const readPageBtn = document.getElementById("readPageBtn");
+    const stopReadBtn = document.getElementById("stopReadBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const progressBar = document.getElementById("progressBar");
+    const screenKicker = document.getElementById("screenKicker");
+    const screenTitleSubtle = document.getElementById("screenTitleSubtle");
+    const screenCounter = document.getElementById("screenCounter");
+    const actionHeading = document.getElementById("actionHeading");
+    const helpText = document.getElementById("helpText");
+    const responseCard = document.getElementById("responseCard");
+    const visualCard = document.getElementById("visualCard");
+    const feedbackCard = document.getElementById("feedbackCard");
+    const checkBtn = document.getElementById("checkBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const navHint = document.getElementById("navHint");
+
+    questionBox.textContent = questionText;
+
+    function createDefaultScreenState(screen){
+      return {
+        attempts: 0,
+        correct: false,
+        selected: null,
+        inputs: {},
+        inputStatus: {},
+        matchLeft: null,
+        matchRight: null,
+        optionOrder: null,
+        feedbackHTML: null,
+        feedbackClass: "neutral"
+      };
+    }
+
+    function getScreenState(screen){
+      if(!state.screenStates[screen.id]){
+        state.screenStates[screen.id] = createDefaultScreenState(screen);
+      }
+      return state.screenStates[screen.id];
+    }
+
+    function shuffle(arr){
+      const a = [...arr];
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function speak(text){
+      if(!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.95;
+      utter.pitch = 1;
+      utter.lang = "en-SG";
+      window.speechSynthesis.speak(utter);
+    }
+
+    function stopSpeaking(){
+      if("speechSynthesis" in window){
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function bagHTML(count, bagSize){
+      return Array.from({length: count}, () => `
+        <div class="bag" aria-hidden="true">
+          <div class="bag-label">${bagSize}</div>
+        </div>
+      `).join("");
+    }
+
+    function orangeHTML(count){
+      return Array.from({length: count}, (_, i) => `
+        <div class="orange-dot" style="animation-delay:${i * 0.04}s" aria-hidden="true"></div>
+      `).join("");
+    }
+
+    function renderVisual(screen){
+      const sState = getScreenState(screen);
+      const base = [];
+
+      if(screen.id === "r1"){
+        base.push(`
+          <div class="visual-label">Start by finding the goal.</div>
+          <div class="step-strip">
+            <div class="step-card">
+              <div class="num">1</div>
+              <h4>Read both clues</h4>
+              <p>There are 2 packing clues.</p>
+            </div>
+            <div class="step-card">
+              <div class="num">2</div>
+              <h4>Find the goal</h4>
+              <p>We want the least total number of oranges.</p>
+            </div>
+          </div>
+          <div class="math-line">Goal: least total number of oranges</div>
+        `);
+      }
+
+      if(screen.id === "r2"){
+        base.push(`
+          <div class="visual-label">First clue: bags of 8 and 6 left</div>
+          <div class="bag-visual">
+            ${bagHTML(1, 8)}
+            <div class="loose-group">
+              <div class="visual-label">6 loose oranges left</div>
+              <div class="orange-row">${orangeHTML(6)}</div>
+            </div>
+          </div>
+          <div class="math-line">full bags of 8 + 6 left</div>
+        `);
+      }
+
+      if(screen.id === "r3"){
+        base.push(`<div class="visual-label">Possible totals from the first clue</div>`);
+        screen.rows.forEach((row) => {
+          const productId = `${row.id}_product`;
+          const totalId = `${row.id}_total`;
+          const productValue = sState.inputs[productId] || "?";
+          const totalValue = sState.inputs[totalId] || "?";
+          base.push(`
+            <div class="row-card">
+              <div class="row-head">${row.bags} ${row.bags === 1 ? "full bag" : "full bags"} of ${row.bagSize} and ${row.remainder} left</div>
+              <div class="bag-visual">
+                ${bagHTML(row.bags, row.bagSize)}
+                <div class="loose-group">
+                  <div class="visual-label">${row.remainder} loose oranges left</div>
+                  <div class="orange-row">${orangeHTML(row.remainder)}</div>
+                </div>
+              </div>
+              <div class="math-line">Step 1: ${row.bags} × ${row.bagSize} = <strong>${productValue}</strong></div>
+              <div class="math-line">Step 2: ${productValue} + ${row.remainder} = <strong>${totalValue}</strong></div>
+            </div>
+          `);
+        });
+      }
+
+      if(screen.id === "r4"){
+        base.push(`
+          <div class="visual-label">Second clue: bags of 5 and 2 left</div>
+          <div class="bag-visual">
+            ${bagHTML(1, 5)}
+            <div class="loose-group">
+              <div class="visual-label">2 loose oranges left</div>
+              <div class="orange-row">${orangeHTML(2)}</div>
+            </div>
+          </div>
+          <div class="math-line">full bags of 5 + 2 left</div>
+        `);
+      }
+
+      if(screen.id === "r5"){
+        base.push(`<div class="visual-label">Possible totals from the second clue</div>`);
+        screen.rows.forEach((row) => {
+          const productId = `${row.id}_product`;
+          const totalId = `${row.id}_total`;
+          const productValue = sState.inputs[productId] || "?";
+          const totalValue = sState.inputs[totalId] || "?";
+          base.push(`
+            <div class="row-card">
+              <div class="row-head">${row.bags} ${row.bags === 1 ? "full bag" : "full bags"} of ${row.bagSize} and ${row.remainder} left</div>
+              <div class="bag-visual">
+                ${bagHTML(row.bags, row.bagSize)}
+                <div class="loose-group">
+                  <div class="visual-label">${row.remainder} loose oranges left</div>
+                  <div class="orange-row">${orangeHTML(row.remainder)}</div>
+                </div>
+              </div>
+              <div class="math-line">Step 1: ${row.bags} × ${row.bagSize} = <strong>${productValue}</strong></div>
+              <div class="math-line">Step 2: ${productValue} + ${row.remainder} = <strong>${totalValue}</strong></div>
+            </div>
+          `);
+        });
+      }
+
+      if(screen.id === "r6"){
+        base.push(`
+          <div class="visual-label">Now compare the totals</div>
+          <div class="columns">
+            <div class="column-box">
+              <h3>Totals from bags of 8</h3>
+              <div class="chips">
+                <button class="total-chip" type="button" disabled>14</button>
+                <button class="total-chip" type="button" disabled>22</button>
+                <button class="total-chip" type="button" disabled>30</button>
+              </div>
+            </div>
+            <div class="column-box">
+              <h3>Totals from bags of 5</h3>
+              <div class="chips">
+                <button class="total-chip" type="button" disabled>7</button>
+                <button class="total-chip" type="button" disabled>12</button>
+                <button class="total-chip" type="button" disabled>17</button>
+                <button class="total-chip" type="button" disabled>22</button>
+              </div>
+            </div>
+          </div>
+          <div class="math-line">Compare totals with totals</div>
+        `);
+      }
+
+      if(screen.id === "r7"){
+        const leftSelected = sState.matchLeft;
+        const rightSelected = sState.matchRight;
+        const matched = sState.correct;
+        base.push(`
+          <div class="visual-label">Find the first common total</div>
+          <div class="match-grid">
+            <div class="match-column">
+              <h3>Bags of 8 and 6 left</h3>
+              ${screen.leftTotals.map(n => `
+                <button type="button" class="match-chip ${leftSelected === n ? "selected" : ""}" data-role="match-left" data-value="${n}">
+                  ${n}
+                </button>
+              `).join("")}
+            </div>
+            <div class="match-column">
+              <h3>Bags of 5 and 2 left</h3>
+              ${screen.rightTotals.map(n => `
+                <button type="button" class="match-chip ${rightSelected === n ? "selected" : ""}" data-role="match-right" data-value="${n}">
+                  ${n}
+                </button>
+              `).join("")}
+            </div>
+          </div>
+          <div class="match-line ${matched ? "show" : ""}">22 ⟷ 22</div>
+        `);
+      }
+
+      if(screen.id === "r8"){
+        base.push(`
+          <div class="visual-label">Stop at the first match</div>
+          <div class="columns">
+            <div class="column-box">
+              <h3>First list</h3>
+              <div class="chips">
+                <button class="total-chip" type="button" disabled>14</button>
+                <button class="total-chip selected" type="button" disabled>22</button>
+                <button class="total-chip" type="button" disabled>30</button>
+              </div>
+            </div>
+            <div class="column-box">
+              <h3>Second list</h3>
+              <div class="chips">
+                <button class="total-chip" type="button" disabled>7</button>
+                <button class="total-chip" type="button" disabled>12</button>
+                <button class="total-chip" type="button" disabled>17</button>
+                <button class="total-chip selected" type="button" disabled>22</button>
+              </div>
+            </div>
+          </div>
+          ${sState.correct ? `<div class="stop-badge">🛑 Stop here at 22</div>` : `<div class="math-line">Least = first common total</div>`}
+        `);
+      }
+
+      if(screen.id === "r9"){
+        base.push(`
+          <div class="visual-label">Check both clues</div>
+          <div class="badge-row">
+            <div class="check-badge">✅ 22 ÷ 8 leaves 6</div>
+            <div class="check-badge">✅ 22 ÷ 5 leaves 2</div>
+          </div>
+          <div class="math-line">Both clues work for 22.</div>
+        `);
+      }
+
+      if(screen.id === "r10"){
+        base.push(`
+          <div class="visual-label">Strategy to remember</div>
+          <div class="step-strip">
+            <div class="step-card">
+              <div class="num">1</div>
+              <h4>Make totals</h4>
+              <p>Use each clue to make possible total numbers.</p>
+            </div>
+            <div class="step-card">
+              <div class="num">2</div>
+              <h4>Compare</h4>
+              <p>Look for a total that appears in both lists.</p>
+            </div>
+            <div class="step-card">
+              <div class="num">3</div>
+              <h4>Stop</h4>
+              <p>Stop at the first common total. That gives the least answer.</p>
+            </div>
+          </div>
+          ${sState.correct ? `<div class="finish-panel">Well done. You used two clues, built possible totals, compared them, and stopped at the first match.</div>` : ""}
+        `);
+      }
+
+      visualCard.innerHTML = base.join("");
+    }
+
+    function renderResponse(screen){
+      const sState = getScreenState(screen);
+
+      if(screen.type === "mcq"){
+        if(!sState.optionOrder){
+          sState.optionOrder = shuffle(screen.options.map(opt => opt.id));
+        }
+        const orderedOptions = sState.optionOrder.map(id => screen.options.find(opt => opt.id === id));
+        responseCard.innerHTML = `
+          <div class="option-grid" role="radiogroup" aria-label="${escapeHTML(screen.title)}">
+            ${orderedOptions.map(opt => `
+              <button
+                type="button"
+                class="option-card ${sState.selected === opt.id ? "selected" : ""}"
+                data-role="mcq-option"
+                data-option-id="${opt.id}"
+                aria-pressed="${sState.selected === opt.id ? "true" : "false"}">
+                ${escapeHTML(opt.text)}
+              </button>
+            `).join("")}
+          </div>
+          ${screen.explanationHTML && sState.attempts >= 2 && !sState.correct ? screen.explanationHTML : ""}
+        `;
+      }
+
+      if(screen.type === "multiinput"){
+        responseCard.innerHTML = `
+          ${screen.rows.map((row, index) => {
+            const productId = `${row.id}_product`;
+            const totalId = `${row.id}_total`;
+            const productStatus = sState.inputStatus[productId] || "";
+            const totalStatus = sState.inputStatus[totalId] || "";
+            const productValue = sState.inputs[productId] || "";
+            const totalValue = sState.inputs[totalId] || "";
+            const productPreview = productValue || "?";
+            return `
+              <div class="row-card">
+                <div class="row-head">
+                  Row ${index + 1}: ${row.bags} ${row.bags === 1 ? "bag" : "bags"} of ${row.bagSize} and ${row.remainder} left
+                </div>
+                <div class="input-wrap">
+                  <label for="${productId}" class="subtle">First, multiply:</label>
+                  <span class="subtle"><strong>${row.bags} × ${row.bagSize}</strong> =</span>
+                  <input
+                    id="${productId}"
+                    class="number-input ${productStatus}"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    autocomplete="off"
+                    aria-label="Type the multiplication result for row ${index + 1}"
+                    data-role="row-input"
+                    data-input-id="${productId}"
+                    value="${escapeHTML(productValue)}">
+                </div>
+                <div class="input-wrap">
+                  <label for="${totalId}" class="subtle">Then, add ${row.remainder} left:</label>
+                  <span class="subtle"><strong>${productPreview}</strong> + ${row.remainder} =</span>
+                  <input
+                    id="${totalId}"
+                    class="number-input ${totalStatus}"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    autocomplete="off"
+                    aria-label="Type the total for row ${index + 1}"
+                    data-role="row-input"
+                    data-input-id="${totalId}"
+                    value="${escapeHTML(totalValue)}">
+                </div>
+              </div>
+            `;
+          }).join("")}
+          ${screen.helper && sState.attempts >= 2 && !sState.correct ? `
+            <div class="help-reveal">
+              <h4>${screen.helper.title}</h4>
+              ${screen.helper.html}
+            </div>
+          ` : ""}
+        `;
+      }
+
+      if(screen.type === "match"){
+        responseCard.innerHTML = `
+          <p style="margin:0 0 12px; font-size:19px;">Tap one total in each list. Then press <strong>Check</strong>.</p>
+          <div class="subtle">Chosen from first list: <strong>${sState.matchLeft ?? "—"}</strong></div>
+          <div class="subtle">Chosen from second list: <strong>${sState.matchRight ?? "—"}</strong></div>
+        `;
+      }
+
+      if(screen.type === "singleinput"){
+        const value = sState.inputs.answer || "";
+        const status = sState.inputStatus.answer || "";
+        responseCard.innerHTML = `
+          <div class="row-card">
+            <div class="row-head">Least number of oranges</div>
+            <div class="input-wrap">
+              <label for="finalAnswer" class="subtle">Answer:</label>
+              <input
+                id="finalAnswer"
+                class="number-input ${status}"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="off"
+                aria-label="Type the least number of oranges"
+                data-role="final-input"
+                value="${escapeHTML(value)}">
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderFeedback(screen){
+      const sState = getScreenState(screen);
+      feedbackCard.className = `feedback-card ${sState.feedbackClass || "neutral"}`;
+      feedbackCard.innerHTML = sState.feedbackHTML || `Choose an answer, then press <strong style="margin-left:6px;">Check</strong>.`;
+    }
+
+    function render(){
+      const screen = screens[state.screenIndex];
+      const sState = getScreenState(screen);
+      screenKicker.textContent = screen.kicker;
+      screenTitleSubtle.textContent = "Take one clear step at a time.";
+      screenCounter.textContent = `Screen ${state.screenIndex + 1} of ${screens.length}`;
+      actionHeading.textContent = screen.title;
+      helpText.textContent = screen.help;
+      navHint.textContent = "Your action for this screen is shown in the blue box.";
+      progressBar.style.width = `${((state.screenIndex) / (screens.length - 1)) * 100}%`;
+      questionPanel.classList.toggle("show", state.questionOpen);
+      toggleQuestionBtn.textContent = state.questionOpen ? "Hide question" : "Show question";
+      nextBtn.disabled = !sState.correct;
+      nextBtn.textContent = state.screenIndex === screens.length - 1 ? "Done" : "Next";
+      renderVisual(screen);
+      renderResponse(screen);
+      renderFeedback(screen);
+    }
+
+    function setFeedback(html, kind="neutral"){
+      const screen = screens[state.screenIndex];
+      const sState = getScreenState(screen);
+      sState.feedbackHTML = html;
+      sState.feedbackClass = kind;
+      renderFeedback(screen);
+    }
+
+    function checkMCQ(screen){
+      const sState = getScreenState(screen);
+      if(!sState.selected){
+        setFeedback("Choose one answer first.", "neutral");
+        return;
+      }
+      if(sState.selected === screen.correct){
+        sState.correct = true;
+        setFeedback(screen.feedback.correct, "good");
+      } else {
+        sState.attempts += 1;
+        const msg = sState.attempts === 1 ? screen.feedback.wrong1 : screen.feedback.wrong2;
+        setFeedback(msg, "bad");
+      }
+      render();
+    }
+
+    function allDigitsOrBlank(str){
+      return /^[0-9]+$/.test(str);
+    }
+
+    function checkMultiInput(screen){
+      const sState = getScreenState(screen);
+      let allFilled = true;
+      let allCorrect = true;
+      let allProductsCorrect = true;
+      let totalsAreBagOnly = true;
+
+      screen.rows.forEach(row => {
+        const productId = `${row.id}_product`;
+        const totalId = `${row.id}_total`;
+        const rawProduct = String(sState.inputs[productId] || "").trim();
+        const rawTotal = String(sState.inputs[totalId] || "").trim();
+        const productValue = Number(rawProduct);
+        const totalValue = Number(rawTotal);
+        const productAnswer = row.bags * row.bagSize;
+
+        if(!rawProduct || !allDigitsOrBlank(rawProduct)){
+          allFilled = false;
+          allCorrect = false;
+          allProductsCorrect = false;
+          sState.inputStatus[productId] = "";
+        } else if(productValue === productAnswer){
+          sState.inputStatus[productId] = "correct";
+        } else {
+          sState.inputStatus[productId] = "wrong";
+          allCorrect = false;
+          allProductsCorrect = false;
+        }
+
+        if(!rawTotal || !allDigitsOrBlank(rawTotal)){
+          allFilled = false;
+          allCorrect = false;
+          sState.inputStatus[totalId] = "";
+        } else if(totalValue === row.answer){
+          sState.inputStatus[totalId] = "correct";
+        } else {
+          sState.inputStatus[totalId] = "wrong";
+          allCorrect = false;
+        }
+
+        if(totalValue !== productAnswer){
+          totalsAreBagOnly = false;
+        }
+      });
+
+      if(!allFilled){
+        setFeedback("Complete both boxes in every row.", "neutral");
+        render();
+        return;
+      }
+
+      if(allCorrect){
+        sState.correct = true;
+        setFeedback(screen.feedback.correct, "good");
+      } else {
+        sState.attempts += 1;
+        let msg = sState.attempts === 1 ? screen.feedback.wrong1 : screen.feedback.wrong2;
+        if(!allProductsCorrect){
+          msg = "First multiply: number of bags × oranges in each bag. Find the oranges in the full bags before adding the ones left.";
+        } else if(totalsAreBagOnly){
+          msg = "Good multiplying. Now add the loose oranges to each multiplication answer.";
+        }
+        setFeedback(msg, "bad");
+      }
+      render();
+    }
+
+    function checkMatch(screen){
+      const sState = getScreenState(screen);
+      if(sState.matchLeft === null || sState.matchRight === null){
+        setFeedback("Tap one total in each list first.", "neutral");
+        return;
+      }
+      if(sState.matchLeft === screen.correct && sState.matchRight === screen.correct){
+        sState.correct = true;
+        setFeedback(screen.feedback.correct, "good");
+      } else {
+        sState.attempts += 1;
+        const msg = sState.attempts === 1 ? screen.feedback.wrong1 : screen.feedback.wrong2;
+        setFeedback(msg, "bad");
+      }
+      render();
+    }
+
+    function checkSingleInput(screen){
+      const sState = getScreenState(screen);
+      const raw = String(sState.inputs.answer || "").trim();
+      if(!raw || !allDigitsOrBlank(raw)){
+        setFeedback("Type your answer first.", "neutral");
+        render();
+        return;
+      }
+      const value = Number(raw);
+      if(value === screen.answer){
+        sState.correct = true;
+        sState.inputStatus.answer = "correct";
+        setFeedback(screen.feedback.correct, "good");
+      } else {
+        sState.attempts += 1;
+        sState.inputStatus.answer = "wrong";
+        const msg = sState.attempts === 1 ? screen.feedback.wrong1 : screen.feedback.wrong2;
+        setFeedback(msg, "bad");
+      }
+      render();
+    }
+
+    function checkCurrentScreen(){
+      const screen = screens[state.screenIndex];
+      if(screen.type === "mcq") checkMCQ(screen);
+      if(screen.type === "multiinput") checkMultiInput(screen);
+      if(screen.type === "match") checkMatch(screen);
+      if(screen.type === "singleinput") checkSingleInput(screen);
+    }
+
+    document.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-role], #toggleQuestionBtn, #readQuestionBtn, #readPageBtn, #stopReadBtn, #restartBtn, #checkBtn, #nextBtn");
+      if(!target) return;
+
+      const screen = screens[state.screenIndex];
+      const sState = getScreenState(screen);
+
+      if(target.id === "toggleQuestionBtn"){
+        state.questionOpen = !state.questionOpen;
+        questionPanel.classList.toggle("show", state.questionOpen);
+        toggleQuestionBtn.textContent = state.questionOpen ? "Hide question" : "Show question";
+        return;
+      }
+
+      if(target.id === "readQuestionBtn"){
+        speak(questionText);
+        return;
+      }
+
+      if(target.id === "readPageBtn"){
+        const textParts = [screen.title, screen.help];
+        if(state.questionOpen) textParts.push(questionText);
+        const feedbackText = feedbackCard.textContent.trim();
+        if(feedbackText) textParts.push(feedbackText);
+        speak(textParts.join(". "));
+        return;
+      }
+
+      if(target.id === "stopReadBtn"){
+        stopSpeaking();
+        return;
+      }
+
+      if(target.id === "restartBtn"){
+        stopSpeaking();
+        state.screenIndex = 0;
+        state.questionOpen = false;
+        state.screenStates = {};
+        render();
+        return;
+      }
+
+      if(target.id === "checkBtn"){
+        checkCurrentScreen();
+        return;
+      }
+
+      if(target.id === "nextBtn"){
+        if(target.disabled) return;
+        if(state.screenIndex < screens.length - 1){
+          state.screenIndex += 1;
+          render();
+        } else {
+          setFeedback("You have finished this interactive. Press Restart to try again.", "good");
+          progressBar.style.width = "100%";
+        }
+        return;
+      }
+
+      if(target.dataset.role === "mcq-option"){
+        sState.selected = target.dataset.optionId;
+        render();
+        return;
+      }
+
+      if(target.dataset.role === "match-left"){
+        sState.matchLeft = Number(target.dataset.value);
+        render();
+        return;
+      }
+
+      if(target.dataset.role === "match-right"){
+        sState.matchRight = Number(target.dataset.value);
+        render();
+        return;
+      }
+    });
+
+    document.addEventListener("input", (e) => {
+      const target = e.target;
+      const screen = screens[state.screenIndex];
+      const sState = getScreenState(screen);
+
+      if(target.matches("[data-role='row-input']")){
+        sState.inputs[target.dataset.inputId] = target.value.replace(/[^\d]/g, "");
+      }
+
+      if(target.matches("[data-role='final-input']")){
+        sState.inputs.answer = target.value.replace(/[^\d]/g, "");
+      }
+    });
+
+    window.addEventListener("beforeunload", () => {
+      stopSpeaking();
+    });
+
+    render();
+  </script>
+</body>
+</html>
