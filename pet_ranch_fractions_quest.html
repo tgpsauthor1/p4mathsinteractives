@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pet Ranch Fractions Quest</title>
+  <style>
+    :root {
+      --bg: #fff7dc;
+      --card: #ffffff;
+      --ink: #263238;
+      --muted: #5f6b73;
+      --primary: #3366cc;
+      --primary-dark: #244c9c;
+      --good: #16834a;
+      --warn: #b76500;
+      --bad: #b3261e;
+      --soft-blue: #eaf2ff;
+      --soft-green: #e9f8ee;
+      --soft-yellow: #fff4bf;
+      --soft-pink: #ffeaf2;
+      --line: #d7dde4;
+      --shadow: 0 12px 30px rgba(26, 38, 54, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 15%, #fff0a6 0 12%, transparent 13%),
+        radial-gradient(circle at 80% 8%, #d7f5ff 0 10%, transparent 11%),
+        linear-gradient(180deg, #d9f4ff 0%, var(--bg) 50%, #e8f6d1 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button, input, textarea {
+      font-family: inherit;
+      font-size: 18px;
+    }
+
+    .app {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(160deg, #fff, #ffe0a6);
+      border: 4px solid #f2a93b;
+      position: relative;
+      flex: 0 0 auto;
+      box-shadow: 0 5px 0 #cc7e1d;
+    }
+
+    .brand-icon::before,
+    .brand-icon::after {
+      content: "";
+      position: absolute;
+      background: #263238;
+      width: 6px;
+      height: 8px;
+      border-radius: 50%;
+      top: 23px;
+    }
+    .brand-icon::before { left: 19px; }
+    .brand-icon::after { right: 19px; }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.82);
+      border: 2px solid rgba(0,0,0,0.08);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .screen {
+      background: rgba(255,255,255,0.88);
+      border: 3px solid rgba(255,255,255,0.95);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      min-height: 650px;
+      padding: clamp(18px, 3vw, 34px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: auto -20px -48px -20px;
+      height: 120px;
+      background: repeating-linear-gradient(90deg, #9cd970 0 28px, #8acc62 28px 56px);
+      opacity: 0.25;
+      border-radius: 50% 50% 0 0;
+      pointer-events: none;
+    }
+
+    .content { position: relative; z-index: 1; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hero-card, .card {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 24px;
+      padding: clamp(18px, 3vw, 28px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+
+    .hero-card h2, .card h2 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 4vw, 42px);
+    }
+
+    .hero-card p, .card p, li {
+      font-size: 21px;
+      line-height: 1.35;
+    }
+
+    .big-prompt {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin: 10px 0 18px;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 22px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 5px 0 var(--primary-dark);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+      touch-action: manipulation;
+      min-height: 54px;
+    }
+
+    .btn:hover { background: #2b57b1; }
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 var(--primary-dark);
+    }
+    .btn.secondary {
+      background: #ffffff;
+      color: var(--primary-dark);
+      border: 2px solid var(--primary);
+      box-shadow: 0 5px 0 #bdd0ff;
+    }
+    .btn.good { background: var(--good); box-shadow: 0 5px 0 #0b5d32; }
+    .btn.warn { background: #d68600; box-shadow: 0 5px 0 #925600; }
+    .btn.bad { background: var(--bad); box-shadow: 0 5px 0 #7f1710; }
+    .btn:disabled {
+      background: #9aa6b2;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      align-items: center;
+    }
+
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .path-card {
+      background: var(--card);
+      border: 3px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      cursor: pointer;
+      transition: transform 0.1s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      min-height: 270px;
+      touch-action: manipulation;
+    }
+    .path-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 22px rgba(51,102,204,0.2);
+    }
+    .path-card h3 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+    .path-card ul {
+      padding-left: 22px;
+      margin: 12px 0 0;
+    }
+    .path-card li { font-size: 18px; margin: 6px 0; }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .question-card {
+      background: white;
+      border: 2px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      min-height: 420px;
+    }
+
+    .side-card {
+      background: rgba(255,255,255,0.92);
+      border: 2px solid var(--line);
+      border-radius: 24px;
+      padding: 18px;
+      position: sticky;
+      top: 12px;
+    }
+
+    .progress-wrap {
+      background: #edf1f5;
+      border-radius: 999px;
+      height: 22px;
+      overflow: hidden;
+      border: 2px solid #d2d9e0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #65c466, #ffd253);
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+
+    .question-type {
+      display: inline-flex;
+      background: var(--soft-yellow);
+      border: 2px solid #e6c24d;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .math-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      margin: 18px 0;
+    }
+
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      line-height: 1;
+      font-weight: 800;
+      min-width: 32px;
+      margin: 0 2px;
+    }
+    .frac .num, .frac .den {
+      display: block;
+      text-align: center;
+      min-width: 1.3em;
+      padding: 0 4px;
+    }
+    .frac .bar {
+      border-top: 3px solid currentColor;
+      width: 100%;
+      min-width: 1.3em;
+      margin: 3px 0;
+    }
+    .mixed {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      vertical-align: middle;
+    }
+
+    .small-math .frac { font-size: 20px; }
+    .option-card .frac, .answer-display .frac, .feedback .frac { font-size: 24px; }
+
+    .fraction-bars {
+      margin: 18px 0;
+      display: grid;
+      gap: 12px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .bar-label { font-size: 18px; font-weight: 800; }
+    .seg-bar {
+      display: flex;
+      height: 42px;
+      border: 2px solid #263238;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .seg {
+      flex: 1 1 0;
+      border-right: 1px solid #263238;
+      background: #f4f7fb;
+    }
+    .seg:last-child { border-right: 0; }
+    .seg.filled { background: #7acdf0; }
+    .seg.filled.alt { background: #ffaecb; }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .option-card {
+      border: 3px solid var(--line);
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 72px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.08s ease;
+      touch-action: manipulation;
+    }
+    .option-card:hover { border-color: var(--primary); background: var(--soft-blue); }
+    .option-card.selected {
+      border-color: var(--primary-dark);
+      background: #dce9ff;
+      box-shadow: inset 0 0 0 3px #ffffff;
+    }
+    .option-card.correct { border-color: var(--good); background: var(--soft-green); }
+    .option-card.incorrect { border-color: var(--bad); background: #ffebe8; }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+    .answer-input {
+      flex: 1 1 220px;
+      min-height: 58px;
+      border: 3px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .answer-input:focus { outline: 4px solid rgba(51,102,204,0.22); border-color: var(--primary); }
+
+    .hint-box, .feedback, .action-box {
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin: 14px 0;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+    .action-box {
+      background: var(--soft-blue);
+      border: 3px solid #abc8ff;
+      font-weight: 800;
+      font-size: 24px;
+    }
+    .hint-box {
+      background: var(--soft-yellow);
+      border: 2px solid #e4bd3b;
+    }
+    .feedback.good {
+      background: var(--soft-green);
+      border: 3px solid #7ac59a;
+    }
+    .feedback.bad {
+      background: #ffe9e7;
+      border: 3px solid #ef9a95;
+    }
+    .feedback.neutral {
+      background: #f4f7fb;
+      border: 2px solid var(--line);
+    }
+
+    .answer-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 7px 10px;
+      margin: 0 4px;
+      vertical-align: middle;
+    }
+
+    .order-area {
+      display: grid;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .order-picks {
+      min-height: 80px;
+      border: 3px dashed #a9b5c0;
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: #f8fbff;
+    }
+    .pick-label {
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .mini-card {
+      background: #fff;
+      border: 2px solid var(--primary);
+      color: var(--primary-dark);
+      border-radius: 14px;
+      padding: 8px 12px;
+      font-weight: 800;
+      min-width: 72px;
+      text-align: center;
+    }
+
+    .egg-stage {
+      display: grid;
+      place-items: center;
+      min-height: 430px;
+      text-align: center;
+    }
+    .egg {
+      width: 160px;
+      height: 210px;
+      border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+      background: radial-gradient(circle at 38% 24%, #fff 0 8%, transparent 9%), linear-gradient(160deg, #fff9d8, #ffd27a);
+      border: 6px solid #d8942f;
+      box-shadow: 0 18px 0 rgba(0,0,0,0.08), inset -18px -18px 0 rgba(186,117,23,0.12);
+      position: relative;
+      margin: 10px auto 24px;
+    }
+    .egg.shake { animation: eggShake 0.55s ease-in-out infinite; }
+    .egg::after {
+      content: "";
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      top: 95px;
+      height: 22px;
+      background: linear-gradient(135deg, transparent 0 18%, #d8942f 18% 26%, transparent 26% 42%, #d8942f 42% 52%, transparent 52% 67%, #d8942f 67% 75%, transparent 75%);
+      opacity: 0.45;
+    }
+    @keyframes eggShake {
+      0%, 100% { transform: rotate(-3deg) translateY(0); }
+      50% { transform: rotate(4deg) translateY(-8px); }
+    }
+
+    .bird {
+      width: 178px;
+      height: 210px;
+      border-radius: 50% 50% 45% 45% / 58% 58% 42% 42%;
+      background: var(--bird, #ffd369);
+      border: 6px solid rgba(0,0,0,0.16);
+      position: relative;
+      box-shadow: 0 16px 0 rgba(0,0,0,0.08), inset -18px -18px 0 rgba(0,0,0,0.08);
+      animation: popIn 0.6s ease both;
+      margin: 10px auto;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.2) translateY(40px); opacity: 0; }
+      70% { transform: scale(1.12) translateY(-8px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .bird .eye {
+      position: absolute;
+      width: 18px;
+      height: 23px;
+      border-radius: 50%;
+      background: #1f2a30;
+      top: 68px;
+    }
+    .bird .eye.left { left: 52px; }
+    .bird .eye.right { right: 52px; }
+    .bird .eye::after {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 7px;
+      border-radius: 50%;
+      background: white;
+      left: 4px;
+      top: 4px;
+    }
+    .bird .beak {
+      position: absolute;
+      left: 50%;
+      top: 95px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 20px solid #f28f2d;
+    }
+    .bird .wing {
+      position: absolute;
+      width: 48px;
+      height: 64px;
+      background: rgba(255,255,255,0.35);
+      border: 4px solid rgba(0,0,0,0.11);
+      border-radius: 50% 45% 55% 50%;
+      top: 104px;
+    }
+    .bird .wing.left { left: -12px; transform: rotate(25deg); }
+    .bird .wing.right { right: -12px; transform: rotate(-25deg); }
+    .bird .feet {
+      position: absolute;
+      left: 50%;
+      bottom: -19px;
+      width: 86px;
+      height: 24px;
+      transform: translateX(-50%);
+    }
+    .bird .feet::before,
+    .bird .feet::after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 14px;
+      background: #f28f2d;
+      border-radius: 999px;
+      bottom: 0;
+    }
+    .bird .feet::before { left: 4px; transform: rotate(-8deg); }
+    .bird .feet::after { right: 4px; transform: rotate(8deg); }
+    .bird .crown {
+      position: absolute;
+      left: 50%;
+      top: -30px;
+      transform: translateX(-50%);
+      font-size: 36px;
+      filter: drop-shadow(0 3px 0 rgba(0,0,0,0.15));
+    }
+    .bird .sparkle {
+      position: absolute;
+      right: -24px;
+      top: 20px;
+      font-size: 32px;
+      animation: sparkle 1s ease-in-out infinite alternate;
+    }
+    @keyframes sparkle { from { transform: scale(0.8) rotate(-8deg); } to { transform: scale(1.2) rotate(9deg); } }
+
+    .pet-grid, .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .pet-card, .shop-item {
+      background: white;
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      text-align: center;
+    }
+    .pet-mini {
+      width: 90px;
+      height: 110px;
+      transform: scale(0.72);
+      margin: -8px auto -4px;
+    }
+    .shop-item h3, .pet-card h3 { margin: 8px 0; }
+
+    .reflection-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .confetti {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .confetti i {
+      position: absolute;
+      width: 12px;
+      height: 18px;
+      top: -30px;
+      opacity: 0.9;
+      animation: fall 2.2s linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(760px) rotate(360deg); }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    @media (max-width: 850px) {
+      .hero, .quiz-grid, .path-grid {
+        grid-template-columns: 1fr;
+      }
+      .side-card { position: static; }
+      .option-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .pill-row { justify-content: flex-start; }
+      .screen { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true"></div>
+        <div>
+          <h1>Pet Ranch Fractions Quest</h1>
+          <p>Hatch egg-shaped chibi birds with strong fraction thinking.</p>
+        </div>
+      </div>
+      <div class="pill-row" id="statusPills"></div>
+    </div>
+    <main class="screen" id="appScreen" aria-live="polite"></main>
+  </div>
+
+  <script>
+    const root = document.getElementById('appScreen');
+    const statusPills = document.getElementById('statusPills');
+
+    const state = {
+      screen: 'home',
+      path: null,
+      questions: [],
+      current: 0,
+      eggPoints: 0,
+      coins: 0,
+      pets: [],
+      feedback: null,
+      selected: null,
+      order: [],
+      inputValue: '',
+      hintShown: false,
+      tries: 0,
+      wrongStreak: 0,
+      correctStreak: 0,
+      hatchedPet: null,
+      ownedShop: [],
+      reflection: null,
+      showAnswerReview: null
+    };
+
+    const rarityInfo = {
+      Common: { color: '#ffd36b', bonus: '', coins: 10 },
+      Uncommon: { color: '#88d483', bonus: '', coins: 16 },
+      Rare: { color: '#7ec8ff', bonus: 'sparkle', coins: 24 },
+      Epic: { color: '#cda1ff', bonus: 'sparkle', coins: 32 },
+      Legendary: { color: '#ffd159', bonus: 'crown', coins: 45 },
+      Mythical: { color: '#ffa6d5', bonus: 'crownSparkle', coins: 60 }
+    };
+
+    const shopItems = [
+      { id: 'background', name: 'Sunny Ranch Background', cost: 25, icon: '🌈' },
+      { id: 'food', name: 'Tiny Food Bowl', cost: 15, icon: '🥣' },
+      { id: 'toy', name: 'Pet Toy', cost: 20, icon: '🧸' },
+      { id: 'sparkle', name: 'Egg Sparkle Effect', cost: 30, icon: '✨' },
+      { id: 'sign', name: 'Ranch Name Sign', cost: 18, icon: '🪧' },
+      { id: 'flowers', name: 'Flower Patch', cost: 16, icon: '🌼' }
+    ];
+
+    function gcd(a, b) {
+      a = Math.abs(a); b = Math.abs(b);
+      while (b) [a, b] = [b, a % b];
+      return a || 1;
+    }
+
+    function simplify(n, d) {
+      const g = gcd(n, d);
+      d = d || 1;
+      if (d < 0) { n = -n; d = -d; }
+      return { n: n / g, d: d / g };
+    }
+
+    function toImproper(value) {
+      if (typeof value === 'number') return { n: value, d: 1 };
+      const w = value.w || 0;
+      const n = value.n || 0;
+      const d = value.d || 1;
+      return simplify(w * d + n, d);
+    }
+
+    function equivalent(a, b) {
+      const x = simplify(a.n, a.d);
+      const y = simplify(b.n, b.d);
+      return x.n === y.n && x.d === y.d;
+    }
+
+    function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function fracHTML(n, d, label) {
+      const aria = label || `${n} out of ${d}`;
+      return `<span class="frac" role="math" aria-label="${aria}"><span class="num">${n}</span><span class="bar"></span><span class="den">${d}</span></span>`;
+    }
+
+    function mixedHTML(value) {
+      const w = value.w || 0, n = value.n || 0, d = value.d || 1;
+      if (n === 0) return `<span class="whole">${w}</span>`;
+      if (w === 0) return fracHTML(n, d);
+      return `<span class="mixed" aria-label="${w} and ${n} out of ${d}"><span class="whole">${w}</span>${fracHTML(n, d)}</span>`;
+    }
+
+    function displayAnswer(value) {
+      const imp = toImproper(value);
+      if (imp.d === 1) return `<span class="whole">${imp.n}</span>`;
+      const whole = Math.floor(imp.n / imp.d);
+      const rem = imp.n % imp.d;
+      if (whole > 0 && rem > 0) return mixedHTML({ w: whole, n: rem, d: imp.d });
+      return fracHTML(imp.n, imp.d);
+    }
+
+    function rawFractionDisplay(value) {
+      if (!value) return '';
+      if (value.kind === 'mixed') return mixedHTML({ w: value.w, n: value.n, d: value.d });
+      if (value.kind === 'whole') return `<span class="whole">${value.w}</span>`;
+      return fracHTML(value.n, value.d);
+    }
+
+    function parseStudentAnswer(text) {
+      const cleaned = text.trim().replace(/\s+/g, ' ');
+      if (!cleaned) return null;
+      const mixed = cleaned.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+      if (mixed) {
+        const w = Number(mixed[1]), n = Number(mixed[2]), d = Number(mixed[3]);
+        if (d === 0) return null;
+        return { kind: 'mixed', w, n, d, nImp: w * d + n, dImp: d };
+      }
+      const frac = cleaned.match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (frac) {
+        const n = Number(frac[1]), d = Number(frac[2]);
+        if (d === 0) return null;
+        return { kind: 'fraction', n, d, nImp: n, dImp: d };
+      }
+      const whole = cleaned.match(/^\d+$/);
+      if (whole) {
+        const w = Number(cleaned);
+        return { kind: 'whole', w, nImp: w, dImp: 1 };
+      }
+      return null;
+    }
+
+    function answerObjectFromParsed(parsed) {
+      if (!parsed) return null;
+      return { n: parsed.nImp, d: parsed.dImp };
+    }
+
+    function fractionBarsHTML(fractions, caption = 'Fraction parts only') {
+      if (!fractions || !fractions.length) return '';
+      return `<div class="fraction-bars"><div class="subtle" style="font-weight:800;">${caption}</div>${fractions.map((f, idx) => {
+        const segs = Array.from({ length: f.d }, (_, i) => `<span class="seg ${i < f.n ? 'filled' : ''} ${idx % 2 ? 'alt' : ''}"></span>`).join('');
+        return `<div class="bar-row"><div class="bar-label">${fracHTML(f.n, f.d)}</div><div class="seg-bar" aria-label="${f.n} out of ${f.d}">${segs}</div></div>`;
+      }).join('')}</div>`;
+    }
+
+    function makeAddQuestion(level) {
+      const denomPool = level === 'Sprout' ? [2, 3, 4] : level === 'Trail' ? [2, 3, 4, 5, 6] : [3, 4, 5, 6, 8];
+      const d = rand(denomPool);
+      let n1, n2;
+
+      // For Sprout and Trail, avoid immediate regrouping in mixed-number addition.
+      // This keeps the focus on: add wholes, add numerators, keep the denominator.
+      // Summit may include regrouping as a challenge.
+      if (level === 'Summit') {
+        n1 = rand([...Array(d - 1)].map((_, i) => i + 1));
+        n2 = rand([...Array(d - 1)].map((_, i) => i + 1));
+      } else {
+        const possiblePairs = [];
+        for (let a = 1; a < d; a++) {
+          for (let b = 1; b < d; b++) {
+            if (a + b < d) possiblePairs.push([a, b]);
+          }
+        }
+        [n1, n2] = rand(possiblePairs);
+      }
+
+      const w1 = rand(level === 'Sprout' ? [1, 2] : [1, 2, 3]);
+      const w2 = rand(level === 'Sprout' ? [1, 2] : [1, 2, 3]);
+      const wholePart = w1 + w2;
+      const fractionPart = simplify(n1 + n2, d);
+      const correct = simplify((w1 * d + n1) + (w2 * d + n2), d);
+      return {
+        type: 'typed',
+        family: 'addMixed',
+        tag: 'Add mixed numbers',
+        prompt: `Find the sum.`,
+        math: `${mixedHTML({ w: w1, n: n1, d })} <span>+</span> ${mixedHTML({ w: w2, n: n2, d })} <span>=</span>`,
+        correct,
+        wholePart,
+        fractionPart,
+        hint: `This is a mixed-number question. Add the whole numbers first: ${w1} + ${w2}. Then add the fraction parts. The denominator stays the same because the parts are the same size.`,
+        success: `Correct! You added the whole numbers and the fraction parts.`,
+        misconception: `Check whether your answer includes both parts of the mixed numbers: the whole numbers and the fraction parts.`,
+        supportBars: level === 'Sprout' ? [{ n: n1, d }, { n: n2, d }] : []
+      };
+    }
+
+    function makeEquivalentQuestion(level) {
+      const basePool = level === 'Sprout' ? [[1,2], [1,3], [2,3], [1,4]] : [[2,3], [3,5], [4,6], [2,5], [3,4], [5,6]];
+      const [n, d] = rand(basePool);
+      const k = rand(level === 'Sprout' ? [2, 3] : [2, 3, 4]);
+      const newD = d * k;
+      const answer = n * k;
+      return {
+        type: level === 'Summit' ? 'typedNumber' : 'choice',
+        tag: 'Equivalent fractions',
+        prompt: `Complete the equivalent fraction.`,
+        math: `${fracHTML(n, d)} <span>=</span> ${fracHTML('?', newD, `blank out of ${newD}`)}`,
+        correct: { n: answer, d: 1 },
+        correctValue: String(answer),
+        options: shuffle([answer, answer + 1, Math.max(1, answer - 1), n + newD].filter((v, i, a) => a.indexOf(v) === i)).slice(0, 4),
+        hint: `Find what the denominator was multiplied by. Then multiply the numerator by the same number.`,
+        success: `Correct! Equivalent fractions are made by multiplying the numerator and denominator by the same number.`,
+        misconception: `Check the multiplier. The numerator and denominator must be multiplied by the same number.`,
+        supportBars: level === 'Sprout' ? [{ n, d }, { n: answer, d: newD }] : []
+      };
+    }
+
+    function makeCompareQuestion(level) {
+      const numerator = rand(level === 'Sprout' ? [1, 2, 3] : [2, 3, 4, 5]);
+      const denoms = shuffle(level === 'Sprout' ? [4, 5, 6, 8, 10] : [5, 6, 7, 8, 9, 10, 11, 12]).slice(0, 3);
+      const fractions = denoms.map(d => ({ n: numerator, d }));
+      const ask = Math.random() > 0.5 ? 'smallest' : 'greatest';
+      const sorted = [...fractions].sort((a, b) => (a.n / a.d) - (b.n / b.d));
+      const correct = ask === 'smallest' ? sorted[0] : sorted[sorted.length - 1];
+      return {
+        type: 'choiceFraction',
+        tag: 'Compare fractions',
+        prompt: `Which fraction is the ${ask}?`,
+        math: fractions.map(f => fracHTML(f.n, f.d)).join('<span>,</span>'),
+        fractions,
+        options: shuffle(fractions),
+        correct,
+        hint: `The numerators are the same. Compare the denominators. A larger denominator means each equal part is smaller.`,
+        success: `Correct! When the numerators are the same, the denominator tells you the size of each part.`,
+        misconception: `Look carefully: a bigger denominator does not always mean a bigger fraction when the numerators are the same.`,
+        supportBars: level !== 'Summit' ? fractions : []
+      };
+    }
+
+    function makeOrderQuestion(level) {
+      const numerator = rand(level === 'Sprout' ? [1, 2, 3] : [2, 3, 4, 5]);
+      const denoms = shuffle(level === 'Sprout' ? [4, 5, 6, 8] : [4, 5, 6, 7, 8, 9, 10, 11]).slice(0, 3);
+      const fractions = denoms.map(d => ({ n: numerator, d }));
+      const correctOrder = [...fractions].sort((a, b) => (a.n / a.d) - (b.n / b.d));
+      return {
+        type: 'order',
+        tag: 'Increasing order',
+        prompt: `Tap the fractions from smallest to greatest.`,
+        math: fractions.map(f => fracHTML(f.n, f.d)).join('<span>,</span>'),
+        options: shuffle(fractions),
+        correctOrder,
+        hint: `Increasing order means smallest to greatest. With the same numerator, the fraction with the larger denominator is smaller.`,
+        success: `Correct! You arranged the fractions from smallest to greatest.`,
+        misconception: `Check the first fraction. Increasing order starts with the smallest fraction.`,
+        supportBars: level === 'Sprout' ? fractions : []
+      };
+    }
+
+    function makeTrueFalseQuestion(level) {
+      const templates = [
+        {
+          statement: () => `If two fractions have the same numerator, the fraction with the larger denominator is smaller.`,
+          answer: true,
+          why: `Correct. The denominator tells how many equal parts the whole is split into. More equal parts means each part is smaller.`
+        },
+        {
+          statement: () => `If two fractions have the same numerator, the fraction with the larger denominator is always greater.`,
+          answer: false,
+          why: `Correct. With the same numerator, a larger denominator means smaller equal parts, so the fraction is smaller.`
+        },
+        {
+          statement: () => `Equivalent fractions are made by multiplying or dividing the numerator and denominator by the same number.`,
+          answer: true,
+          why: `Correct. The value stays the same because both the numerator and denominator change by the same factor.`
+        },
+        {
+          statement: () => `When adding fractions with like denominators, add the denominators too.`,
+          answer: false,
+          why: `Correct. The denominator stays the same because the size of the parts does not change.`
+        }
+      ];
+      const t = rand(templates);
+      return {
+        type: 'truefalse',
+        tag: 'True or false',
+        prompt: `Decide whether the statement is true or false.`,
+        math: `<span style="font-size: 0.72em; font-weight: 800; line-height: 1.25;">${t.statement()}</span>`,
+        correctBool: t.answer,
+        hint: `Think about what the numerator and denominator mean. Does the statement match the fraction idea?`,
+        success: t.why,
+        misconception: `Read the statement again and test it with a simple fraction bar.`,
+        supportBars: level === 'Sprout' ? [{ n: 1, d: 3 }, { n: 1, d: 6 }] : []
+      };
+    }
+
+    function makeErrorQuestion(level) {
+      const q = rand([
+        {
+          prompt: `A student says ${fracHTML(4, 11)} is greater than ${fracHTML(4, 5)} because 11 is greater than 5. What is the mistake?`,
+          correctId: 'parts',
+          options: [
+            { id: 'parts', text: `The numerators are the same, so the larger denominator means smaller equal parts.` },
+            { id: 'add', text: `The student should add the denominators first.` },
+            { id: 'same', text: `The fractions are equivalent because they both have numerator 4.` },
+            { id: 'none', text: `There is no mistake.` }
+          ],
+          hint: `The numerator is the same in both fractions. Focus on the size of each equal part.`
+        },
+        {
+          prompt: `A student changes ${fracHTML(2, 3)} to ${fracHTML(4, 3)} and says it is equivalent. What is the mistake?`,
+          correctId: 'both',
+          options: [
+            { id: 'both', text: `Only the numerator changed. For equivalent fractions, the numerator and denominator must change by the same factor.` },
+            { id: 'denom', text: `Only the denominator should change.` },
+            { id: 'smaller', text: `The new fraction must always be smaller.` },
+            { id: 'none', text: `There is no mistake.` }
+          ],
+          hint: `For equivalent fractions, check whether both parts of the fraction changed in the same way.`
+        },
+        {
+          prompt: `A student adds ${mixedHTML({w:1,n:1,d:2})} + ${mixedHTML({w:2,n:1,d:2})} and writes ${mixedHTML({w:3,n:2,d:4})}. What should the student check?`,
+          correctId: 'denominator',
+          options: [
+            { id: 'denominator', text: `When adding like denominators, the denominator should stay the same.` },
+            { id: 'whole', text: `The whole numbers should not be added.` },
+            { id: 'multiply', text: `The student should multiply all the numbers.` },
+            { id: 'none', text: `There is no mistake.` }
+          ],
+          hint: `The fractions have the same denominator. Think about whether the size of each part changes.`
+        }
+      ]);
+      return {
+        type: level === 'Summit' ? 'choice' : 'choiceText',
+        tag: 'Spot the mistake',
+        prompt: q.prompt,
+        math: '',
+        options: shuffle(q.options),
+        correctId: q.correctId,
+        hint: q.hint,
+        success: `Correct! You found the hidden misconception.`,
+        misconception: `Look at what changed and what stayed the same. Then match the explanation to the fraction idea.`,
+        supportBars: []
+      };
+    }
+
+    function makeCreateQuestion() {
+      return {
+        type: 'create',
+        tag: 'Ranch Boss Challenge',
+        prompt: `Create 3 fractions with the same numerator. Put them in increasing order.`,
+        math: '',
+        hint: `Use the same numerator for all 3 fractions. For increasing order, start with the smallest fraction.`,
+        success: `Great reasoning! You created fractions and explained the order.`,
+        misconception: `Check that all 3 fractions have the same numerator, then compare the denominators.`
+      };
+    }
+
+    function generateQuestions(path) {
+      const makers = path === 'Sprout'
+        ? [makeCompareQuestion, makeEquivalentQuestion, makeAddQuestion, makeOrderQuestion, makeTrueFalseQuestion]
+        : path === 'Trail'
+          ? [makeAddQuestion, makeEquivalentQuestion, makeCompareQuestion, makeOrderQuestion, makeErrorQuestion]
+          : [makeEquivalentQuestion, makeCompareQuestion, makeOrderQuestion, makeErrorQuestion, makeAddQuestion];
+      return makers.map(fn => fn(path));
+    }
+
+    function updateStatus() {
+      const path = state.path ? `<span class="pill">Path: ${state.path}</span>` : '';
+      const progress = state.questions.length ? `<span class="pill">Question: ${Math.min(state.current + 1, state.questions.length)} / ${state.questions.length}</span>` : '';
+      statusPills.innerHTML = `${path}${progress}<span class="pill">Egg points: ${state.eggPoints}</span><span class="pill">Coins: ${state.coins}</span><span class="pill">Pets: ${state.pets.length}</span>`;
+    }
+
+    function render() {
+      updateStatus();
+      const map = {
+        home: renderHome,
+        path: renderPath,
+        quiz: renderQuiz,
+        hatch: renderHatch,
+        ranch: renderRanch,
+        shop: renderShop,
+        reflection: renderReflection,
+        finish: renderFinish
+      };
+      root.innerHTML = map[state.screen]();
+      if (state.screen === 'hatch') setTimeout(() => root.classList.add('hatching'), 10);
+    }
+
+    function renderHome() {
+      return `<div class="content hero">
+        <section class="hero-card">
+          <h2>Hatch birds with fraction thinking!</h2>
+          <p class="big-prompt">Answer 5 fraction questions to earn an egg. Hatch the egg to collect a cute egg-shaped chibi bird for your ranch.</p>
+          <p>Fractions are shown properly with the numerator above the line and the denominator below the line. When reading fractions, use “out of” language.</p>
+          <div class="button-row"><button class="btn" data-action="goPath">Start quest</button></div>
+        </section>
+        <section class="card" aria-hidden="true">
+          ${birdHTML('Rare', 'large')}
+          <h2 style="text-align:center; margin-top: 18px;">Your first egg is waiting!</h2>
+        </section>
+      </div>`;
+    }
+
+    function renderPath() {
+      return `<div class="content">
+        <div class="card" style="margin-bottom: 18px;">
+          <h2>Choose your quest path</h2>
+          <p>Pick the path that gives you the right amount of help today. Every path can hatch an egg.</p>
+        </div>
+        <div class="path-grid">
+          <div class="path-card" data-action="startPath" data-path="Sprout" tabindex="0" role="button">
+            <h3>🌱 Sprout Path</h3>
+            <p>More help and more visuals.</p>
+            <ul><li>Fraction bars</li><li>Small steps</li><li>More choices</li><li>Helper hints</li></ul>
+          </div>
+          <div class="path-card" data-action="startPath" data-path="Trail" tabindex="0" role="button">
+            <h3>🏞️ Trail Path</h3>
+            <p>Balanced practice.</p>
+            <ul><li>Some hints</li><li>Some visuals</li><li>Choices and typing</li><li>One explanation</li></ul>
+          </div>
+          <div class="path-card" data-action="startPath" data-path="Summit" tabindex="0" role="button">
+            <h3>⛰️ Summit Path</h3>
+            <p>More reasoning and challenge.</p>
+            <ul><li>Fewer hints</li><li>Error analysis</li><li>Missing numbers</li><li>Boss challenge</li></ul>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function renderQuiz() {
+      const q = state.questions[state.current];
+      const pct = Math.round((state.current / state.questions.length) * 100);
+      return `<div class="content quiz-grid">
+        <section class="question-card">
+          <span class="question-type">${q.tag}</span>
+          <div class="action-box">${q.prompt}</div>
+          ${q.math ? `<div class="math-line">${q.math}</div>` : ''}
+          ${q.supportBars && q.supportBars.length ? fractionBarsHTML(q.supportBars, q.family === 'addMixed' ? 'Fraction parts only — remember to add the whole numbers too' : 'Fraction bars') : ''}
+          ${renderQuestionInteraction(q)}
+          ${state.hintShown ? `<div class="hint-box"><strong>Helper Pet Hint:</strong> ${q.hint}</div>` : ''}
+          ${state.feedback ? renderFeedback(state.feedback) : ''}
+        </section>
+        <aside class="side-card">
+          <h2 style="font-size:26px; margin-top:0;">Egg progress</h2>
+          <div class="progress-wrap" aria-label="Egg progress"><div class="progress-bar" style="width:${pct}%;"></div></div>
+          <p><strong>${state.current}</strong> of <strong>${state.questions.length}</strong> questions completed.</p>
+          <p><strong>Egg points:</strong> ${state.eggPoints}</p>
+          <p class="subtle">First try = 2 points. After a hint = 1 point. Everyone hatches an egg after 5 completed questions.</p>
+          <div class="button-row"><button class="btn secondary" data-action="hint">Hint</button></div>
+        </aside>
+      </div>`;
+    }
+
+    function renderQuestionInteraction(q) {
+      if (q.type === 'typed') {
+        return `<div class="input-row">
+          <input class="answer-input" id="answerInput" value="${escapeHTML(state.inputValue)}" data-role="answerInput" placeholder="Type with slash if needed, then check" />
+          <button class="btn" data-action="checkTyped">Check</button>
+        </div>
+        <p class="subtle">You may type with a slash, such as 7/5. After checking, your answer will be shown as a proper vertical fraction.</p>`;
+      }
+      if (q.type === 'typedNumber') {
+        return `<div class="input-row">
+          <input class="answer-input" id="answerInput" value="${escapeHTML(state.inputValue)}" data-role="answerInput" placeholder="Type the missing numerator" />
+          <button class="btn" data-action="checkTypedNumber">Check</button>
+        </div>`;
+      }
+      if (q.type === 'choiceFraction') {
+        return `<div class="option-grid">${q.options.map((f, i) => optionCard(i, fracHTML(f.n, f.d))).join('')}</div>
+        <button class="btn" data-action="checkChoiceFraction">Check</button>`;
+      }
+      if (q.type === 'choice') {
+        if (q.correctValue) {
+          return `<div class="option-grid">${q.options.map((v, i) => optionCard(i, String(v))).join('')}</div>
+          <button class="btn" data-action="checkChoiceValue">Check</button>`;
+        }
+        return `<div class="option-grid">${q.options.map((o, i) => optionCard(i, o.text)).join('')}</div>
+        <button class="btn" data-action="checkChoiceId">Check</button>`;
+      }
+      if (q.type === 'choiceText') {
+        return `<div class="option-grid">${q.options.map((o, i) => optionCard(i, o.text)).join('')}</div>
+        <button class="btn" data-action="checkChoiceId">Check</button>`;
+      }
+      if (q.type === 'truefalse') {
+        return `<div class="option-grid">
+          ${optionCard('true', 'True')}
+          ${optionCard('false', 'False')}
+        </div>
+        <button class="btn" data-action="checkTrueFalse">Check</button>`;
+      }
+      if (q.type === 'order') {
+        const available = q.options.map((f, i) => ({...f, originalIndex: i})).filter((_, i) => !state.order.includes(i));
+        return `<div class="order-area">
+          <div class="order-picks"><span class="pick-label">Your order:</span>${state.order.length ? state.order.map(i => `<span class="mini-card">${fracHTML(q.options[i].n, q.options[i].d)}</span>`).join('') : '<span class="subtle">Tap a fraction below.</span>'}</div>
+          <div class="option-grid">${q.options.map((f, i) => `<div class="option-card ${state.order.includes(i) ? 'selected' : ''}" data-action="pickOrder" data-index="${i}" tabindex="0" role="button">${fracHTML(f.n, f.d)}</div>`).join('')}</div>
+          <div class="button-row"><button class="btn secondary" data-action="resetOrder">Reset order</button><button class="btn" data-action="checkOrder">Check</button></div>
+        </div>`;
+      }
+      if (q.type === 'create') {
+        return `<textarea class="answer-input" style="width:100%; min-height:130px;" data-role="answerInput" placeholder="Type your three fractions and explanation. You may type fractions with a slash; after checking, I will show typed fractions properly.">${escapeHTML(state.inputValue)}</textarea>
+        <div class="button-row"><button class="btn" data-action="checkCreate">Check my challenge</button></div>`;
+      }
+      return '';
+    }
+
+    function optionCard(value, html) {
+      return `<div class="option-card ${String(state.selected) === String(value) ? 'selected' : ''}" data-action="select" data-value="${value}" tabindex="0" role="button">${html}</div>`;
+    }
+
+    function renderFeedback(fb) {
+      const cls = fb.good ? 'good' : fb.bad ? 'bad' : 'neutral';
+      return `<div class="feedback ${cls}">${fb.html}
+        ${fb.showNext ? `<div class="button-row"><button class="btn good" data-action="nextQuestion">${state.current + 1 >= state.questions.length ? 'Hatch egg' : 'Next question'}</button></div>` : ''}
+      </div>`;
+    }
+
+    function renderHatch() {
+      const pet = state.hatchedPet;
+      const points = state.eggPoints;
+      return `<div class="content egg-stage">
+        <div>
+          <h2 style="font-size:42px;">Your egg is hatching!</h2>
+          <p class="big-prompt">Egg points: ${points}</p>
+          ${pet ? birdHTML(pet.rarity) : '<div class="egg shake"></div>'}
+          <p style="font-size:26px; font-weight:800;">${pet ? `You hatched a ${pet.rarity} bird!` : 'Tap to reveal your egg-shaped chibi bird.'}</p>
+          <div class="button-row" style="justify-content:center;">
+            ${pet ? `<button class="btn good" data-action="goRanch">Place bird in ranch</button>` : `<button class="btn warn" data-action="revealPet">Hatch egg</button>`}
+          </div>
+        </div>
+        <div class="confetti">${pet ? confettiHTML() : ''}</div>
+      </div>`;
+    }
+
+    function renderRanch() {
+      return `<div class="content">
+        <div class="card">
+          <h2>Your Pet Ranch</h2>
+          <p>Tap a bird to collect a few coins. Then finish with a quick reflection.</p>
+          <div class="button-row"><button class="btn secondary" data-action="goShop">Visit shop</button><button class="btn" data-action="goReflection">Finish quest</button><button class="btn secondary" data-action="playAgain">Hatch another egg</button></div>
+        </div>
+        <div class="pet-grid">
+          ${state.pets.length ? state.pets.map((p, i) => `<div class="pet-card"><div data-action="collectPet" data-index="${i}">${birdHTML(p.rarity, 'mini')}</div><h3>${p.rarity} bird</h3><p class="subtle">Tap to collect coins.</p></div>`).join('') : '<div class="card"><p>No pets yet.</p></div>'}
+        </div>
+      </div>`;
+    }
+
+    function renderShop() {
+      return `<div class="content">
+        <div class="card">
+          <h2>Ranch Shop</h2>
+          <p>Spend coins on simple decorations. The shop is for fun; the maths quest is still the main activity.</p>
+          <div class="button-row"><button class="btn secondary" data-action="goRanch">Back to ranch</button></div>
+        </div>
+        <div class="shop-grid">
+          ${shopItems.map(item => {
+            const owned = state.ownedShop.includes(item.id);
+            const canBuy = state.coins >= item.cost && !owned;
+            return `<div class="shop-item"><div style="font-size:48px;">${item.icon}</div><h3>${item.name}</h3><p><strong>${item.cost}</strong> coins</p><button class="btn ${owned ? 'good' : 'secondary'}" data-action="buyItem" data-id="${item.id}" ${canBuy ? '' : 'disabled'}>${owned ? 'Owned' : 'Buy'}</button></div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    function renderReflection() {
+      const choices = [
+        'adding mixed numbers',
+        'making equivalent fractions',
+        'comparing fractions',
+        'explaining my fraction thinking'
+      ];
+      return `<div class="content hero">
+        <section class="hero-card">
+          <h2>Final reflection</h2>
+          <p class="big-prompt">Today I became better at…</p>
+          <div class="reflection-grid">
+            ${choices.map((c, i) => `<div class="option-card ${state.reflection === c ? 'selected' : ''}" data-action="selectReflection" data-value="${escapeHTML(c)}">${String.fromCharCode(65+i)}. ${c}</div>`).join('')}
+          </div>
+          <div class="button-row"><button class="btn good" data-action="finish" ${state.reflection ? '' : 'disabled'}>Finish</button></div>
+        </section>
+        <section class="card">${state.pets[0] ? birdHTML(state.pets[state.pets.length - 1].rarity) : birdHTML('Common')}<h2 style="text-align:center;">Your ranch grows when your fraction thinking grows!</h2></section>
+      </div>`;
+    }
+
+    function renderFinish() {
+      return `<div class="content hero">
+        <section class="hero-card">
+          <h2>Quest complete!</h2>
+          <p class="big-prompt">Your ranch grew because your fraction thinking grew.</p>
+          <p>You earned <strong>${state.coins}</strong> coins and collected <strong>${state.pets.length}</strong> bird${state.pets.length === 1 ? '' : 's'}.</p>
+          <p><strong>Your reflection:</strong> I became better at ${state.reflection}.</p>
+          <div class="button-row"><button class="btn" data-action="playAgain">Play another round</button><button class="btn secondary" data-action="goRanch">Visit ranch</button></div>
+        </section>
+        <section class="card">${state.pets.length ? birdHTML(state.pets[state.pets.length - 1].rarity) : birdHTML('Common')}</section>
+      </div>`;
+    }
+
+    function birdHTML(rarity = 'Common', size = 'large') {
+      const info = rarityInfo[rarity] || rarityInfo.Common;
+      const miniClass = size === 'mini' ? ' pet-mini' : '';
+      const extras = info.bonus === 'crown' ? '<div class="crown">👑</div>' : info.bonus === 'crownSparkle' ? '<div class="crown">👑</div><div class="sparkle">✨</div>' : info.bonus === 'sparkle' ? '<div class="sparkle">✨</div>' : '';
+      return `<div class="bird${miniClass}" style="--bird:${info.color};" aria-label="${rarity} egg-shaped chibi bird">
+        ${extras}<div class="eye left"></div><div class="eye right"></div><div class="beak"></div><div class="wing left"></div><div class="wing right"></div><div class="feet"></div>
+      </div>`;
+    }
+
+    function confettiHTML() {
+      const colors = ['#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40'];
+      return Array.from({ length: 45 }, (_, i) => `<i style="left:${Math.random()*100}%; background:${colors[i % colors.length]}; animation-delay:${Math.random()*0.55}s;"></i>`).join('');
+    }
+
+    function getRarity(points) {
+      if (points >= 10) return Math.random() < 0.4 ? 'Mythical' : 'Legendary';
+      if (points >= 9) return Math.random() < 0.5 ? 'Legendary' : 'Epic';
+      if (points >= 7) return 'Rare';
+      if (points >= 6) return 'Uncommon';
+      return 'Common';
+    }
+
+    function saveInputFromDom() {
+      const input = root.querySelector('[data-role="answerInput"]');
+      if (input) state.inputValue = input.value;
+    }
+
+    function selectOption(value) {
+      state.selected = value;
+      state.feedback = null;
+      render();
+    }
+
+    function checkTyped() {
+      saveInputFromDom();
+      const q = state.questions[state.current];
+      const parsed = parseStudentAnswer(state.inputValue);
+      if (!parsed) {
+        state.feedback = { bad: true, html: `I could not read that answer. Try typing a whole number, a fraction, or a mixed number. For typing only, you may use a slash.` };
+        render(); return;
+      }
+      const shown = rawFractionDisplay(parsed);
+      const entered = answerObjectFromParsed(parsed);
+
+      if (equivalent(entered, q.correct)) {
+        correctFeedback(`${q.success}<br><br>You entered: <span class="answer-display">${shown}</span>`);
+        return;
+      }
+
+      // Targeted feedback for a common mixed-number addition error:
+      // students add only the fractional parts and forget the whole numbers.
+      if (q.family === 'addMixed' && q.fractionPart && equivalent(entered, q.fractionPart)) {
+        wrongFeedback(`You added only the fraction parts: <span class="answer-display">${shown}</span>.<br><br>This is a mixed-number sum, so you also need the whole-number part: <strong>${q.wholePart}</strong>.<br><br>Now combine the whole-number part and the fraction part.`);
+        return;
+      }
+
+      wrongFeedback(`${q.misconception}<br><br>You entered: <span class="answer-display">${shown}</span>`);
+    }
+
+    function checkTypedNumber() {
+      saveInputFromDom();
+      const q = state.questions[state.current];
+      const val = state.inputValue.trim();
+      if (!/^\d+$/.test(val)) {
+        state.feedback = { bad: true, html: `Type the missing numerator as a whole number.` };
+        render(); return;
+      }
+      if (val === q.correctValue) correctFeedback(`${q.success}<br><br>Your missing numerator is <span class="answer-display">${val}</span>.`);
+      else wrongFeedback(`${q.misconception}<br><br>You entered <span class="answer-display">${val}</span>.`);
+    }
+
+    function checkChoiceValue() {
+      const q = state.questions[state.current];
+      if (state.selected === null) { needSelect(); return; }
+      const selectedValue = q.options[Number(state.selected)];
+      if (String(selectedValue) === String(q.correctValue)) correctFeedback(`${q.success}<br><br>Your missing numerator is <span class="answer-display">${selectedValue}</span>.`);
+      else wrongFeedback(`${q.misconception}<br><br>You chose <span class="answer-display">${selectedValue}</span>.`);
+    }
+
+    function checkChoiceFraction() {
+      const q = state.questions[state.current];
+      if (state.selected === null) { needSelect(); return; }
+      const f = q.options[Number(state.selected)];
+      if (f.n === q.correct.n && f.d === q.correct.d) correctFeedback(`${q.success}<br><br>You chose: <span class="answer-display">${fracHTML(f.n, f.d)}</span>`);
+      else wrongFeedback(`${q.misconception}<br><br>You chose: <span class="answer-display">${fracHTML(f.n, f.d)}</span>`);
+    }
+
+    function checkChoiceId() {
+      const q = state.questions[state.current];
+      if (state.selected === null) { needSelect(); return; }
+      const option = q.options[Number(state.selected)];
+      if (option.id === q.correctId) correctFeedback(`${q.success}`);
+      else wrongFeedback(`${q.misconception}`);
+    }
+
+    function checkTrueFalse() {
+      const q = state.questions[state.current];
+      if (state.selected === null) { needSelect(); return; }
+      const picked = state.selected === 'true';
+      if (picked === q.correctBool) correctFeedback(q.success);
+      else wrongFeedback(q.misconception);
+    }
+
+    function checkOrder() {
+      const q = state.questions[state.current];
+      if (state.order.length !== q.options.length) {
+        state.feedback = { bad: true, html: `Tap all the fractions to make your order from smallest to greatest.` };
+        render(); return;
+      }
+      const picked = state.order.map(i => q.options[i]);
+      const ok = picked.every((f, i) => f.n === q.correctOrder[i].n && f.d === q.correctOrder[i].d);
+      const pickedHTML = picked.map(f => fracHTML(f.n, f.d)).join('<span>,</span>');
+      if (ok) correctFeedback(`${q.success}<br><br>Your order: <span class="answer-display">${pickedHTML}</span>`);
+      else wrongFeedback(`${q.misconception}<br><br>Your order: <span class="answer-display">${pickedHTML}</span>`);
+    }
+
+    function checkCreate() {
+      saveInputFromDom();
+      const parsed = extractFractions(state.inputValue);
+      if (parsed.length < 3) {
+        state.feedback = { bad: true, html: `Try to include 3 fractions. You may type them with a slash, and I will display them properly.` };
+        render(); return;
+      }
+      const sameNumerator = parsed.slice(0,3).every(f => f.n === parsed[0].n);
+      const display = parsed.slice(0,3).map(f => fracHTML(f.n, f.d)).join('<span>,</span>');
+      if (!sameNumerator) {
+        state.feedback = { bad: true, html: `Check that all 3 fractions have the same numerator.<br><br>You entered: <span class="answer-display">${display}</span>` };
+        render(); return;
+      }
+      correctFeedback(`Great! Your fractions have the same numerator.<br><br>You entered: <span class="answer-display">${display}</span><br><br>Now remember: for the same numerator, the larger denominator gives the smaller fraction.`);
+    }
+
+    function extractFractions(text) {
+      const found = [];
+      const re = /(\d+)\s*\/\s*(\d+)/g;
+      let match;
+      while ((match = re.exec(text)) !== null) {
+        const n = Number(match[1]), d = Number(match[2]);
+        if (d !== 0) found.push({ n, d });
+      }
+      return found;
+    }
+
+    function needSelect() {
+      state.feedback = { bad: true, html: `Choose an answer first, then press Check.` };
+      render();
+    }
+
+    function correctFeedback(html) {
+      const points = state.hintShown || state.tries > 0 ? 1 : 2;
+      state.eggPoints += points;
+      state.correctStreak += 1;
+      state.wrongStreak = 0;
+      state.feedback = { good: true, showNext: true, html: `${html}<br><br>+${points} egg point${points === 1 ? '' : 's'}!` };
+      render();
+    }
+
+    function wrongFeedback(html) {
+      state.tries += 1;
+      state.wrongStreak += 1;
+      state.correctStreak = 0;
+      let helper = '';
+      if (state.wrongStreak >= 2) helper = `<br><br><strong>Helper Pet Hint unlocked:</strong> Slow down and point to the numerator first, then the denominator. Ask, “What does each number mean?”`;
+      state.feedback = { bad: true, html: `${html}<br><br>Try → check → refine. Use the hint if you need it.${helper}` };
+      render();
+    }
+
+    function nextQuestion() {
+      state.current += 1;
+      state.feedback = null;
+      state.selected = null;
+      state.order = [];
+      state.inputValue = '';
+      state.hintShown = false;
+      state.tries = 0;
+      if (state.current >= state.questions.length) state.screen = 'hatch';
+      render();
+    }
+
+    function startPath(path) {
+      state.path = path;
+      state.questions = generateQuestions(path);
+      if (path === 'Summit') state.questions.push(makeCreateQuestion());
+      state.current = 0;
+      state.eggPoints = 0;
+      state.feedback = null;
+      state.selected = null;
+      state.order = [];
+      state.inputValue = '';
+      state.hintShown = false;
+      state.tries = 0;
+      state.wrongStreak = 0;
+      state.correctStreak = 0;
+      state.hatchedPet = null;
+      state.screen = 'quiz';
+      render();
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[ch]));
+    }
+
+    root.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+      const action = target.dataset.action;
+
+      if (action === 'goPath') { state.screen = 'path'; render(); }
+      if (action === 'startPath') startPath(target.dataset.path);
+      if (action === 'select') selectOption(target.dataset.value);
+      if (action === 'hint') { state.hintShown = true; state.feedback = null; render(); }
+      if (action === 'checkTyped') checkTyped();
+      if (action === 'checkTypedNumber') checkTypedNumber();
+      if (action === 'checkChoiceValue') checkChoiceValue();
+      if (action === 'checkChoiceFraction') checkChoiceFraction();
+      if (action === 'checkChoiceId') checkChoiceId();
+      if (action === 'checkTrueFalse') checkTrueFalse();
+      if (action === 'pickOrder') {
+        const idx = Number(target.dataset.index);
+        if (!state.order.includes(idx)) state.order.push(idx);
+        state.feedback = null;
+        render();
+      }
+      if (action === 'resetOrder') { state.order = []; state.feedback = null; render(); }
+      if (action === 'checkOrder') checkOrder();
+      if (action === 'checkCreate') checkCreate();
+      if (action === 'nextQuestion') nextQuestion();
+      if (action === 'revealPet') {
+        const rarity = getRarity(state.eggPoints);
+        const pet = { rarity, id: Date.now() };
+        state.hatchedPet = pet;
+        state.pets.push(pet);
+        state.coins += rarityInfo[rarity].coins;
+        render();
+      }
+      if (action === 'goRanch') { state.screen = 'ranch'; render(); }
+      if (action === 'goShop') { state.screen = 'shop'; render(); }
+      if (action === 'buyItem') {
+        const id = target.dataset.id;
+        const item = shopItems.find(x => x.id === id);
+        if (item && state.coins >= item.cost && !state.ownedShop.includes(id)) {
+          state.coins -= item.cost;
+          state.ownedShop.push(id);
+          render();
+        }
+      }
+      if (action === 'collectPet') {
+        state.coins += 2;
+        target.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 250 });
+        updateStatus();
+      }
+      if (action === 'goReflection') { state.screen = 'reflection'; render(); }
+      if (action === 'selectReflection') { state.reflection = target.dataset.value; render(); }
+      if (action === 'finish') { state.screen = 'finish'; render(); }
+      if (action === 'playAgain') { state.screen = 'path'; render(); }
+    });
+
+    root.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-action]')) {
+        e.preventDefault();
+        e.target.click();
+      }
+      if (e.key === 'Enter' && e.target.matches('[data-role="answerInput"]')) {
+        const q = state.questions[state.current];
+        if (!q) return;
+        if (q.type === 'typed') checkTyped();
+        if (q.type === 'typedNumber') checkTypedNumber();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
